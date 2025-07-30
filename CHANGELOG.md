@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-alpha.2 (2025-07-30)
+
+Full Changelog: [v0.1.0-alpha.1...v0.1.0-alpha.2](https://github.com/dedalus-labs/dedalus-sdk-go/compare/v0.1.0-alpha.1...v0.1.0-alpha.2)
+
+### Features
+
+* **api:** api update ([497edff](https://github.com/dedalus-labs/dedalus-sdk-go/commit/497edff59925bb26099cd715325aa9a1ae7a95a4))
+
 ## 0.1.0-alpha.1 (2025-07-30)
 
 Full Changelog: [v0.0.1-alpha.0...v0.1.0-alpha.1](https://github.com/dedalus-labs/dedalus-sdk-go/compare/v0.0.1-alpha.0...v0.1.0-alpha.1)
