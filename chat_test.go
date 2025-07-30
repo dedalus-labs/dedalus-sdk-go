@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package dedalus_test
+package githubcomdedaluslabsdedalussdkgo_test
 
 import (
 	"context"
@@ -22,18 +22,18 @@ func TestChatNewWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := dedalus.NewClient(
+	client := githubcomdedaluslabsdedalussdkgo.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Chat.New(context.TODO(), dedalus.ChatNewParams{
-		CompletionRequest: dedalus.CompletionRequestParam{
+	_, err := client.Chat.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatNewParams{
+		CompletionRequest: githubcomdedaluslabsdedalussdkgo.CompletionRequestParam{
 			AgentAttributes: map[string]float64{
 				"accuracy":   0.9,
 				"complexity": 0.8,
 				"efficiency": 0.7,
 			},
-			FrequencyPenalty: dedalus.Float(-0.5),
+			FrequencyPenalty: githubcomdedaluslabsdedalussdkgo.Float(-0.5),
 			Guardrails: []map[string]any{{
 				"foo": "bar",
 			}},
@@ -47,14 +47,14 @@ func TestChatNewWithOptionalParams(t *testing.T) {
 			LogitBias: map[string]int64{
 				"50256": -100,
 			},
-			MaxTokens:  dedalus.Int(100),
-			MaxTurns:   dedalus.Int(5),
+			MaxTokens:  githubcomdedaluslabsdedalussdkgo.Int(100),
+			MaxTurns:   githubcomdedaluslabsdedalussdkgo.Int(5),
 			McpServers: []string{"dedalus-labs/brave-search", "dedalus-labs/github-api"},
 			Messages: []map[string]any{{
 				"foo": "bar",
 			}},
-			Model: dedalus.CompletionRequestModelUnionParam{
-				OfString: dedalus.String("gpt-4"),
+			Model: githubcomdedaluslabsdedalussdkgo.CompletionRequestModelUnionParam{
+				OfString: githubcomdedaluslabsdedalussdkgo.String("gpt-4"),
 			},
 			ModelAttributes: map[string]map[string]float64{
 				"claude-3-5-sonnet": {
@@ -73,24 +73,24 @@ func TestChatNewWithOptionalParams(t *testing.T) {
 					"speed":        0.9,
 				},
 			},
-			N:               dedalus.Int(1),
-			PresencePenalty: dedalus.Float(-0.5),
+			N:               githubcomdedaluslabsdedalussdkgo.Int(1),
+			PresencePenalty: githubcomdedaluslabsdedalussdkgo.Float(-0.5),
 			Stop:            []string{"\\n", "END"},
-			Stream:          dedalus.Bool(true),
-			Temperature:     dedalus.Float(0),
-			ToolChoice: dedalus.CompletionRequestToolChoiceUnionParam{
-				OfString: dedalus.String("auto"),
+			Stream:          githubcomdedaluslabsdedalussdkgo.Bool(true),
+			Temperature:     githubcomdedaluslabsdedalussdkgo.Float(0),
+			ToolChoice: githubcomdedaluslabsdedalussdkgo.CompletionRequestToolChoiceUnionParam{
+				OfString: githubcomdedaluslabsdedalussdkgo.String("auto"),
 			},
 			Tools: []map[string]any{{
 				"function": "bar",
 				"type":     "bar",
 			}},
-			TopP: dedalus.Float(0.1),
-			User: dedalus.String("user-123"),
+			TopP: githubcomdedaluslabsdedalussdkgo.Float(0.1),
+			User: githubcomdedaluslabsdedalussdkgo.String("user-123"),
 		},
 	})
 	if err != nil {
-		var apierr *dedalus.Error
+		var apierr *githubcomdedaluslabsdedalussdkgo.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}

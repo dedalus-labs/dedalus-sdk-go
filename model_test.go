@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package dedalus_test
+package githubcomdedaluslabsdedalussdkgo_test
 
 import (
 	"context"
@@ -22,13 +22,13 @@ func TestModelGet(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := dedalus.NewClient(
+	client := githubcomdedaluslabsdedalussdkgo.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Models.Get(context.TODO(), "model_id")
 	if err != nil {
-		var apierr *dedalus.Error
+		var apierr *githubcomdedaluslabsdedalussdkgo.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -45,13 +45,13 @@ func TestModelList(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := dedalus.NewClient(
+	client := githubcomdedaluslabsdedalussdkgo.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Models.List(context.TODO())
 	if err != nil {
-		var apierr *dedalus.Error
+		var apierr *githubcomdedaluslabsdedalussdkgo.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}

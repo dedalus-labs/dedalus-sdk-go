@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package dedalus_test
+package githubcomdedaluslabsdedalussdkgo_test
 
 import (
 	"context"
@@ -20,12 +20,12 @@ func TestUsage(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := dedalus.NewClient(
+	client := githubcomdedaluslabsdedalussdkgo.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	completion, err := client.Chat.New(context.TODO(), dedalus.ChatNewParams{
-		CompletionRequest: dedalus.CompletionRequestParam{},
+	completion, err := client.Chat.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatNewParams{
+		CompletionRequest: githubcomdedaluslabsdedalussdkgo.CompletionRequestParam{},
 	})
 	if err != nil {
 		t.Fatalf("err should be nil: %s", err.Error())
