@@ -39,7 +39,7 @@ func (r *RootService) Get(ctx context.Context, opts ...option.RequestOption) (re
 	return
 }
 
-// Response model for the root endpoint.
+// Response model for the root endpoint of the Dedalus API.
 type RootGetResponse struct {
 	Message string `json:"message,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
