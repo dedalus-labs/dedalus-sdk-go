@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package dedalussdk
+package githubcomdedaluslabsdedalussdkgo
 
 import (
 	"context"
@@ -8,14 +8,14 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/stainless-sdks/dedalus-sdk-go/internal/apijson"
-	"github.com/stainless-sdks/dedalus-sdk-go/internal/requestconfig"
-	"github.com/stainless-sdks/dedalus-sdk-go/option"
-	"github.com/stainless-sdks/dedalus-sdk-go/packages/respjson"
+	"github.com/dedalus-labs/dedalus-sdk-go/internal/apijson"
+	"github.com/dedalus-labs/dedalus-sdk-go/internal/requestconfig"
+	"github.com/dedalus-labs/dedalus-sdk-go/option"
+	"github.com/dedalus-labs/dedalus-sdk-go/packages/respjson"
 )
 
 // ModelService contains methods and other services that help with interacting with
-// the dedalus-sdk API.
+// the dedalus API.
 //
 // Note, unlike clients, this service does not read variables from the environment
 // automatically. You should not instantiate this service directly, and instead use
@@ -120,7 +120,7 @@ func (r *ModelService) Get(ctx context.Context, modelID string, opts ...option.R
 //	    ]
 //	}
 //	```
-func (r *ModelService) List(ctx context.Context, opts ...option.RequestOption) (res *ModelListResponse, err error) {
+func (r *ModelService) List(ctx context.Context, opts ...option.RequestOption) (res *ModelsResponse, err error) {
 	opts = append(r.Options[:], opts...)
 	path := "v1/models"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
@@ -188,7 +188,7 @@ func (r *Model) UnmarshalJSON(data []byte) error {
 // Example: { "object": "list", "data": [ { "id": "gpt-4", "object": "model",
 // "owned_by": "openai" }, { "id": "claude-3-5-sonnet-20241022", "object": "model",
 // "owned_by": "anthropic" } ] }
-type ModelListResponse struct {
+type ModelsResponse struct {
 	// List of models
 	Data []Model `json:"data,required"`
 	// Object type
@@ -203,7 +203,7 @@ type ModelListResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r ModelListResponse) RawJSON() string { return r.JSON.raw }
-func (r *ModelListResponse) UnmarshalJSON(data []byte) error {
+func (r ModelsResponse) RawJSON() string { return r.JSON.raw }
+func (r *ModelsResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }

@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package dedalussdk_test
+package githubcomdedaluslabsdedalussdkgo_test
 
 import (
 	"context"
@@ -8,12 +8,12 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stainless-sdks/dedalus-sdk-go"
-	"github.com/stainless-sdks/dedalus-sdk-go/internal/testutil"
-	"github.com/stainless-sdks/dedalus-sdk-go/option"
+	"github.com/dedalus-labs/dedalus-sdk-go"
+	"github.com/dedalus-labs/dedalus-sdk-go/internal/testutil"
+	"github.com/dedalus-labs/dedalus-sdk-go/option"
 )
 
-func TestDedalussdkGetRoot(t *testing.T) {
+func TestRootGet(t *testing.T) {
 	t.Skip("skipped: tests are disabled for the time being")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -22,13 +22,13 @@ func TestDedalussdkGetRoot(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := dedalussdk.NewClient(
+	client := githubcomdedaluslabsdedalussdkgo.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithBearerToken("My Bearer Token"),
+		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.GetRoot(context.TODO())
+	_, err := client.Root.Get(context.TODO())
 	if err != nil {
-		var apierr *dedalussdk.Error
+		var apierr *githubcomdedaluslabsdedalussdkgo.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}

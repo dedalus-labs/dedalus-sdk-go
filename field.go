@@ -1,7 +1,7 @@
-package dedalussdk
+package githubcomdedaluslabsdedalussdkgo
 
 import (
-	"github.com/stainless-sdks/dedalus-sdk-go/packages/param"
+	"github.com/dedalus-labs/dedalus-sdk-go/packages/param"
 	"io"
 	"time"
 )

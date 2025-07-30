@@ -2,7 +2,7 @@
 package json
 
 import (
-	"github.com/stainless-sdks/dedalus-sdk-go/internal/encoding/json/shims"
+	"github.com/dedalus-labs/dedalus-sdk-go/internal/encoding/json/shims"
 	"reflect"
 	"time"
 )

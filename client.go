@@ -1,48 +1,50 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package dedalussdk
+package githubcomdedaluslabsdedalussdkgo
 
 import (
 	"context"
 	"net/http"
 	"os"
 
-	"github.com/stainless-sdks/dedalus-sdk-go/internal/requestconfig"
-	"github.com/stainless-sdks/dedalus-sdk-go/option"
+	"github.com/dedalus-labs/dedalus-sdk-go/internal/requestconfig"
+	"github.com/dedalus-labs/dedalus-sdk-go/option"
 )
 
 // Client creates a struct with services and top level methods that help with
-// interacting with the dedalus-sdk API. You should not instantiate this client
+// interacting with the dedalus API. You should not instantiate this client
 // directly, and instead use the [NewClient] method instead.
 type Client struct {
 	Options []option.RequestOption
+	Root    RootService
 	Health  HealthService
 	Models  ModelService
 	Chat    ChatService
 }
 
-// DefaultClientOptions read from the environment (DEDALUS_SDK_BEARER_TOKEN,
-// DEDALUS_SDK_BASE_URL). This should be used to initialize new clients.
+// DefaultClientOptions read from the environment (DEDALUS_API_KEY,
+// DEDALUS_BASE_URL). This should be used to initialize new clients.
 func DefaultClientOptions() []option.RequestOption {
 	defaults := []option.RequestOption{option.WithEnvironmentProduction()}
-	if o, ok := os.LookupEnv("DEDALUS_SDK_BASE_URL"); ok {
+	if o, ok := os.LookupEnv("DEDALUS_BASE_URL"); ok {
 		defaults = append(defaults, option.WithBaseURL(o))
 	}
-	if o, ok := os.LookupEnv("DEDALUS_SDK_BEARER_TOKEN"); ok {
-		defaults = append(defaults, option.WithBearerToken(o))
+	if o, ok := os.LookupEnv("DEDALUS_API_KEY"); ok {
+		defaults = append(defaults, option.WithAPIKey(o))
 	}
 	return defaults
 }
 
 // NewClient generates a new client with the default option read from the
-// environment (DEDALUS_SDK_BEARER_TOKEN, DEDALUS_SDK_BASE_URL). The option passed
-// in as arguments are applied after these default arguments, and all option will
-// be passed down to the services and requests that this client makes.
+// environment (DEDALUS_API_KEY, DEDALUS_BASE_URL). The option passed in as
+// arguments are applied after these default arguments, and all option will be
+// passed down to the services and requests that this client makes.
 func NewClient(opts ...option.RequestOption) (r Client) {
 	opts = append(DefaultClientOptions(), opts...)
 
 	r = Client{Options: opts}
 
+	r.Root = NewRootService(opts...)
 	r.Health = NewHealthService(opts...)
 	r.Models = NewModelService(opts...)
 	r.Chat = NewChatService(opts...)
@@ -117,12 +119,4 @@ func (r *Client) Patch(ctx context.Context, path string, params any, res any, op
 // response.
 func (r *Client) Delete(ctx context.Context, path string, params any, res any, opts ...option.RequestOption) error {
 	return r.Execute(ctx, http.MethodDelete, path, params, res, opts...)
-}
-
-// Root
-func (r *Client) GetRoot(ctx context.Context, opts ...option.RequestOption) (res *GetRootResponse, err error) {
-	opts = append(r.Options[:], opts...)
-	path := ""
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
 }

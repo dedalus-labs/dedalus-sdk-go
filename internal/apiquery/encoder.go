@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/stainless-sdks/dedalus-sdk-go/packages/param"
+	"github.com/dedalus-labs/dedalus-sdk-go/packages/param"
 )
 
 var encoders sync.Map // map[reflect.Type]encoderFunc
