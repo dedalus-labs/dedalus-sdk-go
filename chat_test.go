@@ -50,9 +50,6 @@ func TestChatNewWithOptionalParams(t *testing.T) {
 			MaxTokens:  githubcomdedaluslabsdedalussdkgo.Int(100),
 			MaxTurns:   githubcomdedaluslabsdedalussdkgo.Int(5),
 			McpServers: []string{"dedalus-labs/brave-search", "dedalus-labs/github-api"},
-			Messages: []map[string]any{{
-				"foo": "bar",
-			}},
 			Model: githubcomdedaluslabsdedalussdkgo.CompletionRequestModelUnionParam{
 				OfString: githubcomdedaluslabsdedalussdkgo.String("gpt-4"),
 			},
