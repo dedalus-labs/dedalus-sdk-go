@@ -1,15 +1,15 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package dedalussdk_test
+package dedalus_test
 
 import (
 	"context"
 	"os"
 	"testing"
 
-	"github.com/stainless-sdks/dedalus-sdk-go"
-	"github.com/stainless-sdks/dedalus-sdk-go/internal/testutil"
-	"github.com/stainless-sdks/dedalus-sdk-go/option"
+	"github.com/dedalus-labs/dedalus-sdk-go"
+	"github.com/dedalus-labs/dedalus-sdk-go/internal/testutil"
+	"github.com/dedalus-labs/dedalus-sdk-go/option"
 )
 
 func TestUsage(t *testing.T) {
@@ -20,13 +20,15 @@ func TestUsage(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := dedalussdk.NewClient(
+	client := dedalus.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithBearerToken("My Bearer Token"),
+		option.WithAPIKey("My API Key"),
 	)
-	response, err := client.Health.Check(context.TODO())
+	completion, err := client.Chat.New(context.TODO(), dedalus.ChatNewParams{
+		CompletionRequest: dedalus.CompletionRequestParam{},
+	})
 	if err != nil {
 		t.Fatalf("err should be nil: %s", err.Error())
 	}
-	t.Logf("%+v\n", response.Status)
+	t.Logf("%+v\n", completion.ID)
 }

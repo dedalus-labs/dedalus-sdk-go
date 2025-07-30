@@ -3,8 +3,8 @@ package respjson_test
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stainless-sdks/dedalus-sdk-go/internal/apijson"
-	rj "github.com/stainless-sdks/dedalus-sdk-go/packages/respjson"
+	"github.com/dedalus-labs/dedalus-sdk-go/internal/apijson"
+	rj "github.com/dedalus-labs/dedalus-sdk-go/packages/respjson"
 	"reflect"
 	"testing"
 )

@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package dedalussdk_test
+package dedalus_test
 
 import (
 	"context"
@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stainless-sdks/dedalus-sdk-go"
-	"github.com/stainless-sdks/dedalus-sdk-go/internal"
-	"github.com/stainless-sdks/dedalus-sdk-go/option"
+	"github.com/dedalus-labs/dedalus-sdk-go"
+	"github.com/dedalus-labs/dedalus-sdk-go/internal"
+	"github.com/dedalus-labs/dedalus-sdk-go/option"
 )
 
 type closureTransport struct {
@@ -25,8 +25,8 @@ func (t *closureTransport) RoundTrip(req *http.Request) (*http.Response, error) 
 
 func TestUserAgentHeader(t *testing.T) {
 	var userAgent string
-	client := dedalussdk.NewClient(
-		option.WithBearerToken("My Bearer Token"),
+	client := dedalus.NewClient(
+		option.WithAPIKey("My API Key"),
 		option.WithHTTPClient(&http.Client{
 			Transport: &closureTransport{
 				fn: func(req *http.Request) (*http.Response, error) {
@@ -39,15 +39,15 @@ func TestUserAgentHeader(t *testing.T) {
 		}),
 	)
 	client.Health.Check(context.Background())
-	if userAgent != fmt.Sprintf("DedalusSDK/Go %s", internal.PackageVersion) {
+	if userAgent != fmt.Sprintf("Dedalus/Go %s", internal.PackageVersion) {
 		t.Errorf("Expected User-Agent to be correct, but got: %#v", userAgent)
 	}
 }
 
 func TestRetryAfter(t *testing.T) {
 	retryCountHeaders := make([]string, 0)
-	client := dedalussdk.NewClient(
-		option.WithBearerToken("My Bearer Token"),
+	client := dedalus.NewClient(
+		option.WithAPIKey("My API Key"),
 		option.WithHTTPClient(&http.Client{
 			Transport: &closureTransport{
 				fn: func(req *http.Request) (*http.Response, error) {
@@ -80,8 +80,8 @@ func TestRetryAfter(t *testing.T) {
 
 func TestDeleteRetryCountHeader(t *testing.T) {
 	retryCountHeaders := make([]string, 0)
-	client := dedalussdk.NewClient(
-		option.WithBearerToken("My Bearer Token"),
+	client := dedalus.NewClient(
+		option.WithAPIKey("My API Key"),
 		option.WithHTTPClient(&http.Client{
 			Transport: &closureTransport{
 				fn: func(req *http.Request) (*http.Response, error) {
@@ -110,8 +110,8 @@ func TestDeleteRetryCountHeader(t *testing.T) {
 
 func TestOverwriteRetryCountHeader(t *testing.T) {
 	retryCountHeaders := make([]string, 0)
-	client := dedalussdk.NewClient(
-		option.WithBearerToken("My Bearer Token"),
+	client := dedalus.NewClient(
+		option.WithAPIKey("My API Key"),
 		option.WithHTTPClient(&http.Client{
 			Transport: &closureTransport{
 				fn: func(req *http.Request) (*http.Response, error) {
@@ -140,8 +140,8 @@ func TestOverwriteRetryCountHeader(t *testing.T) {
 
 func TestRetryAfterMs(t *testing.T) {
 	attempts := 0
-	client := dedalussdk.NewClient(
-		option.WithBearerToken("My Bearer Token"),
+	client := dedalus.NewClient(
+		option.WithAPIKey("My API Key"),
 		option.WithHTTPClient(&http.Client{
 			Transport: &closureTransport{
 				fn: func(req *http.Request) (*http.Response, error) {
@@ -166,8 +166,8 @@ func TestRetryAfterMs(t *testing.T) {
 }
 
 func TestContextCancel(t *testing.T) {
-	client := dedalussdk.NewClient(
-		option.WithBearerToken("My Bearer Token"),
+	client := dedalus.NewClient(
+		option.WithAPIKey("My API Key"),
 		option.WithHTTPClient(&http.Client{
 			Transport: &closureTransport{
 				fn: func(req *http.Request) (*http.Response, error) {
@@ -186,8 +186,8 @@ func TestContextCancel(t *testing.T) {
 }
 
 func TestContextCancelDelay(t *testing.T) {
-	client := dedalussdk.NewClient(
-		option.WithBearerToken("My Bearer Token"),
+	client := dedalus.NewClient(
+		option.WithAPIKey("My API Key"),
 		option.WithHTTPClient(&http.Client{
 			Transport: &closureTransport{
 				fn: func(req *http.Request) (*http.Response, error) {
@@ -214,8 +214,8 @@ func TestContextDeadline(t *testing.T) {
 	defer cancel()
 
 	go func() {
-		client := dedalussdk.NewClient(
-			option.WithBearerToken("My Bearer Token"),
+		client := dedalus.NewClient(
+			option.WithAPIKey("My API Key"),
 			option.WithHTTPClient(&http.Client{
 				Transport: &closureTransport{
 					fn: func(req *http.Request) (*http.Response, error) {

@@ -3,7 +3,7 @@ package param
 import (
 	"encoding/json"
 	"fmt"
-	shimjson "github.com/stainless-sdks/dedalus-sdk-go/internal/encoding/json"
+	shimjson "github.com/dedalus-labs/dedalus-sdk-go/internal/encoding/json"
 	"time"
 )
 

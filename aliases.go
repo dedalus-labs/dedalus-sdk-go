@@ -1,10 +1,10 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package dedalussdk
+package dedalus
 
 import (
-	"github.com/stainless-sdks/dedalus-sdk-go/internal/apierror"
-	"github.com/stainless-sdks/dedalus-sdk-go/packages/param"
+	"github.com/dedalus-labs/dedalus-sdk-go/internal/apierror"
+	"github.com/dedalus-labs/dedalus-sdk-go/packages/param"
 )
 
 // aliased to make [param.APIUnion] private when embedding

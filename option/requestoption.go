@@ -11,15 +11,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/stainless-sdks/dedalus-sdk-go/internal/requestconfig"
+	"github.com/dedalus-labs/dedalus-sdk-go/internal/requestconfig"
 	"github.com/tidwall/sjson"
 )
 
-// RequestOption is an option for the requests made by the dedalus-sdk API Client
+// RequestOption is an option for the requests made by the dedalus API Client
 // which can be supplied to clients, services, and methods. You can read more about this functional
 // options pattern in our [README].
 //
-// [README]: https://pkg.go.dev/github.com/stainless-sdks/dedalus-sdk-go#readme-requestoptions
+// [README]: https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#readme-requestoptions
 type RequestOption = requestconfig.RequestOption
 
 // WithBaseURL returns a RequestOption that sets the BaseURL for the client.
@@ -263,13 +263,13 @@ func WithRequestTimeout(dur time.Duration) RequestOption {
 // environment to be the "production" environment. An environment specifies which base URL
 // to use by default.
 func WithEnvironmentProduction() RequestOption {
-	return requestconfig.WithDefaultBaseURL("https://api.example.com/")
+	return requestconfig.WithDefaultBaseURL("https://api.dedaluslabs.ai/")
 }
 
-// WithBearerToken returns a RequestOption that sets the client setting "bearer_token".
-func WithBearerToken(value string) RequestOption {
+// WithAPIKey returns a RequestOption that sets the client setting "api_key".
+func WithAPIKey(value string) RequestOption {
 	return requestconfig.RequestOptionFunc(func(r *requestconfig.RequestConfig) error {
-		r.BearerToken = value
-		return r.Apply(WithHeader("authorization", fmt.Sprintf("Bearer %s", r.BearerToken)))
+		r.APIKey = value
+		return r.Apply(WithHeader("authorization", fmt.Sprintf("Bearer %s", r.APIKey)))
 	})
 }

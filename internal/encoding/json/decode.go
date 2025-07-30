@@ -14,7 +14,7 @@ import (
 	"encoding"
 	"encoding/base64"
 	"fmt"
-	"github.com/stainless-sdks/dedalus-sdk-go/internal/encoding/json/shims"
+	"github.com/dedalus-labs/dedalus-sdk-go/internal/encoding/json/shims"
 	"reflect"
 	"strconv"
 	"strings"
