@@ -3,8 +3,8 @@ package apijson_test
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stainless-sdks/dedalus-sdk-go/internal/apijson"
-	"github.com/stainless-sdks/dedalus-sdk-go/packages/param"
+	"github.com/dedalus-labs/dedalus-sdk-go/internal/apijson"
+	"github.com/dedalus-labs/dedalus-sdk-go/packages/param"
 	"reflect"
 	"testing"
 )

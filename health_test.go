@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package dedalussdk_test
+package dedalus_test
 
 import (
 	"context"
@@ -8,9 +8,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stainless-sdks/dedalus-sdk-go"
-	"github.com/stainless-sdks/dedalus-sdk-go/internal/testutil"
-	"github.com/stainless-sdks/dedalus-sdk-go/option"
+	"github.com/dedalus-labs/dedalus-sdk-go"
+	"github.com/dedalus-labs/dedalus-sdk-go/internal/testutil"
+	"github.com/dedalus-labs/dedalus-sdk-go/option"
 )
 
 func TestHealthCheck(t *testing.T) {
@@ -22,13 +22,13 @@ func TestHealthCheck(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := dedalussdk.NewClient(
+	client := dedalus.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithBearerToken("My Bearer Token"),
+		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Health.Check(context.TODO())
 	if err != nil {
-		var apierr *dedalussdk.Error
+		var apierr *dedalus.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
