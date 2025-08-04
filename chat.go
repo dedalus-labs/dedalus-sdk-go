@@ -12,7 +12,6 @@ import (
 	"github.com/dedalus-labs/dedalus-sdk-go/option"
 	"github.com/dedalus-labs/dedalus-sdk-go/packages/param"
 	"github.com/dedalus-labs/dedalus-sdk-go/packages/respjson"
-	"github.com/dedalus-labs/dedalus-sdk-go/packages/ssestream"
 	"github.com/dedalus-labs/dedalus-sdk-go/shared/constant"
 )
 
@@ -113,15 +112,11 @@ func NewChatService(opts ...option.RequestOption) (r ChatService) {
 //	    if chunk.choices[0].delta.content:
 //	        print(chunk.choices[0].delta.content, end="")
 //	```
-func (r *ChatService) NewStreaming(ctx context.Context, body ChatNewParams, opts ...option.RequestOption) (stream *ssestream.Stream[Completion]) {
-	var (
-		raw *http.Response
-		err error
-	)
+func (r *ChatService) New(ctx context.Context, body ChatNewParams, opts ...option.RequestOption) (res *Completion, err error) {
 	opts = append(r.Options[:], opts...)
 	path := "v1/chat"
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &raw, opts...)
-	return ssestream.NewStream[Completion](ssestream.NewDecoder(raw), err)
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
+	return
 }
 
 type Completion struct {
