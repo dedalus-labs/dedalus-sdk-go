@@ -12,6 +12,7 @@ import (
 	"github.com/dedalus-labs/dedalus-sdk-go/option"
 	"github.com/dedalus-labs/dedalus-sdk-go/packages/param"
 	"github.com/dedalus-labs/dedalus-sdk-go/packages/respjson"
+	"github.com/dedalus-labs/dedalus-sdk-go/packages/ssestream"
 	"github.com/dedalus-labs/dedalus-sdk-go/shared/constant"
 )
 
@@ -67,9 +68,7 @@ func NewChatService(opts ...option.RequestOption) (r ChatService) {
 //
 //	completion = client.chat.create(
 //	    model="gpt-4",
-//	    input=[
-//	        {"role": "user", "content": "Hello, how are you?"}
-//	    ]
+//	    input=[{"role": "user", "content": "Hello, how are you?"}],
 //	)
 //
 //	print(completion.choices[0].message.content)
@@ -79,19 +78,17 @@ func NewChatService(opts ...option.RequestOption) (r ChatService) {
 //	```python
 //	completion = client.chat.create(
 //	    model="gpt-4",
-//	    input=[
-//	        {"role": "user", "content": "Search for recent AI news"}
-//	    ],
+//	    input=[{"role": "user", "content": "Search for recent AI news"}],
 //	    tools=[
 //	        {
 //	            "type": "function",
 //	            "function": {
 //	                "name": "search_web",
-//	                "description": "Search the web for information"
-//	            }
+//	                "description": "Search the web for information",
+//	            },
 //	        }
 //	    ],
-//	    mcp_servers=["dedalus-labs/brave-search"]
+//	    mcp_servers=["dedalus-labs/brave-search"],
 //	)
 //	```
 //
@@ -99,13 +96,8 @@ func NewChatService(opts ...option.RequestOption) (r ChatService) {
 //	```python
 //	completion = client.chat.create(
 //	    model=["gpt-4o-mini", "gpt-4", "claude-3-5-sonnet"],
-//	    input=[
-//	        {"role": "user", "content": "Analyze this complex data"}
-//	    ],
-//	    agent_attributes={
-//	        "complexity": 0.8,
-//	        "accuracy": 0.9
-//	    }
+//	    input=[{"role": "user", "content": "Analyze this complex data"}],
+//	    agent_attributes={"complexity": 0.8, "accuracy": 0.9},
 //	)
 //	```
 //
@@ -113,21 +105,23 @@ func NewChatService(opts ...option.RequestOption) (r ChatService) {
 //	```python
 //	stream = client.chat.create(
 //	    model="gpt-4",
-//	    input=[
-//	        {"role": "user", "content": "Tell me a story"}
-//	    ],
-//	    stream=True
+//	    input=[{"role": "user", "content": "Tell me a story"}],
+//	    stream=True,
 //	)
 //
 //	for chunk in stream:
 //	    if chunk.choices[0].delta.content:
 //	        print(chunk.choices[0].delta.content, end="")
 //	```
-func (r *ChatService) New(ctx context.Context, body ChatNewParams, opts ...option.RequestOption) (res *Completion, err error) {
+func (r *ChatService) NewStreaming(ctx context.Context, body ChatNewParams, opts ...option.RequestOption) (stream *ssestream.Stream[Completion]) {
+	var (
+		raw *http.Response
+		err error
+	)
 	opts = append(r.Options[:], opts...)
 	path := "v1/chat"
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &raw, opts...)
+	return ssestream.NewStream[Completion](ssestream.NewDecoder(raw), err)
 }
 
 type Completion struct {
@@ -633,8 +627,7 @@ type CompletionRequestParam struct {
 	// tool execution. Can be URLs (e.g., 'https://mcp.example.com') or slugs (e.g.,
 	// 'dedalus-labs/brave-search'). MCP tools are executed server-side and billed
 	// separately.
-	McpServers []string         `json:"mcp_servers,omitzero"`
-	Messages   []map[string]any `json:"messages,omitzero"`
+	McpServers []string `json:"mcp_servers,omitzero"`
 	// Model(s) to use for completion. Can be a single model ID or a list for
 	// multi-model routing. Single model: 'gpt-4', 'claude-3-5-sonnet-20241022',
 	// 'gpt-4o-mini'. Multi-model routing: ['gpt-4o-mini', 'gpt-4',
