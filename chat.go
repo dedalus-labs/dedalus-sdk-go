@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/apijson"
+	shimjson "github.com/dedalus-labs/dedalus-sdk-go/internal/encoding/json"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/requestconfig"
 	"github.com/dedalus-labs/dedalus-sdk-go/option"
 	"github.com/dedalus-labs/dedalus-sdk-go/packages/param"
@@ -1101,7 +1102,7 @@ type ChatNewParams struct {
 }
 
 func (r ChatNewParams) MarshalJSON() (data []byte, err error) {
-	return json.Marshal(r.CompletionRequest)
+	return shimjson.Marshal(r.CompletionRequest)
 }
 func (r *ChatNewParams) UnmarshalJSON(data []byte) error {
 	return json.Unmarshal(data, &r.CompletionRequest)
