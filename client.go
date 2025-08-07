@@ -12,7 +12,7 @@ import (
 )
 
 // Client creates a struct with services and top level methods that help with
-// interacting with the dedalus API. You should not instantiate this client
+// interacting with the Dedalus API. You should not instantiate this client
 // directly, and instead use the [NewClient] method instead.
 type Client struct {
 	Options []option.RequestOption
