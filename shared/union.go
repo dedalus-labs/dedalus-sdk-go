@@ -4,4 +4,5 @@ package shared
 
 type UnionString string
 
-func (UnionString) ImplementsCompletionRequestModelUnionParam() {}
+func (UnionString) ImplementsCompletionRequestModelUnionParam()      {}
+func (UnionString) ImplementsCompletionRequestToolChoiceUnionParam() {}
