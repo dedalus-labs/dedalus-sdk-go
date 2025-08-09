@@ -6,7 +6,6 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -124,7 +123,6 @@ type Stream[T any] struct {
 	decoder Decoder
 	cur     T
 	err     error
-	done    bool
 }
 
 func NewStream[T any](decoder Decoder, err error) *Stream[T] {
@@ -151,29 +149,13 @@ func (s *Stream[T]) Next() bool {
 	}
 
 	for s.decoder.Next() {
-		if s.done {
-			continue
-		}
-
-		if bytes.HasPrefix(s.decoder.Event().Data, []byte("[DONE]")) {
-			// In this case we don't break because we still want to iterate through the full stream.
-			s.done = true
-			continue
-		}
-
-		switch s.decoder.Event().Type {
-		case "error":
-			s.err = fmt.Errorf("received error while streaming: %s", string(s.decoder.Event().Data))
+		var nxt T
+		s.err = json.Unmarshal(s.decoder.Event().Data, &nxt)
+		if s.err != nil {
 			return false
-		case "":
-			var nxt T
-			s.err = json.Unmarshal(s.decoder.Event().Data, &nxt)
-			if s.err != nil {
-				return false
-			}
-			s.cur = nxt
-			return true
 		}
+		s.cur = nxt
+		return true
 	}
 
 	// decoder.Next() may be false because of an error
