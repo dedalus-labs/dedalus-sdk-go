@@ -38,6 +38,78 @@ func NewChatService(opts ...option.RequestOption) (r *ChatService) {
 // 100+ LLM providers via the Agent framework. It supports both single and
 // multi-model routing, client-side and server-side tool execution, and integration
 // with MCP (Model Context Protocol) servers.
+//
+// Features: - Cross-vendor compatibility (OpenAI, Anthropic, Cohere, etc.) -
+// Multi-model routing with intelligent agentic handoffs - Client-side tool
+// execution (tools returned as JSON) - Server-side MCP tool execution with
+// automatic billing - Streaming and non-streaming responses - Advanced agent
+// attributes for routing decisions - Automatic usage tracking and billing
+//
+// Args: request: Chat completion request with messages, model, and configuration
+// http_request: FastAPI request object for accessing headers and state
+// background_tasks: FastAPI background tasks for async billing operations user:
+// Authenticated user with validated API key and sufficient balance
+//
+// Returns: ChatCompletion: OpenAI-compatible completion response with usage data
+//
+// Raises: HTTPException: - 401 if authentication fails or insufficient balance -
+// 400 if request validation fails - 500 if internal processing error occurs
+//
+// Billing: - Token usage billed automatically based on model pricing - MCP tool
+// calls billed separately using credits system - Streaming responses billed after
+// completion via background task
+//
+// Example: Basic chat completion: ```python import dedalus_labs
+//
+//	client = dedalus_labs.Client(api_key="your-api-key")
+//
+//	completion = client.chat.create(
+//	    model="gpt-4",
+//	    input=[{"role": "user", "content": "Hello, how are you?"}],
+//	)
+//
+//	print(completion.choices[0].message.content)
+//	```
+//
+//	With tools and MCP servers:
+//	```python
+//	completion = client.chat.create(
+//	    model="gpt-4",
+//	    input=[{"role": "user", "content": "Search for recent AI news"}],
+//	    tools=[
+//	        {
+//	            "type": "function",
+//	            "function": {
+//	                "name": "search_web",
+//	                "description": "Search the web for information",
+//	            },
+//	        }
+//	    ],
+//	    mcp_servers=["dedalus-labs/brave-search"],
+//	)
+//	```
+//
+//	Multi-model routing:
+//	```python
+//	completion = client.chat.create(
+//	    model=["gpt-4o-mini", "gpt-4", "claude-3-5-sonnet"],
+//	    input=[{"role": "user", "content": "Analyze this complex data"}],
+//	    agent_attributes={"complexity": 0.8, "accuracy": 0.9},
+//	)
+//	```
+//
+//	Streaming response:
+//	```python
+//	stream = client.chat.create(
+//	    model="gpt-4",
+//	    input=[{"role": "user", "content": "Tell me a story"}],
+//	    stream=True,
+//	)
+//
+//	for chunk in stream:
+//	    if chunk.choices[0].delta.content:
+//	        print(chunk.choices[0].delta.content, end="")
+//	```
 func (r *ChatService) NewStreaming(ctx context.Context, body ChatNewParams, opts ...option.RequestOption) (stream *ssestream.Stream[StreamChunk]) {
 	var (
 		raw *http.Response
@@ -50,15 +122,16 @@ func (r *ChatService) NewStreaming(ctx context.Context, body ChatNewParams, opts
 }
 
 type Completion struct {
-	ID                string                `json:"id,required"`
-	Choices           []CompletionChoice    `json:"choices,required"`
-	Created           int64                 `json:"created,required"`
-	Model             string                `json:"model,required"`
-	Object            CompletionObject      `json:"object,required"`
-	ServiceTier       CompletionServiceTier `json:"service_tier,nullable"`
-	SystemFingerprint string                `json:"system_fingerprint,nullable"`
-	Usage             CompletionUsage       `json:"usage,nullable"`
-	JSON              completionJSON        `json:"-"`
+	ID                string                 `json:"id,required"`
+	Choices           []CompletionChoice     `json:"choices,required"`
+	Created           int64                  `json:"created,required"`
+	Model             string                 `json:"model,required"`
+	Object            CompletionObject       `json:"object,required"`
+	ServiceTier       CompletionServiceTier  `json:"service_tier,nullable"`
+	SystemFingerprint string                 `json:"system_fingerprint,nullable"`
+	Usage             CompletionUsage        `json:"usage,nullable"`
+	ExtraFields       map[string]interface{} `json:"-,extras"`
+	JSON              completionJSON         `json:"-"`
 }
 
 // completionJSON contains the JSON metadata for the struct [Completion]
@@ -88,6 +161,7 @@ type CompletionChoice struct {
 	Index        int64                         `json:"index,required"`
 	Message      CompletionChoicesMessage      `json:"message,required"`
 	Logprobs     CompletionChoicesLogprobs     `json:"logprobs,nullable"`
+	ExtraFields  map[string]interface{}        `json:"-,extras"`
 	JSON         completionChoiceJSON          `json:"-"`
 }
 
@@ -136,6 +210,7 @@ type CompletionChoicesMessage struct {
 	FunctionCall CompletionChoicesMessageFunctionCall `json:"function_call,nullable"`
 	Refusal      string                               `json:"refusal,nullable"`
 	ToolCalls    []CompletionChoicesMessageToolCall   `json:"tool_calls,nullable"`
+	ExtraFields  map[string]interface{}               `json:"-,extras"`
 	JSON         completionChoicesMessageJSON         `json:"-"`
 }
 
@@ -178,6 +253,7 @@ func (r CompletionChoicesMessageRole) IsKnown() bool {
 type CompletionChoicesMessageAnnotation struct {
 	Type        CompletionChoicesMessageAnnotationsType        `json:"type,required"`
 	URLCitation CompletionChoicesMessageAnnotationsURLCitation `json:"url_citation,required"`
+	ExtraFields map[string]interface{}                         `json:"-,extras"`
 	JSON        completionChoicesMessageAnnotationJSON         `json:"-"`
 }
 
@@ -213,11 +289,12 @@ func (r CompletionChoicesMessageAnnotationsType) IsKnown() bool {
 }
 
 type CompletionChoicesMessageAnnotationsURLCitation struct {
-	EndIndex   int64                                              `json:"end_index,required"`
-	StartIndex int64                                              `json:"start_index,required"`
-	Title      string                                             `json:"title,required"`
-	URL        string                                             `json:"url,required"`
-	JSON       completionChoicesMessageAnnotationsURLCitationJSON `json:"-"`
+	EndIndex    int64                                              `json:"end_index,required"`
+	StartIndex  int64                                              `json:"start_index,required"`
+	Title       string                                             `json:"title,required"`
+	URL         string                                             `json:"url,required"`
+	ExtraFields map[string]interface{}                             `json:"-,extras"`
+	JSON        completionChoicesMessageAnnotationsURLCitationJSON `json:"-"`
 }
 
 // completionChoicesMessageAnnotationsURLCitationJSON contains the JSON metadata
@@ -240,11 +317,12 @@ func (r completionChoicesMessageAnnotationsURLCitationJSON) RawJSON() string {
 }
 
 type CompletionChoicesMessageAudio struct {
-	ID         string                            `json:"id,required"`
-	Data       string                            `json:"data,required"`
-	ExpiresAt  int64                             `json:"expires_at,required"`
-	Transcript string                            `json:"transcript,required"`
-	JSON       completionChoicesMessageAudioJSON `json:"-"`
+	ID          string                            `json:"id,required"`
+	Data        string                            `json:"data,required"`
+	ExpiresAt   int64                             `json:"expires_at,required"`
+	Transcript  string                            `json:"transcript,required"`
+	ExtraFields map[string]interface{}            `json:"-,extras"`
+	JSON        completionChoicesMessageAudioJSON `json:"-"`
 }
 
 // completionChoicesMessageAudioJSON contains the JSON metadata for the struct
@@ -267,9 +345,10 @@ func (r completionChoicesMessageAudioJSON) RawJSON() string {
 }
 
 type CompletionChoicesMessageFunctionCall struct {
-	Arguments string                                   `json:"arguments,required"`
-	Name      string                                   `json:"name,required"`
-	JSON      completionChoicesMessageFunctionCallJSON `json:"-"`
+	Arguments   string                                   `json:"arguments,required"`
+	Name        string                                   `json:"name,required"`
+	ExtraFields map[string]interface{}                   `json:"-,extras"`
+	JSON        completionChoicesMessageFunctionCallJSON `json:"-"`
 }
 
 // completionChoicesMessageFunctionCallJSON contains the JSON metadata for the
@@ -290,10 +369,11 @@ func (r completionChoicesMessageFunctionCallJSON) RawJSON() string {
 }
 
 type CompletionChoicesMessageToolCall struct {
-	ID       string                                    `json:"id,required"`
-	Function CompletionChoicesMessageToolCallsFunction `json:"function,required"`
-	Type     CompletionChoicesMessageToolCallsType     `json:"type,required"`
-	JSON     completionChoicesMessageToolCallJSON      `json:"-"`
+	ID          string                                    `json:"id,required"`
+	Function    CompletionChoicesMessageToolCallsFunction `json:"function,required"`
+	Type        CompletionChoicesMessageToolCallsType     `json:"type,required"`
+	ExtraFields map[string]interface{}                    `json:"-,extras"`
+	JSON        completionChoicesMessageToolCallJSON      `json:"-"`
 }
 
 // completionChoicesMessageToolCallJSON contains the JSON metadata for the struct
@@ -315,9 +395,10 @@ func (r completionChoicesMessageToolCallJSON) RawJSON() string {
 }
 
 type CompletionChoicesMessageToolCallsFunction struct {
-	Arguments string                                        `json:"arguments,required"`
-	Name      string                                        `json:"name,required"`
-	JSON      completionChoicesMessageToolCallsFunctionJSON `json:"-"`
+	Arguments   string                                        `json:"arguments,required"`
+	Name        string                                        `json:"name,required"`
+	ExtraFields map[string]interface{}                        `json:"-,extras"`
+	JSON        completionChoicesMessageToolCallsFunctionJSON `json:"-"`
 }
 
 // completionChoicesMessageToolCallsFunctionJSON contains the JSON metadata for the
@@ -352,9 +433,10 @@ func (r CompletionChoicesMessageToolCallsType) IsKnown() bool {
 }
 
 type CompletionChoicesLogprobs struct {
-	Content []CompletionChoicesLogprobsContent `json:"content,nullable"`
-	Refusal []CompletionChoicesLogprobsRefusal `json:"refusal,nullable"`
-	JSON    completionChoicesLogprobsJSON      `json:"-"`
+	Content     []CompletionChoicesLogprobsContent `json:"content,nullable"`
+	Refusal     []CompletionChoicesLogprobsRefusal `json:"refusal,nullable"`
+	ExtraFields map[string]interface{}             `json:"-,extras"`
+	JSON        completionChoicesLogprobsJSON      `json:"-"`
 }
 
 // completionChoicesLogprobsJSON contains the JSON metadata for the struct
@@ -379,6 +461,7 @@ type CompletionChoicesLogprobsContent struct {
 	Logprob     float64                                      `json:"logprob,required"`
 	TopLogprobs []CompletionChoicesLogprobsContentTopLogprob `json:"top_logprobs,required"`
 	Bytes       []int64                                      `json:"bytes,nullable"`
+	ExtraFields map[string]interface{}                       `json:"-,extras"`
 	JSON        completionChoicesLogprobsContentJSON         `json:"-"`
 }
 
@@ -402,10 +485,11 @@ func (r completionChoicesLogprobsContentJSON) RawJSON() string {
 }
 
 type CompletionChoicesLogprobsContentTopLogprob struct {
-	Token   string                                         `json:"token,required"`
-	Logprob float64                                        `json:"logprob,required"`
-	Bytes   []int64                                        `json:"bytes,nullable"`
-	JSON    completionChoicesLogprobsContentTopLogprobJSON `json:"-"`
+	Token       string                                         `json:"token,required"`
+	Logprob     float64                                        `json:"logprob,required"`
+	Bytes       []int64                                        `json:"bytes,nullable"`
+	ExtraFields map[string]interface{}                         `json:"-,extras"`
+	JSON        completionChoicesLogprobsContentTopLogprobJSON `json:"-"`
 }
 
 // completionChoicesLogprobsContentTopLogprobJSON contains the JSON metadata for
@@ -431,6 +515,7 @@ type CompletionChoicesLogprobsRefusal struct {
 	Logprob     float64                                      `json:"logprob,required"`
 	TopLogprobs []CompletionChoicesLogprobsRefusalTopLogprob `json:"top_logprobs,required"`
 	Bytes       []int64                                      `json:"bytes,nullable"`
+	ExtraFields map[string]interface{}                       `json:"-,extras"`
 	JSON        completionChoicesLogprobsRefusalJSON         `json:"-"`
 }
 
@@ -454,10 +539,11 @@ func (r completionChoicesLogprobsRefusalJSON) RawJSON() string {
 }
 
 type CompletionChoicesLogprobsRefusalTopLogprob struct {
-	Token   string                                         `json:"token,required"`
-	Logprob float64                                        `json:"logprob,required"`
-	Bytes   []int64                                        `json:"bytes,nullable"`
-	JSON    completionChoicesLogprobsRefusalTopLogprobJSON `json:"-"`
+	Token       string                                         `json:"token,required"`
+	Logprob     float64                                        `json:"logprob,required"`
+	Bytes       []int64                                        `json:"bytes,nullable"`
+	ExtraFields map[string]interface{}                         `json:"-,extras"`
+	JSON        completionChoicesLogprobsRefusalTopLogprobJSON `json:"-"`
 }
 
 // completionChoicesLogprobsRefusalTopLogprobJSON contains the JSON metadata for
@@ -516,6 +602,7 @@ type CompletionUsage struct {
 	TotalTokens             int64                                  `json:"total_tokens,required"`
 	CompletionTokensDetails CompletionUsageCompletionTokensDetails `json:"completion_tokens_details,nullable"`
 	PromptTokensDetails     CompletionUsagePromptTokensDetails     `json:"prompt_tokens_details,nullable"`
+	ExtraFields             map[string]interface{}                 `json:"-,extras"`
 	JSON                    completionUsageJSON                    `json:"-"`
 }
 
@@ -543,6 +630,7 @@ type CompletionUsageCompletionTokensDetails struct {
 	AudioTokens              int64                                      `json:"audio_tokens,nullable"`
 	ReasoningTokens          int64                                      `json:"reasoning_tokens,nullable"`
 	RejectedPredictionTokens int64                                      `json:"rejected_prediction_tokens,nullable"`
+	ExtraFields              map[string]interface{}                     `json:"-,extras"`
 	JSON                     completionUsageCompletionTokensDetailsJSON `json:"-"`
 }
 
@@ -568,6 +656,7 @@ func (r completionUsageCompletionTokensDetailsJSON) RawJSON() string {
 type CompletionUsagePromptTokensDetails struct {
 	AudioTokens  int64                                  `json:"audio_tokens,nullable"`
 	CachedTokens int64                                  `json:"cached_tokens,nullable"`
+	ExtraFields  map[string]interface{}                 `json:"-,extras"`
 	JSON         completionUsagePromptTokensDetailsJSON `json:"-"`
 }
 
@@ -589,50 +678,138 @@ func (r completionUsagePromptTokensDetailsJSON) RawJSON() string {
 }
 
 // Request model for chat completions.
+//
+// Validates incoming chat requests with support for multimodality, multi-model
+// routing, and agent-enhanced features. Compatible with OpenAI API format while
+// extending functionality for advanced use cases.
+//
+// This model supports both the OpenAI-standard 'messages' field and the
+// Dedalus-specific 'input' field for maximum compatibility. The 'input' field can
+// handle various modalities beyond text messages.
+//
+// Key Features: - Multi-model routing with intelligent handoffs - MCP (Model
+// Context Protocol) server integration - Advanced agent attributes for routing
+// decisions - Client-side and server-side tool execution - Streaming and
+// non-streaming responses - Automatic usage tracking and billing
+//
+// Examples: Basic chat completion:
+// `python request = ChatCompletionRequest( model="gpt-4", input=[ {"role": "user", "content": "Hello, how are you?"} ] ) `
+//
+//	Multi-model routing with attributes:
+//	```python
+//	request = ChatCompletionRequest(
+//	    model=["gpt-4o-mini", "gpt-4", "claude-3-5-sonnet"],
+//	    input=[
+//	        {"role": "user", "content": "Analyze this complex problem"}
+//	    ],
+//	    agent_attributes={
+//	        "complexity": 0.8,
+//	        "accuracy": 0.9
+//	    },
+//	    model_attributes={
+//	        "gpt-4": {"intelligence": 0.9, "cost": 0.8},
+//	        "claude-3-5-sonnet": {"intelligence": 0.95, "cost": 0.7}
+//	    }
+//	)
+//	```
+//
+//	With tools and MCP servers:
+//	```python
+//	request = ChatCompletionRequest(
+//	    model="gpt-4",
+//	    input=[
+//	        {"role": "user", "content": "Search for AI news"}
+//	    ],
+//	    tools=[
+//	        {
+//	            "type": "function",
+//	            "function": {
+//	                "name": "search_web",
+//	                "description": "Search the web"
+//	            }
+//	        }
+//	    ],
+//	    mcp_servers=["dedalus-labs/brave-search"],
+//	    temperature=0.7,
+//	    max_tokens=1000
+//	)
+//	```
 type CompletionRequestParam struct {
 	// Attributes for the agent itself, influencing behavior and model selection.
+	// Format: {'attribute': value}, where values are 0.0-1.0. Common attributes:
+	// 'complexity', 'accuracy', 'efficiency', 'creativity', 'friendliness'. Higher
+	// values indicate stronger preference for that characteristic.
 	AgentAttributes param.Field[map[string]float64] `json:"agent_attributes"`
 	// Frequency penalty (-2 to 2). Positive values penalize new tokens based on their
-	// existing frequency in the text so far.
+	// existing frequency in the text so far, decreasing likelihood of repeated
+	// phrases.
 	FrequencyPenalty param.Field[float64] `json:"frequency_penalty"`
+	// Guardrails to apply to the agent for input/output validation and safety checks.
+	// Reserved for future use - guardrails configuration format not yet finalized.
+	Guardrails param.Field[[]map[string]interface{}] `json:"guardrails"`
+	// Configuration for multi-model handoffs and agent orchestration. Reserved for
+	// future use - handoff configuration format not yet finalized.
+	HandoffConfig param.Field[map[string]interface{}] `json:"handoff_config"`
 	// Input to the model - can be messages, images, or other modalities. Supports
 	// OpenAI chat format with role/content structure. For multimodal inputs, content
 	// can include text, images, or other media types.
-	Input param.Field[[]interface{}] `json:"input"`
-	// Modify likelihood of specified tokens appearing in the completion.
+	Input param.Field[[]map[string]interface{}] `json:"input"`
+	// Modify likelihood of specified tokens appearing in the completion. Maps token
+	// IDs (as strings) to bias values (-100 to 100). -100 = completely ban token, +100
+	// = strongly favor token.
 	LogitBias param.Field[map[string]int64] `json:"logit_bias"`
-	// Maximum number of tokens to generate in the completion.
+	// Maximum number of tokens to generate in the completion. Does not include tokens
+	// in the input messages.
 	MaxTokens param.Field[int64] `json:"max_tokens"`
 	// Maximum number of turns for agent execution before terminating (default: 10).
+	// Each turn represents one model inference cycle. Higher values allow more complex
+	// reasoning but increase cost and latency.
 	MaxTurns param.Field[int64] `json:"max_turns"`
 	// MCP (Model Context Protocol) server addresses to make available for server-side
-	// tool execution.
+	// tool execution. Can be URLs (e.g., 'https://mcp.example.com') or slugs (e.g.,
+	// 'dedalus-labs/brave-search'). MCP tools are executed server-side and billed
+	// separately.
 	McpServers param.Field[[]string] `json:"mcp_servers"`
-	// Model(s) to use for completion. Can be a single model ID, a Model object, or a
-	// list for multi-model routing.
+	// Model(s) to use for completion. Can be a single model ID, a ModelConfig object
+	// (optionally with per-model 'settings'), or a list for multi-model routing.
+	// Single model: 'gpt-4', 'claude-3-5-sonnet-20241022', 'gpt-4o-mini', or a Model
+	// instance. Multi-model routing: ['gpt-4o-mini', 'gpt-4', 'claude-3-5-sonnet'] or
+	// list of ModelConfig objects - agent will choose optimal model based on task
+	// complexity.
 	Model param.Field[CompletionRequestModelUnionParam] `json:"model"`
 	// Attributes for individual models used in routing decisions during multi-model
-	// execution.
+	// execution. Format: {'model_name': {'attribute': value}}, where values are
+	// 0.0-1.0. Common attributes: 'intelligence', 'speed', 'cost', 'creativity',
+	// 'accuracy'. Used by agent to select optimal model based on task requirements.
 	ModelAttributes param.Field[map[string]map[string]float64] `json:"model_attributes"`
 	// Number of completions to generate. Note: only n=1 is currently supported.
 	N param.Field[int64] `json:"n"`
 	// Presence penalty (-2 to 2). Positive values penalize new tokens based on whether
-	// they appear in the text so far.
+	// they appear in the text so far, encouraging the model to talk about new topics.
 	PresencePenalty param.Field[float64] `json:"presence_penalty"`
-	// Up to 4 sequences where the API will stop generating further tokens.
+	// Up to 4 sequences where the API will stop generating further tokens. The model
+	// will stop as soon as it encounters any of these sequences.
 	Stop param.Field[[]string] `json:"stop"`
-	// Whether to stream back partial message deltas as Server-Sent Events.
+	// Whether to stream back partial message deltas as Server-Sent Events. When true,
+	// partial message deltas will be sent as chunks in OpenAI format.
 	Stream param.Field[bool] `json:"stream"`
 	// Sampling temperature (0 to 2). Higher values make output more random, lower
-	// values make it more focused and deterministic.
+	// values make it more focused and deterministic. 0 = deterministic, 1 = balanced,
+	// 2 = very creative.
 	Temperature param.Field[float64] `json:"temperature"`
-	// Controls which tool is called by the model.
-	ToolChoice param.Field[interface{}] `json:"tool_choice"`
-	// List of tools available to the model in OpenAI function calling format.
-	Tools param.Field[[]interface{}] `json:"tools"`
-	// Nucleus sampling parameter (0 to 1). Alternative to temperature.
+	// Controls which tool is called by the model. Options: 'auto' (default), 'none',
+	// 'required', or specific tool name. Can also be a dict specifying a particular
+	// tool.
+	ToolChoice param.Field[CompletionRequestToolChoiceUnionParam] `json:"tool_choice"`
+	// List of tools available to the model in OpenAI function calling format. Tools
+	// are executed client-side and returned as JSON for the application to handle. Use
+	// 'mcp_servers' for server-side tool execution.
+	Tools param.Field[[]map[string]interface{}] `json:"tools"`
+	// Nucleus sampling parameter (0 to 1). Alternative to temperature. 0.1 = only top
+	// 10% probability mass, 1.0 = consider all tokens.
 	TopP param.Field[float64] `json:"top_p"`
-	// Unique identifier representing your end-user.
+	// Unique identifier representing your end-user. Used for monitoring and abuse
+	// detection. Should be consistent across requests from the same user.
 	User param.Field[string] `json:"user"`
 }
 
@@ -640,56 +817,70 @@ func (r CompletionRequestParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-// Model(s) to use for completion. Can be a single model ID, a Model object, or a
-// list for multi-model routing.
+// Model(s) to use for completion. Can be a single model ID, a ModelConfig object
+// (optionally with per-model 'settings'), or a list for multi-model routing.
+// Single model: 'gpt-4', 'claude-3-5-sonnet-20241022', 'gpt-4o-mini', or a Model
+// instance. Multi-model routing: ['gpt-4o-mini', 'gpt-4', 'claude-3-5-sonnet'] or
+// list of ModelConfig objects - agent will choose optimal model based on task
+// complexity.
 //
-// Satisfied by [shared.UnionString], [CompletionRequestModelArrayParam],
-// [CompletionRequestModelModelParam], [CompletionRequestModelArrayParam].
+// Satisfied by [shared.UnionString], [CompletionRequestModelModelIDListParam],
+// [CompletionRequestModelModelConfigParam],
+// [CompletionRequestModelModelConfigListParam].
 type CompletionRequestModelUnionParam interface {
 	ImplementsCompletionRequestModelUnionParam()
 }
 
-type CompletionRequestModelArrayParam []string
+type CompletionRequestModelModelIDListParam []string
 
-func (r CompletionRequestModelArrayParam) ImplementsCompletionRequestModelUnionParam() {}
+func (r CompletionRequestModelModelIDListParam) ImplementsCompletionRequestModelUnionParam() {}
 
-type CompletionRequestModelModelParam struct {
-	// Model identifier (e.g., 'gpt-4', 'claude-3-5-sonnet')
+// A model with optional routing attributes and per-model settings.
+type CompletionRequestModelModelConfigParam struct {
+	// Model identifier, e.g. 'gpt-4' or 'claude-3-5-sonnet-20241022'.
 	Name param.Field[string] `json:"name,required"`
-	// Model attributes as scores between 0-1. Used for multi-model routing decisions.
+	// Numeric attributes used by routing (0.0–1.0), e.g. intelligence, speed, cost.
 	Attributes param.Field[map[string]float64] `json:"attributes"`
-	// Model generation settings including temperature, max_tokens, and other
-	// parameters.
-	Settings param.Field[CompletionRequestModelModelSettingsParam] `json:"settings"`
+	// Per-model generation settings like temperature, max_tokens, etc.
+	Settings param.Field[map[string]interface{}] `json:"settings"`
 }
 
-func (r CompletionRequestModelModelParam) MarshalJSON() (data []byte, err error) {
+func (r CompletionRequestModelModelConfigParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-func (r CompletionRequestModelModelParam) ImplementsCompletionRequestModelUnionParam() {}
+func (r CompletionRequestModelModelConfigParam) ImplementsCompletionRequestModelUnionParam() {}
 
-// Model generation settings including temperature, max_tokens, and other
-// parameters.
-type CompletionRequestModelModelSettingsParam struct {
-	FrequencyPenalty  param.Field[float64]           `json:"frequency_penalty"`
-	IncludeUsage      param.Field[bool]              `json:"include_usage"`
-	InputAudioFormat  param.Field[string]            `json:"input_audio_format"`
-	MaxTokens         param.Field[int64]             `json:"max_tokens"`
-	Metadata          param.Field[map[string]string] `json:"metadata"`
-	Modalities        param.Field[[]string]          `json:"modalities"`
-	OutputAudioFormat param.Field[string]            `json:"output_audio_format"`
-	ParallelToolCalls param.Field[bool]              `json:"parallel_tool_calls"`
-	PresencePenalty   param.Field[float64]           `json:"presence_penalty"`
-	Store             param.Field[bool]              `json:"store"`
-	Temperature       param.Field[float64]           `json:"temperature"`
-	TopP              param.Field[float64]           `json:"top_p"`
-	Voice             param.Field[string]            `json:"voice"`
+type CompletionRequestModelModelConfigListParam []CompletionRequestModelModelConfigListItemParam
+
+func (r CompletionRequestModelModelConfigListParam) ImplementsCompletionRequestModelUnionParam() {}
+
+// A model with optional routing attributes and per-model settings.
+type CompletionRequestModelModelConfigListItemParam struct {
+	// Model identifier, e.g. 'gpt-4' or 'claude-3-5-sonnet-20241022'.
+	Name param.Field[string] `json:"name,required"`
+	// Numeric attributes used by routing (0.0–1.0), e.g. intelligence, speed, cost.
+	Attributes param.Field[map[string]float64] `json:"attributes"`
+	// Per-model generation settings like temperature, max_tokens, etc.
+	Settings param.Field[map[string]interface{}] `json:"settings"`
 }
 
-func (r CompletionRequestModelModelSettingsParam) MarshalJSON() (data []byte, err error) {
+func (r CompletionRequestModelModelConfigListItemParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
+
+// Controls which tool is called by the model. Options: 'auto' (default), 'none',
+// 'required', or specific tool name. Can also be a dict specifying a particular
+// tool.
+//
+// Satisfied by [shared.UnionString], [CompletionRequestToolChoiceMapParam].
+type CompletionRequestToolChoiceUnionParam interface {
+	ImplementsCompletionRequestToolChoiceUnionParam()
+}
+
+type CompletionRequestToolChoiceMapParam map[string]interface{}
+
+func (r CompletionRequestToolChoiceMapParam) ImplementsCompletionRequestToolChoiceUnionParam() {}
 
 type StreamChunk struct {
 	ID                string                 `json:"id,required"`
@@ -700,6 +891,7 @@ type StreamChunk struct {
 	ServiceTier       StreamChunkServiceTier `json:"service_tier,nullable"`
 	SystemFingerprint string                 `json:"system_fingerprint,nullable"`
 	Usage             StreamChunkUsage       `json:"usage,nullable"`
+	ExtraFields       map[string]interface{} `json:"-,extras"`
 	JSON              streamChunkJSON        `json:"-"`
 }
 
@@ -730,6 +922,7 @@ type StreamChunkChoice struct {
 	Index        int64                          `json:"index,required"`
 	FinishReason StreamChunkChoicesFinishReason `json:"finish_reason,nullable"`
 	Logprobs     StreamChunkChoicesLogprobs     `json:"logprobs,nullable"`
+	ExtraFields  map[string]interface{}         `json:"-,extras"`
 	JSON         streamChunkChoiceJSON          `json:"-"`
 }
 
@@ -758,6 +951,7 @@ type StreamChunkChoicesDelta struct {
 	Refusal      string                              `json:"refusal,nullable"`
 	Role         StreamChunkChoicesDeltaRole         `json:"role,nullable"`
 	ToolCalls    []StreamChunkChoicesDeltaToolCall   `json:"tool_calls,nullable"`
+	ExtraFields  map[string]interface{}              `json:"-,extras"`
 	JSON         streamChunkChoicesDeltaJSON         `json:"-"`
 }
 
@@ -782,9 +976,10 @@ func (r streamChunkChoicesDeltaJSON) RawJSON() string {
 }
 
 type StreamChunkChoicesDeltaFunctionCall struct {
-	Arguments string                                  `json:"arguments,nullable"`
-	Name      string                                  `json:"name,nullable"`
-	JSON      streamChunkChoicesDeltaFunctionCallJSON `json:"-"`
+	Arguments   string                                  `json:"arguments,nullable"`
+	Name        string                                  `json:"name,nullable"`
+	ExtraFields map[string]interface{}                  `json:"-,extras"`
+	JSON        streamChunkChoicesDeltaFunctionCallJSON `json:"-"`
 }
 
 // streamChunkChoicesDeltaFunctionCallJSON contains the JSON metadata for the
@@ -823,11 +1018,12 @@ func (r StreamChunkChoicesDeltaRole) IsKnown() bool {
 }
 
 type StreamChunkChoicesDeltaToolCall struct {
-	Index    int64                                    `json:"index,required"`
-	ID       string                                   `json:"id,nullable"`
-	Function StreamChunkChoicesDeltaToolCallsFunction `json:"function,nullable"`
-	Type     StreamChunkChoicesDeltaToolCallsType     `json:"type,nullable"`
-	JSON     streamChunkChoicesDeltaToolCallJSON      `json:"-"`
+	Index       int64                                    `json:"index,required"`
+	ID          string                                   `json:"id,nullable"`
+	Function    StreamChunkChoicesDeltaToolCallsFunction `json:"function,nullable"`
+	Type        StreamChunkChoicesDeltaToolCallsType     `json:"type,nullable"`
+	ExtraFields map[string]interface{}                   `json:"-,extras"`
+	JSON        streamChunkChoicesDeltaToolCallJSON      `json:"-"`
 }
 
 // streamChunkChoicesDeltaToolCallJSON contains the JSON metadata for the struct
@@ -850,9 +1046,10 @@ func (r streamChunkChoicesDeltaToolCallJSON) RawJSON() string {
 }
 
 type StreamChunkChoicesDeltaToolCallsFunction struct {
-	Arguments string                                       `json:"arguments,nullable"`
-	Name      string                                       `json:"name,nullable"`
-	JSON      streamChunkChoicesDeltaToolCallsFunctionJSON `json:"-"`
+	Arguments   string                                       `json:"arguments,nullable"`
+	Name        string                                       `json:"name,nullable"`
+	ExtraFields map[string]interface{}                       `json:"-,extras"`
+	JSON        streamChunkChoicesDeltaToolCallsFunctionJSON `json:"-"`
 }
 
 // streamChunkChoicesDeltaToolCallsFunctionJSON contains the JSON metadata for the
@@ -905,9 +1102,10 @@ func (r StreamChunkChoicesFinishReason) IsKnown() bool {
 }
 
 type StreamChunkChoicesLogprobs struct {
-	Content []StreamChunkChoicesLogprobsContent `json:"content,nullable"`
-	Refusal []StreamChunkChoicesLogprobsRefusal `json:"refusal,nullable"`
-	JSON    streamChunkChoicesLogprobsJSON      `json:"-"`
+	Content     []StreamChunkChoicesLogprobsContent `json:"content,nullable"`
+	Refusal     []StreamChunkChoicesLogprobsRefusal `json:"refusal,nullable"`
+	ExtraFields map[string]interface{}              `json:"-,extras"`
+	JSON        streamChunkChoicesLogprobsJSON      `json:"-"`
 }
 
 // streamChunkChoicesLogprobsJSON contains the JSON metadata for the struct
@@ -932,6 +1130,7 @@ type StreamChunkChoicesLogprobsContent struct {
 	Logprob     float64                                       `json:"logprob,required"`
 	TopLogprobs []StreamChunkChoicesLogprobsContentTopLogprob `json:"top_logprobs,required"`
 	Bytes       []int64                                       `json:"bytes,nullable"`
+	ExtraFields map[string]interface{}                        `json:"-,extras"`
 	JSON        streamChunkChoicesLogprobsContentJSON         `json:"-"`
 }
 
@@ -955,10 +1154,11 @@ func (r streamChunkChoicesLogprobsContentJSON) RawJSON() string {
 }
 
 type StreamChunkChoicesLogprobsContentTopLogprob struct {
-	Token   string                                          `json:"token,required"`
-	Logprob float64                                         `json:"logprob,required"`
-	Bytes   []int64                                         `json:"bytes,nullable"`
-	JSON    streamChunkChoicesLogprobsContentTopLogprobJSON `json:"-"`
+	Token       string                                          `json:"token,required"`
+	Logprob     float64                                         `json:"logprob,required"`
+	Bytes       []int64                                         `json:"bytes,nullable"`
+	ExtraFields map[string]interface{}                          `json:"-,extras"`
+	JSON        streamChunkChoicesLogprobsContentTopLogprobJSON `json:"-"`
 }
 
 // streamChunkChoicesLogprobsContentTopLogprobJSON contains the JSON metadata for
@@ -984,6 +1184,7 @@ type StreamChunkChoicesLogprobsRefusal struct {
 	Logprob     float64                                       `json:"logprob,required"`
 	TopLogprobs []StreamChunkChoicesLogprobsRefusalTopLogprob `json:"top_logprobs,required"`
 	Bytes       []int64                                       `json:"bytes,nullable"`
+	ExtraFields map[string]interface{}                        `json:"-,extras"`
 	JSON        streamChunkChoicesLogprobsRefusalJSON         `json:"-"`
 }
 
@@ -1007,10 +1208,11 @@ func (r streamChunkChoicesLogprobsRefusalJSON) RawJSON() string {
 }
 
 type StreamChunkChoicesLogprobsRefusalTopLogprob struct {
-	Token   string                                          `json:"token,required"`
-	Logprob float64                                         `json:"logprob,required"`
-	Bytes   []int64                                         `json:"bytes,nullable"`
-	JSON    streamChunkChoicesLogprobsRefusalTopLogprobJSON `json:"-"`
+	Token       string                                          `json:"token,required"`
+	Logprob     float64                                         `json:"logprob,required"`
+	Bytes       []int64                                         `json:"bytes,nullable"`
+	ExtraFields map[string]interface{}                          `json:"-,extras"`
+	JSON        streamChunkChoicesLogprobsRefusalTopLogprobJSON `json:"-"`
 }
 
 // streamChunkChoicesLogprobsRefusalTopLogprobJSON contains the JSON metadata for
@@ -1069,6 +1271,7 @@ type StreamChunkUsage struct {
 	TotalTokens             int64                                   `json:"total_tokens,required"`
 	CompletionTokensDetails StreamChunkUsageCompletionTokensDetails `json:"completion_tokens_details,nullable"`
 	PromptTokensDetails     StreamChunkUsagePromptTokensDetails     `json:"prompt_tokens_details,nullable"`
+	ExtraFields             map[string]interface{}                  `json:"-,extras"`
 	JSON                    streamChunkUsageJSON                    `json:"-"`
 }
 
@@ -1097,6 +1300,7 @@ type StreamChunkUsageCompletionTokensDetails struct {
 	AudioTokens              int64                                       `json:"audio_tokens,nullable"`
 	ReasoningTokens          int64                                       `json:"reasoning_tokens,nullable"`
 	RejectedPredictionTokens int64                                       `json:"rejected_prediction_tokens,nullable"`
+	ExtraFields              map[string]interface{}                      `json:"-,extras"`
 	JSON                     streamChunkUsageCompletionTokensDetailsJSON `json:"-"`
 }
 
@@ -1122,6 +1326,7 @@ func (r streamChunkUsageCompletionTokensDetailsJSON) RawJSON() string {
 type StreamChunkUsagePromptTokensDetails struct {
 	AudioTokens  int64                                   `json:"audio_tokens,nullable"`
 	CachedTokens int64                                   `json:"cached_tokens,nullable"`
+	ExtraFields  map[string]interface{}                  `json:"-,extras"`
 	JSON         streamChunkUsagePromptTokensDetailsJSON `json:"-"`
 }
 
@@ -1144,6 +1349,62 @@ func (r streamChunkUsagePromptTokensDetailsJSON) RawJSON() string {
 
 type ChatNewParams struct {
 	// Request model for chat completions.
+	//
+	// Validates incoming chat requests with support for multimodality, multi-model
+	// routing, and agent-enhanced features. Compatible with OpenAI API format while
+	// extending functionality for advanced use cases.
+	//
+	// This model supports both the OpenAI-standard 'messages' field and the
+	// Dedalus-specific 'input' field for maximum compatibility. The 'input' field can
+	// handle various modalities beyond text messages.
+	//
+	// Key Features: - Multi-model routing with intelligent handoffs - MCP (Model
+	// Context Protocol) server integration - Advanced agent attributes for routing
+	// decisions - Client-side and server-side tool execution - Streaming and
+	// non-streaming responses - Automatic usage tracking and billing
+	//
+	// Examples: Basic chat completion:
+	// `python request = ChatCompletionRequest( model="gpt-4", input=[ {"role": "user", "content": "Hello, how are you?"} ] ) `
+	//
+	//	Multi-model routing with attributes:
+	//	```python
+	//	request = ChatCompletionRequest(
+	//	    model=["gpt-4o-mini", "gpt-4", "claude-3-5-sonnet"],
+	//	    input=[
+	//	        {"role": "user", "content": "Analyze this complex problem"}
+	//	    ],
+	//	    agent_attributes={
+	//	        "complexity": 0.8,
+	//	        "accuracy": 0.9
+	//	    },
+	//	    model_attributes={
+	//	        "gpt-4": {"intelligence": 0.9, "cost": 0.8},
+	//	        "claude-3-5-sonnet": {"intelligence": 0.95, "cost": 0.7}
+	//	    }
+	//	)
+	//	```
+	//
+	//	With tools and MCP servers:
+	//	```python
+	//	request = ChatCompletionRequest(
+	//	    model="gpt-4",
+	//	    input=[
+	//	        {"role": "user", "content": "Search for AI news"}
+	//	    ],
+	//	    tools=[
+	//	        {
+	//	            "type": "function",
+	//	            "function": {
+	//	                "name": "search_web",
+	//	                "description": "Search the web"
+	//	            }
+	//	        }
+	//	    ],
+	//	    mcp_servers=["dedalus-labs/brave-search"],
+	//	    temperature=0.7,
+	//	    max_tokens=1000
+	//	)
+	//	```
 	CompletionRequest CompletionRequestParam `json:"completion_request,required"`
 }
 
