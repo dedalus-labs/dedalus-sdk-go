@@ -629,10 +629,11 @@ type CompletionRequestParam struct {
 	// 'dedalus-labs/brave-search'). MCP tools are executed server-side and billed
 	// separately.
 	McpServers []string `json:"mcp_servers,omitzero"`
-	// Model(s) to use for completion. Can be a single model ID or a list for
-	// multi-model routing. Single model: 'gpt-4', 'claude-3-5-sonnet-20241022',
-	// 'gpt-4o-mini'. Multi-model routing: ['gpt-4o-mini', 'gpt-4',
-	// 'claude-3-5-sonnet'] - agent will choose optimal model based on task complexity.
+	// Model(s) to use for completion. Can be a single model ID, a Model object, or a
+	// list for multi-model routing. Single model: 'gpt-4',
+	// 'claude-3-5-sonnet-20241022', 'gpt-4o-mini', or a Model instance. Multi-model
+	// routing: ['gpt-4o-mini', 'gpt-4', 'claude-3-5-sonnet'] or list of Model
+	// objects - agent will choose optimal model based on task complexity.
 	Model CompletionRequestModelUnionParam `json:"model,omitzero"`
 	// Attributes for individual models used in routing decisions during multi-model
 	// execution. Format: {'model_name': {'attribute': value}}, where values are
@@ -665,13 +666,15 @@ func (r *CompletionRequestParam) UnmarshalJSON(data []byte) error {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type CompletionRequestModelUnionParam struct {
-	OfString      param.Opt[string] `json:",omitzero,inline"`
-	OfStringArray []string          `json:",omitzero,inline"`
+	OfString                       param.Opt[string]                      `json:",omitzero,inline"`
+	OfStringArray                  []string                               `json:",omitzero,inline"`
+	OfCompletionRequestModelObject *CompletionRequestModelObjectParam     `json:",omitzero,inline"`
+	OfCompletionRequestModelArray  []CompletionRequestModelArrayItemParam `json:",omitzero,inline"`
 	paramUnion
 }
 
 func (u CompletionRequestModelUnionParam) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion(u, u.OfString, u.OfStringArray)
+	return param.MarshalUnion(u, u.OfString, u.OfStringArray, u.OfCompletionRequestModelObject, u.OfCompletionRequestModelArray)
 }
 func (u *CompletionRequestModelUnionParam) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
@@ -682,8 +685,42 @@ func (u *CompletionRequestModelUnionParam) asAny() any {
 		return &u.OfString.Value
 	} else if !param.IsOmitted(u.OfStringArray) {
 		return &u.OfStringArray
+	} else if !param.IsOmitted(u.OfCompletionRequestModelObject) {
+		return u.OfCompletionRequestModelObject
+	} else if !param.IsOmitted(u.OfCompletionRequestModelArray) {
+		return &u.OfCompletionRequestModelArray
 	}
 	return nil
+}
+
+// The property Name is required.
+type CompletionRequestModelObjectParam struct {
+	Name       string             `json:"name,required"`
+	Attributes map[string]float64 `json:"attributes,omitzero"`
+	paramObj
+}
+
+func (r CompletionRequestModelObjectParam) MarshalJSON() (data []byte, err error) {
+	type shadow CompletionRequestModelObjectParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *CompletionRequestModelObjectParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// The property Name is required.
+type CompletionRequestModelArrayItemParam struct {
+	Name       string             `json:"name,required"`
+	Attributes map[string]float64 `json:"attributes,omitzero"`
+	paramObj
+}
+
+func (r CompletionRequestModelArrayItemParam) MarshalJSON() (data []byte, err error) {
+	type shadow CompletionRequestModelArrayItemParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *CompletionRequestModelArrayItemParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Only one field can be non-zero.
