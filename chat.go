@@ -666,15 +666,15 @@ func (r *CompletionRequestParam) UnmarshalJSON(data []byte) error {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type CompletionRequestModelUnionParam struct {
-	OfString                       param.Opt[string]                      `json:",omitzero,inline"`
-	OfStringArray                  []string                               `json:",omitzero,inline"`
-	OfCompletionRequestModelObject *CompletionRequestModelObjectParam     `json:",omitzero,inline"`
-	OfCompletionRequestModelArray  []CompletionRequestModelArrayItemParam `json:",omitzero,inline"`
+	OfString           param.Opt[string]                                 `json:",omitzero,inline"`
+	OfModelStringArray []string                                          `json:",omitzero,inline"`
+	OfModelObject      *CompletionRequestModelModelObjectParam           `json:",omitzero,inline"`
+	OfModelObjectArray []CompletionRequestModelModelObjectArrayItemParam `json:",omitzero,inline"`
 	paramUnion
 }
 
 func (u CompletionRequestModelUnionParam) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion(u, u.OfString, u.OfStringArray, u.OfCompletionRequestModelObject, u.OfCompletionRequestModelArray)
+	return param.MarshalUnion(u, u.OfString, u.OfModelStringArray, u.OfModelObject, u.OfModelObjectArray)
 }
 func (u *CompletionRequestModelUnionParam) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
@@ -683,43 +683,57 @@ func (u *CompletionRequestModelUnionParam) UnmarshalJSON(data []byte) error {
 func (u *CompletionRequestModelUnionParam) asAny() any {
 	if !param.IsOmitted(u.OfString) {
 		return &u.OfString.Value
-	} else if !param.IsOmitted(u.OfStringArray) {
-		return &u.OfStringArray
-	} else if !param.IsOmitted(u.OfCompletionRequestModelObject) {
-		return u.OfCompletionRequestModelObject
-	} else if !param.IsOmitted(u.OfCompletionRequestModelArray) {
-		return &u.OfCompletionRequestModelArray
+	} else if !param.IsOmitted(u.OfModelStringArray) {
+		return &u.OfModelStringArray
+	} else if !param.IsOmitted(u.OfModelObject) {
+		return u.OfModelObject
+	} else if !param.IsOmitted(u.OfModelObjectArray) {
+		return &u.OfModelObjectArray
 	}
 	return nil
 }
 
+// Model specification for API requests.
+//
+// This is used in the OpenAPI schema to properly generate named types instead of
+// anonymous union members.
+//
 // The property Name is required.
-type CompletionRequestModelObjectParam struct {
-	Name       string             `json:"name,required"`
+type CompletionRequestModelModelObjectParam struct {
+	// Model identifier
+	Name string `json:"name,required"`
+	// Model attributes for routing decisions (0.0-1.0 range)
 	Attributes map[string]float64 `json:"attributes,omitzero"`
 	paramObj
 }
 
-func (r CompletionRequestModelObjectParam) MarshalJSON() (data []byte, err error) {
-	type shadow CompletionRequestModelObjectParam
+func (r CompletionRequestModelModelObjectParam) MarshalJSON() (data []byte, err error) {
+	type shadow CompletionRequestModelModelObjectParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
-func (r *CompletionRequestModelObjectParam) UnmarshalJSON(data []byte) error {
+func (r *CompletionRequestModelModelObjectParam) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Model specification for API requests.
+//
+// This is used in the OpenAPI schema to properly generate named types instead of
+// anonymous union members.
+//
 // The property Name is required.
-type CompletionRequestModelArrayItemParam struct {
-	Name       string             `json:"name,required"`
+type CompletionRequestModelModelObjectArrayItemParam struct {
+	// Model identifier
+	Name string `json:"name,required"`
+	// Model attributes for routing decisions (0.0-1.0 range)
 	Attributes map[string]float64 `json:"attributes,omitzero"`
 	paramObj
 }
 
-func (r CompletionRequestModelArrayItemParam) MarshalJSON() (data []byte, err error) {
-	type shadow CompletionRequestModelArrayItemParam
+func (r CompletionRequestModelModelObjectArrayItemParam) MarshalJSON() (data []byte, err error) {
+	type shadow CompletionRequestModelModelObjectArrayItemParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
-func (r *CompletionRequestModelArrayItemParam) UnmarshalJSON(data []byte) error {
+func (r *CompletionRequestModelModelObjectArrayItemParam) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
