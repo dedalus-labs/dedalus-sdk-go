@@ -11,6 +11,7 @@ import (
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/apijson"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/requestconfig"
 	"github.com/dedalus-labs/dedalus-sdk-go/option"
+	"github.com/dedalus-labs/dedalus-sdk-go/packages/respjson"
 )
 
 // ModelService contains methods and other services that help with interacting with
@@ -26,8 +27,8 @@ type ModelService struct {
 // NewModelService generates a new service that applies the given options to each
 // request. These options are applied after the parent client's options (if there
 // is one), and before any request-specific options.
-func NewModelService(opts ...option.RequestOption) (r *ModelService) {
-	r = &ModelService{}
+func NewModelService(opts ...option.RequestOption) (r ModelService) {
+	r = ModelService{}
 	r.Options = opts
 	return
 }
@@ -66,7 +67,7 @@ func NewModelService(opts ...option.RequestOption) (r *ModelService) {
 //	    "owned_by": "openai"
 //	}
 //	```
-func (r *ModelService) Get(ctx context.Context, modelID string, opts ...option.RequestOption) (res *ModelInfo, err error) {
+func (r *ModelService) Get(ctx context.Context, modelID string, opts ...option.RequestOption) (res *Model, err error) {
 	opts = append(r.Options[:], opts...)
 	if modelID == "" {
 		err = errors.New("missing required model_id parameter")
@@ -141,7 +142,7 @@ func (r *ModelService) List(ctx context.Context, opts ...option.RequestOption) (
 //
 // Example: { "id": "gpt-4", "object": "model", "created": 1687882411, "owned_by":
 // "openai" }
-type ModelInfo struct {
+type Model struct {
 	// Model identifier
 	ID string `json:"id,required"`
 	// Creation timestamp
@@ -153,31 +154,27 @@ type ModelInfo struct {
 	// Parent model
 	Parent string `json:"parent,nullable"`
 	// Permissions
-	Permission []map[string]interface{} `json:"permission,nullable"`
+	Permission []map[string]any `json:"permission,nullable"`
 	// Root model
-	Root string        `json:"root,nullable"`
-	JSON modelInfoJSON `json:"-"`
+	Root string `json:"root,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Created     respjson.Field
+		Object      respjson.Field
+		OwnedBy     respjson.Field
+		Parent      respjson.Field
+		Permission  respjson.Field
+		Root        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// modelInfoJSON contains the JSON metadata for the struct [ModelInfo]
-type modelInfoJSON struct {
-	ID          apijson.Field
-	Created     apijson.Field
-	Object      apijson.Field
-	OwnedBy     apijson.Field
-	Parent      apijson.Field
-	Permission  apijson.Field
-	Root        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ModelInfo) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r Model) RawJSON() string { return r.JSON.raw }
+func (r *Model) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r modelInfoJSON) RawJSON() string {
-	return r.raw
 }
 
 // Response containing list of available models.
@@ -193,24 +190,20 @@ func (r modelInfoJSON) RawJSON() string {
 // "owned_by": "anthropic" } ] }
 type ModelsResponse struct {
 	// List of models
-	Data []ModelInfo `json:"data,required"`
+	Data []Model `json:"data,required"`
 	// Object type
-	Object string             `json:"object"`
-	JSON   modelsResponseJSON `json:"-"`
+	Object string `json:"object"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		Object      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// modelsResponseJSON contains the JSON metadata for the struct [ModelsResponse]
-type modelsResponseJSON struct {
-	Data        apijson.Field
-	Object      apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ModelsResponse) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r ModelsResponse) RawJSON() string { return r.JSON.raw }
+func (r *ModelsResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r modelsResponseJSON) RawJSON() string {
-	return r.raw
 }
