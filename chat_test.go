@@ -11,7 +11,6 @@ import (
 	"github.com/dedalus-labs/dedalus-sdk-go"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/testutil"
 	"github.com/dedalus-labs/dedalus-sdk-go/option"
-	"github.com/dedalus-labs/dedalus-sdk-go/shared"
 )
 
 func TestChatNewWithOptionalParams(t *testing.T) {
@@ -29,58 +28,58 @@ func TestChatNewWithOptionalParams(t *testing.T) {
 	)
 	_, err := client.Chat.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatNewParams{
 		CompletionRequest: githubcomdedaluslabsdedalussdkgo.CompletionRequestParam{
-			AgentAttributes: githubcomdedaluslabsdedalussdkgo.F(map[string]float64{
-				"accuracy":   0.900000,
-				"complexity": 0.800000,
-				"efficiency": 0.700000,
-			}),
-			FrequencyPenalty: githubcomdedaluslabsdedalussdkgo.F(-0.500000),
-			Guardrails: githubcomdedaluslabsdedalussdkgo.F([]map[string]interface{}{{
+			AgentAttributes: map[string]any{
+				"accuracy":   "bar",
+				"complexity": "bar",
+				"efficiency": "bar",
+			},
+			FrequencyPenalty: githubcomdedaluslabsdedalussdkgo.Float(-0.5),
+			Guardrails: []map[string]any{{
 				"foo": "bar",
-			}}),
-			HandoffConfig: githubcomdedaluslabsdedalussdkgo.F(map[string]interface{}{
+			}},
+			HandoffConfig: map[string]any{
 				"foo": "bar",
-			}),
-			Input: githubcomdedaluslabsdedalussdkgo.F([]map[string]interface{}{{
+			},
+			Input: []map[string]any{{
 				"content": "bar",
 				"role":    "bar",
-			}}),
-			LogitBias: githubcomdedaluslabsdedalussdkgo.F(map[string]int64{
-				"50256": int64(-100),
-			}),
-			MaxTokens:  githubcomdedaluslabsdedalussdkgo.F(int64(100)),
-			MaxTurns:   githubcomdedaluslabsdedalussdkgo.F(int64(5)),
-			McpServers: githubcomdedaluslabsdedalussdkgo.F([]string{"dedalus-labs/brave-search", "dedalus-labs/github-api"}),
-			Model:      githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.CompletionRequestModelUnionParam](shared.UnionString("gpt-4")),
-			ModelAttributes: githubcomdedaluslabsdedalussdkgo.F(map[string]map[string]float64{
-				"claude-3-5-sonnet": {
-					"cost":         0.700000,
-					"creativity":   0.800000,
-					"intelligence": 0.950000,
-				},
+			}},
+			LogitBias: map[string]int64{
+				"50256": -100,
+			},
+			MaxTokens:  githubcomdedaluslabsdedalussdkgo.Int(100),
+			MaxTurns:   githubcomdedaluslabsdedalussdkgo.Int(5),
+			McpServers: []string{"dedalus-labs/brave-search", "dedalus-labs/github-api"},
+			Model: githubcomdedaluslabsdedalussdkgo.CompletionRequestModelUnionParam{
+				OfString: githubcomdedaluslabsdedalussdkgo.String("gpt-4"),
+			},
+			ModelAttributes: map[string]map[string]any{
 				"gpt-4": {
-					"cost":         0.800000,
-					"intelligence": 0.900000,
-					"speed":        0.600000,
+					"context_window": "bar",
+					"description":    "bar",
+					"multimodal":     "bar",
+					"strengths":      "bar",
 				},
 				"gpt-4o-mini": {
-					"cost":         0.200000,
-					"intelligence": 0.700000,
-					"speed":        0.900000,
+					"cost_tier":   "bar",
+					"description": "bar",
+					"strengths":   "bar",
 				},
-			}),
-			N:               githubcomdedaluslabsdedalussdkgo.F(int64(1)),
-			PresencePenalty: githubcomdedaluslabsdedalussdkgo.F(-0.500000),
-			Stop:            githubcomdedaluslabsdedalussdkgo.F([]string{"\n", "END"}),
-			Stream:          githubcomdedaluslabsdedalussdkgo.F(true),
-			Temperature:     githubcomdedaluslabsdedalussdkgo.F(0.000000),
-			ToolChoice:      githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.CompletionRequestToolChoiceUnionParam](shared.UnionString("auto")),
-			Tools: githubcomdedaluslabsdedalussdkgo.F([]map[string]interface{}{{
+			},
+			N:               githubcomdedaluslabsdedalussdkgo.Int(1),
+			PresencePenalty: githubcomdedaluslabsdedalussdkgo.Float(-0.5),
+			Stop:            []string{"\\n", "END"},
+			Stream:          githubcomdedaluslabsdedalussdkgo.Bool(true),
+			Temperature:     githubcomdedaluslabsdedalussdkgo.Float(0),
+			ToolChoice: githubcomdedaluslabsdedalussdkgo.CompletionRequestToolChoiceUnionParam{
+				OfString: githubcomdedaluslabsdedalussdkgo.String("auto"),
+			},
+			Tools: []map[string]any{{
 				"function": "bar",
 				"type":     "bar",
-			}}),
-			TopP: githubcomdedaluslabsdedalussdkgo.F(0.100000),
-			User: githubcomdedaluslabsdedalussdkgo.F("user-123"),
+			}},
+			TopP: githubcomdedaluslabsdedalussdkgo.Float(0.1),
+			User: githubcomdedaluslabsdedalussdkgo.String("user-123"),
 		},
 	})
 	if err != nil {

@@ -28,8 +28,7 @@ func TestUsage(t *testing.T) {
 		CompletionRequest: githubcomdedaluslabsdedalussdkgo.CompletionRequestParam{},
 	})
 	if err != nil {
-		t.Error(err)
-		return
+		t.Fatalf("err should be nil: %s", err.Error())
 	}
 	t.Logf("%+v\n", completion.ID)
 }

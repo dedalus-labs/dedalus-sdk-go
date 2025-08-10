@@ -16,10 +16,10 @@ import (
 // directly, and instead use the [NewClient] method instead.
 type Client struct {
 	Options []option.RequestOption
-	Root    *RootService
-	Health  *HealthService
-	Models  *ModelService
-	Chat    *ChatService
+	Root    RootService
+	Health  HealthService
+	Models  ModelService
+	Chat    ChatService
 }
 
 // DefaultClientOptions read from the environment (DEDALUS_API_KEY,
@@ -39,10 +39,10 @@ func DefaultClientOptions() []option.RequestOption {
 // environment (DEDALUS_API_KEY, DEDALUS_BASE_URL). The option passed in as
 // arguments are applied after these default arguments, and all option will be
 // passed down to the services and requests that this client makes.
-func NewClient(opts ...option.RequestOption) (r *Client) {
+func NewClient(opts ...option.RequestOption) (r Client) {
 	opts = append(DefaultClientOptions(), opts...)
 
-	r = &Client{Options: opts}
+	r = Client{Options: opts}
 
 	r.Root = NewRootService(opts...)
 	r.Health = NewHealthService(opts...)
@@ -83,40 +83,40 @@ func NewClient(opts ...option.RequestOption) (r *Client) {
 //
 // For even greater flexibility, see [option.WithResponseInto] and
 // [option.WithResponseBodyInto].
-func (r *Client) Execute(ctx context.Context, method string, path string, params interface{}, res interface{}, opts ...option.RequestOption) error {
+func (r *Client) Execute(ctx context.Context, method string, path string, params any, res any, opts ...option.RequestOption) error {
 	opts = append(r.Options, opts...)
 	return requestconfig.ExecuteNewRequest(ctx, method, path, params, res, opts...)
 }
 
 // Get makes a GET request with the given URL, params, and optionally deserializes
 // to a response. See [Execute] documentation on the params and response.
-func (r *Client) Get(ctx context.Context, path string, params interface{}, res interface{}, opts ...option.RequestOption) error {
+func (r *Client) Get(ctx context.Context, path string, params any, res any, opts ...option.RequestOption) error {
 	return r.Execute(ctx, http.MethodGet, path, params, res, opts...)
 }
 
 // Post makes a POST request with the given URL, params, and optionally
 // deserializes to a response. See [Execute] documentation on the params and
 // response.
-func (r *Client) Post(ctx context.Context, path string, params interface{}, res interface{}, opts ...option.RequestOption) error {
+func (r *Client) Post(ctx context.Context, path string, params any, res any, opts ...option.RequestOption) error {
 	return r.Execute(ctx, http.MethodPost, path, params, res, opts...)
 }
 
 // Put makes a PUT request with the given URL, params, and optionally deserializes
 // to a response. See [Execute] documentation on the params and response.
-func (r *Client) Put(ctx context.Context, path string, params interface{}, res interface{}, opts ...option.RequestOption) error {
+func (r *Client) Put(ctx context.Context, path string, params any, res any, opts ...option.RequestOption) error {
 	return r.Execute(ctx, http.MethodPut, path, params, res, opts...)
 }
 
 // Patch makes a PATCH request with the given URL, params, and optionally
 // deserializes to a response. See [Execute] documentation on the params and
 // response.
-func (r *Client) Patch(ctx context.Context, path string, params interface{}, res interface{}, opts ...option.RequestOption) error {
+func (r *Client) Patch(ctx context.Context, path string, params any, res any, opts ...option.RequestOption) error {
 	return r.Execute(ctx, http.MethodPatch, path, params, res, opts...)
 }
 
 // Delete makes a DELETE request with the given URL, params, and optionally
 // deserializes to a response. See [Execute] documentation on the params and
 // response.
-func (r *Client) Delete(ctx context.Context, path string, params interface{}, res interface{}, opts ...option.RequestOption) error {
+func (r *Client) Delete(ctx context.Context, path string, params any, res any, opts ...option.RequestOption) error {
 	return r.Execute(ctx, http.MethodDelete, path, params, res, opts...)
 }
