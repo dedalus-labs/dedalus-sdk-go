@@ -677,17 +677,18 @@ func (u *CompletionRequestToolChoiceUnionParam) asAny() any {
 //
 // The property Name is required.
 type DedalusModelParam struct {
-	// Model identifier (e.g., 'gpt-4', 'claude-3-sonnet')
+	// Model identifier (e.g., 'openai/gpt-4.1', 'anthropic/claude-3-5-sonnet')
 	Name string `json:"name,required"`
 	// Model metadata for schema documentation and handoffs. Supports flexible types:
 	// strings, numbers, booleans, lists, dicts.
-	Attributes map[string]any `json:"attributes,omitzero"`
+	Attributes  map[string]any `json:"attributes,omitzero"`
+	ExtraFields map[string]any `json:"-"`
 	paramObj
 }
 
 func (r DedalusModelParam) MarshalJSON() (data []byte, err error) {
 	type shadow DedalusModelParam
-	return param.MarshalObject(r, (*shadow)(&r))
+	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
 }
 func (r *DedalusModelParam) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
@@ -695,14 +696,14 @@ func (r *DedalusModelParam) UnmarshalJSON(data []byte) error {
 
 type StreamChunk struct {
 	ID      string                       `json:"id,required"`
-	Choices []any                        `json:"choices,required"`
+	Choices []StreamChunkChoice          `json:"choices,required"`
 	Created int64                        `json:"created,required"`
 	Model   string                       `json:"model,required"`
 	Object  constant.ChatCompletionChunk `json:"object,required"`
 	// Any of "auto", "default", "flex", "scale", "priority".
 	ServiceTier       StreamChunkServiceTier `json:"service_tier,nullable"`
 	SystemFingerprint string                 `json:"system_fingerprint,nullable"`
-	Usage             any                    `json:"usage"`
+	Usage             StreamChunkUsage       `json:"usage,nullable"`
 	ExtraFields       map[string]any         `json:",extras"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -725,6 +726,183 @@ func (r *StreamChunk) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+type StreamChunkChoice struct {
+	Delta StreamChunkChoiceDelta `json:"delta,required"`
+	Index int64                  `json:"index,required"`
+	// Any of "stop", "length", "tool_calls", "content_filter", "function_call".
+	FinishReason string                    `json:"finish_reason,nullable"`
+	Logprobs     StreamChunkChoiceLogprobs `json:"logprobs,nullable"`
+	ExtraFields  map[string]any            `json:",extras"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Delta        respjson.Field
+		Index        respjson.Field
+		FinishReason respjson.Field
+		Logprobs     respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r StreamChunkChoice) RawJSON() string { return r.JSON.raw }
+func (r *StreamChunkChoice) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type StreamChunkChoiceDelta struct {
+	Content      string                             `json:"content,nullable"`
+	FunctionCall StreamChunkChoiceDeltaFunctionCall `json:"function_call,nullable"`
+	Refusal      string                             `json:"refusal,nullable"`
+	// Any of "developer", "system", "user", "assistant", "tool".
+	Role        string                           `json:"role,nullable"`
+	ToolCalls   []StreamChunkChoiceDeltaToolCall `json:"tool_calls,nullable"`
+	ExtraFields map[string]any                   `json:",extras"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Content      respjson.Field
+		FunctionCall respjson.Field
+		Refusal      respjson.Field
+		Role         respjson.Field
+		ToolCalls    respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r StreamChunkChoiceDelta) RawJSON() string { return r.JSON.raw }
+func (r *StreamChunkChoiceDelta) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type StreamChunkChoiceDeltaFunctionCall struct {
+	Arguments   string         `json:"arguments,nullable"`
+	Name        string         `json:"name,nullable"`
+	ExtraFields map[string]any `json:",extras"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Arguments   respjson.Field
+		Name        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r StreamChunkChoiceDeltaFunctionCall) RawJSON() string { return r.JSON.raw }
+func (r *StreamChunkChoiceDeltaFunctionCall) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type StreamChunkChoiceDeltaToolCall struct {
+	Index    int64                                  `json:"index,required"`
+	ID       string                                 `json:"id,nullable"`
+	Function StreamChunkChoiceDeltaToolCallFunction `json:"function,nullable"`
+	// Any of "function".
+	Type        string         `json:"type,nullable"`
+	ExtraFields map[string]any `json:",extras"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Index       respjson.Field
+		ID          respjson.Field
+		Function    respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r StreamChunkChoiceDeltaToolCall) RawJSON() string { return r.JSON.raw }
+func (r *StreamChunkChoiceDeltaToolCall) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type StreamChunkChoiceDeltaToolCallFunction struct {
+	Arguments   string         `json:"arguments,nullable"`
+	Name        string         `json:"name,nullable"`
+	ExtraFields map[string]any `json:",extras"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Arguments   respjson.Field
+		Name        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r StreamChunkChoiceDeltaToolCallFunction) RawJSON() string { return r.JSON.raw }
+func (r *StreamChunkChoiceDeltaToolCallFunction) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type StreamChunkChoiceLogprobs struct {
+	Content     []StreamChunkChoiceLogprobsContent `json:"content,nullable"`
+	Refusal     []StreamChunkChoiceLogprobsRefusal `json:"refusal,nullable"`
+	ExtraFields map[string]any                     `json:",extras"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Content     respjson.Field
+		Refusal     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r StreamChunkChoiceLogprobs) RawJSON() string { return r.JSON.raw }
+func (r *StreamChunkChoiceLogprobs) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type StreamChunkChoiceLogprobsContent struct {
+	Token       string         `json:"token,required"`
+	Logprob     float64        `json:"logprob,required"`
+	TopLogprobs []TopLogprob   `json:"top_logprobs,required"`
+	Bytes       []int64        `json:"bytes,nullable"`
+	ExtraFields map[string]any `json:",extras"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Token       respjson.Field
+		Logprob     respjson.Field
+		TopLogprobs respjson.Field
+		Bytes       respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r StreamChunkChoiceLogprobsContent) RawJSON() string { return r.JSON.raw }
+func (r *StreamChunkChoiceLogprobsContent) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type StreamChunkChoiceLogprobsRefusal struct {
+	Token       string         `json:"token,required"`
+	Logprob     float64        `json:"logprob,required"`
+	TopLogprobs []TopLogprob   `json:"top_logprobs,required"`
+	Bytes       []int64        `json:"bytes,nullable"`
+	ExtraFields map[string]any `json:",extras"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Token       respjson.Field
+		Logprob     respjson.Field
+		TopLogprobs respjson.Field
+		Bytes       respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r StreamChunkChoiceLogprobsRefusal) RawJSON() string { return r.JSON.raw }
+func (r *StreamChunkChoiceLogprobsRefusal) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type StreamChunkServiceTier string
 
 const (
@@ -734,6 +912,73 @@ const (
 	StreamChunkServiceTierScale    StreamChunkServiceTier = "scale"
 	StreamChunkServiceTierPriority StreamChunkServiceTier = "priority"
 )
+
+type StreamChunkUsage struct {
+	CompletionTokens        int64                                   `json:"completion_tokens,required"`
+	PromptTokens            int64                                   `json:"prompt_tokens,required"`
+	TotalTokens             int64                                   `json:"total_tokens,required"`
+	CompletionTokensDetails StreamChunkUsageCompletionTokensDetails `json:"completion_tokens_details,nullable"`
+	PromptTokensDetails     StreamChunkUsagePromptTokensDetails     `json:"prompt_tokens_details,nullable"`
+	ExtraFields             map[string]any                          `json:",extras"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		CompletionTokens        respjson.Field
+		PromptTokens            respjson.Field
+		TotalTokens             respjson.Field
+		CompletionTokensDetails respjson.Field
+		PromptTokensDetails     respjson.Field
+		ExtraFields             map[string]respjson.Field
+		raw                     string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r StreamChunkUsage) RawJSON() string { return r.JSON.raw }
+func (r *StreamChunkUsage) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type StreamChunkUsageCompletionTokensDetails struct {
+	AcceptedPredictionTokens int64          `json:"accepted_prediction_tokens,nullable"`
+	AudioTokens              int64          `json:"audio_tokens,nullable"`
+	ReasoningTokens          int64          `json:"reasoning_tokens,nullable"`
+	RejectedPredictionTokens int64          `json:"rejected_prediction_tokens,nullable"`
+	ExtraFields              map[string]any `json:",extras"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AcceptedPredictionTokens respjson.Field
+		AudioTokens              respjson.Field
+		ReasoningTokens          respjson.Field
+		RejectedPredictionTokens respjson.Field
+		ExtraFields              map[string]respjson.Field
+		raw                      string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r StreamChunkUsageCompletionTokensDetails) RawJSON() string { return r.JSON.raw }
+func (r *StreamChunkUsageCompletionTokensDetails) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type StreamChunkUsagePromptTokensDetails struct {
+	AudioTokens  int64          `json:"audio_tokens,nullable"`
+	CachedTokens int64          `json:"cached_tokens,nullable"`
+	ExtraFields  map[string]any `json:",extras"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AudioTokens  respjson.Field
+		CachedTokens respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r StreamChunkUsagePromptTokensDetails) RawJSON() string { return r.JSON.raw }
+func (r *StreamChunkUsagePromptTokensDetails) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type TopLogprob struct {
 	Token       string         `json:"token,required"`
@@ -753,6 +998,148 @@ type TopLogprob struct {
 // Returns the unmodified JSON received from the API
 func (r TopLogprob) RawJSON() string { return r.JSON.raw }
 func (r *TopLogprob) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// ChatNewResponseUnion contains all possible properties and values from
+// [Completion], [StreamChunk].
+//
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+type ChatNewResponseUnion struct {
+	ID string `json:"id"`
+	// This field is a union of [[]CompletionChoice], [[]StreamChunkChoice]
+	Choices           ChatNewResponseUnionChoices `json:"choices"`
+	Created           int64                       `json:"created"`
+	Model             string                      `json:"model"`
+	Object            string                      `json:"object"`
+	ServiceTier       string                      `json:"service_tier"`
+	SystemFingerprint string                      `json:"system_fingerprint"`
+	// This field is a union of [CompletionUsage], [StreamChunkUsage]
+	Usage ChatNewResponseUnionUsage `json:"usage"`
+	JSON  struct {
+		ID                respjson.Field
+		Choices           respjson.Field
+		Created           respjson.Field
+		Model             respjson.Field
+		Object            respjson.Field
+		ServiceTier       respjson.Field
+		SystemFingerprint respjson.Field
+		Usage             respjson.Field
+		raw               string
+	} `json:"-"`
+}
+
+func (u ChatNewResponseUnion) AsChatCompletion() (v Completion) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u ChatNewResponseUnion) AsChatCompletionChunk() (v StreamChunk) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+// Returns the unmodified JSON received from the API
+func (u ChatNewResponseUnion) RawJSON() string { return u.JSON.raw }
+
+func (r *ChatNewResponseUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// ChatNewResponseUnionChoices is an implicit subunion of [ChatNewResponseUnion].
+// ChatNewResponseUnionChoices provides convenient access to the sub-properties of
+// the union.
+//
+// For type safety it is recommended to directly use a variant of the
+// [ChatNewResponseUnion].
+//
+// If the underlying value is not a json object, one of the following properties
+// will be valid: OfChoices]
+type ChatNewResponseUnionChoices struct {
+	// This field will be present if the value is a [[]CompletionChoice] instead of an
+	// object.
+	OfChoices []CompletionChoice `json:",inline"`
+	JSON      struct {
+		OfChoices respjson.Field
+		raw       string
+	} `json:"-"`
+}
+
+func (r *ChatNewResponseUnionChoices) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// ChatNewResponseUnionUsage is an implicit subunion of [ChatNewResponseUnion].
+// ChatNewResponseUnionUsage provides convenient access to the sub-properties of
+// the union.
+//
+// For type safety it is recommended to directly use a variant of the
+// [ChatNewResponseUnion].
+type ChatNewResponseUnionUsage struct {
+	CompletionTokens int64 `json:"completion_tokens"`
+	PromptTokens     int64 `json:"prompt_tokens"`
+	TotalTokens      int64 `json:"total_tokens"`
+	// This field is a union of [CompletionUsageCompletionTokensDetails],
+	// [StreamChunkUsageCompletionTokensDetails]
+	CompletionTokensDetails ChatNewResponseUnionUsageCompletionTokensDetails `json:"completion_tokens_details"`
+	// This field is a union of [CompletionUsagePromptTokensDetails],
+	// [StreamChunkUsagePromptTokensDetails]
+	PromptTokensDetails ChatNewResponseUnionUsagePromptTokensDetails `json:"prompt_tokens_details"`
+	JSON                struct {
+		CompletionTokens        respjson.Field
+		PromptTokens            respjson.Field
+		TotalTokens             respjson.Field
+		CompletionTokensDetails respjson.Field
+		PromptTokensDetails     respjson.Field
+		raw                     string
+	} `json:"-"`
+}
+
+func (r *ChatNewResponseUnionUsage) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// ChatNewResponseUnionUsageCompletionTokensDetails is an implicit subunion of
+// [ChatNewResponseUnion]. ChatNewResponseUnionUsageCompletionTokensDetails
+// provides convenient access to the sub-properties of the union.
+//
+// For type safety it is recommended to directly use a variant of the
+// [ChatNewResponseUnion].
+type ChatNewResponseUnionUsageCompletionTokensDetails struct {
+	AcceptedPredictionTokens int64 `json:"accepted_prediction_tokens"`
+	AudioTokens              int64 `json:"audio_tokens"`
+	ReasoningTokens          int64 `json:"reasoning_tokens"`
+	RejectedPredictionTokens int64 `json:"rejected_prediction_tokens"`
+	JSON                     struct {
+		AcceptedPredictionTokens respjson.Field
+		AudioTokens              respjson.Field
+		ReasoningTokens          respjson.Field
+		RejectedPredictionTokens respjson.Field
+		raw                      string
+	} `json:"-"`
+}
+
+func (r *ChatNewResponseUnionUsageCompletionTokensDetails) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// ChatNewResponseUnionUsagePromptTokensDetails is an implicit subunion of
+// [ChatNewResponseUnion]. ChatNewResponseUnionUsagePromptTokensDetails provides
+// convenient access to the sub-properties of the union.
+//
+// For type safety it is recommended to directly use a variant of the
+// [ChatNewResponseUnion].
+type ChatNewResponseUnionUsagePromptTokensDetails struct {
+	AudioTokens  int64 `json:"audio_tokens"`
+	CachedTokens int64 `json:"cached_tokens"`
+	JSON         struct {
+		AudioTokens  respjson.Field
+		CachedTokens respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+func (r *ChatNewResponseUnionUsagePromptTokensDetails) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 

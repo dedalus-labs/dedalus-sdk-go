@@ -52,13 +52,13 @@ func main() {
 	client := githubcomdedaluslabsdedalussdkgo.NewClient(
 		option.WithAPIKey("My API Key"), // defaults to os.LookupEnv("DEDALUS_API_KEY")
 	)
-	completion, err := client.Chat.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatNewParams{
+	chat, err := client.Chat.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatNewParams{
 		CompletionRequest: githubcomdedaluslabsdedalussdkgo.CompletionRequestParam{},
 	})
 	if err != nil {
 		panic(err.Error())
 	}
-	fmt.Printf("%+v\n", completion.ID)
+	fmt.Printf("%+v\n", chat)
 }
 
 ```
