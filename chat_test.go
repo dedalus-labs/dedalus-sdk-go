@@ -28,10 +28,10 @@ func TestChatNewWithOptionalParams(t *testing.T) {
 	)
 	_, err := client.Chat.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatNewParams{
 		CompletionRequest: githubcomdedaluslabsdedalussdkgo.CompletionRequestParam{
-			AgentAttributes: map[string]any{
-				"accuracy":   "bar",
-				"complexity": "bar",
-				"efficiency": "bar",
+			AgentAttributes: map[string]float64{
+				"accuracy":   0.9,
+				"complexity": 0.8,
+				"efficiency": 0.7,
 			},
 			FrequencyPenalty: githubcomdedaluslabsdedalussdkgo.Float(-0.5),
 			Guardrails: []map[string]any{{
@@ -53,17 +53,21 @@ func TestChatNewWithOptionalParams(t *testing.T) {
 			Model: githubcomdedaluslabsdedalussdkgo.CompletionRequestModelUnionParam{
 				OfString: githubcomdedaluslabsdedalussdkgo.String("gpt-4"),
 			},
-			ModelAttributes: map[string]map[string]any{
+			ModelAttributes: map[string]map[string]float64{
+				"claude-3-5-sonnet": {
+					"cost":         0.7,
+					"creativity":   0.8,
+					"intelligence": 0.95,
+				},
 				"gpt-4": {
-					"context_window": "bar",
-					"description":    "bar",
-					"multimodal":     "bar",
-					"strengths":      "bar",
+					"cost":         0.8,
+					"intelligence": 0.9,
+					"speed":        0.6,
 				},
 				"gpt-4o-mini": {
-					"cost_tier":   "bar",
-					"description": "bar",
-					"strengths":   "bar",
+					"cost":         0.2,
+					"intelligence": 0.7,
+					"speed":        0.9,
 				},
 			},
 			N:               githubcomdedaluslabsdedalussdkgo.Int(1),

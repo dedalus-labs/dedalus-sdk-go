@@ -18,23 +18,20 @@ func ValueOf[T Constant[T]]() T {
 	return t.Default()
 }
 
-type Assistant string           // Always "assistant"
-type ChatCompletion string      // Always "chat.completion"
-type ChatCompletionChunk string // Always "chat.completion.chunk"
-type Function string            // Always "function"
-type URLCitation string         // Always "url_citation"
+type Assistant string      // Always "assistant"
+type ChatCompletion string // Always "chat.completion"
+type Function string       // Always "function"
+type URLCitation string    // Always "url_citation"
 
-func (c Assistant) Default() Assistant                     { return "assistant" }
-func (c ChatCompletion) Default() ChatCompletion           { return "chat.completion" }
-func (c ChatCompletionChunk) Default() ChatCompletionChunk { return "chat.completion.chunk" }
-func (c Function) Default() Function                       { return "function" }
-func (c URLCitation) Default() URLCitation                 { return "url_citation" }
+func (c Assistant) Default() Assistant           { return "assistant" }
+func (c ChatCompletion) Default() ChatCompletion { return "chat.completion" }
+func (c Function) Default() Function             { return "function" }
+func (c URLCitation) Default() URLCitation       { return "url_citation" }
 
-func (c Assistant) MarshalJSON() ([]byte, error)           { return marshalString(c) }
-func (c ChatCompletion) MarshalJSON() ([]byte, error)      { return marshalString(c) }
-func (c ChatCompletionChunk) MarshalJSON() ([]byte, error) { return marshalString(c) }
-func (c Function) MarshalJSON() ([]byte, error)            { return marshalString(c) }
-func (c URLCitation) MarshalJSON() ([]byte, error)         { return marshalString(c) }
+func (c Assistant) MarshalJSON() ([]byte, error)      { return marshalString(c) }
+func (c ChatCompletion) MarshalJSON() ([]byte, error) { return marshalString(c) }
+func (c Function) MarshalJSON() ([]byte, error)       { return marshalString(c) }
+func (c URLCitation) MarshalJSON() ([]byte, error)    { return marshalString(c) }
 
 type constant[T any] interface {
 	Constant[T]
