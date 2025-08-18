@@ -53,13 +53,11 @@ func main() {
 		option.WithAPIKey("My API Key"), // defaults to os.LookupEnv("DEDALUS_API_KEY")
 		option.WithEnvironmentStaging(), // or option.WithEnvironmentProduction() | option.WithEnvironmentDevelopment(); defaults to option.WithEnvironmentProduction()
 	)
-	streamChunk, err := client.Chat.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatNewParams{
-		CompletionRequest: githubcomdedaluslabsdedalussdkgo.CompletionRequestParam{},
-	})
+	response, err := client.Health.Check(context.TODO())
 	if err != nil {
 		panic(err.Error())
 	}
-	fmt.Printf("%+v\n", streamChunk.ID)
+	fmt.Printf("%+v\n", response.Status)
 }
 
 ```
