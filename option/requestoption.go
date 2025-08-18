@@ -266,10 +266,40 @@ func WithEnvironmentProduction() RequestOption {
 	return requestconfig.WithDefaultBaseURL("https://api.dedaluslabs.ai/")
 }
 
+// WithEnvironmentStaging returns a RequestOption that sets the current
+// environment to be the "staging" environment. An environment specifies which base URL
+// to use by default.
+func WithEnvironmentStaging() RequestOption {
+	return requestconfig.WithDefaultBaseURL("https://staging-api.dedaluslabs.ai/")
+}
+
+// WithEnvironmentDevelopment returns a RequestOption that sets the current
+// environment to be the "development" environment. An environment specifies which base URL
+// to use by default.
+func WithEnvironmentDevelopment() RequestOption {
+	return requestconfig.WithDefaultBaseURL("http://localhost:8000/")
+}
+
 // WithAPIKey returns a RequestOption that sets the client setting "api_key".
 func WithAPIKey(value string) RequestOption {
 	return requestconfig.RequestOptionFunc(func(r *requestconfig.RequestConfig) error {
 		r.APIKey = value
 		return r.Apply(WithHeader("authorization", fmt.Sprintf("Bearer %s", r.APIKey)))
+	})
+}
+
+// WithAPIKeyHeader returns a RequestOption that sets the client setting "api_key_header".
+func WithAPIKeyHeader(value string) RequestOption {
+	return requestconfig.RequestOptionFunc(func(r *requestconfig.RequestConfig) error {
+		r.APIKeyHeader = value
+		return r.Apply(WithHeader("x-api-key", r.APIKeyHeader))
+	})
+}
+
+// WithOrganization returns a RequestOption that sets the client setting "organization".
+func WithOrganization(value string) RequestOption {
+	return requestconfig.RequestOptionFunc(func(r *requestconfig.RequestConfig) error {
+		r.Organization = value
+		return nil
 	})
 }
