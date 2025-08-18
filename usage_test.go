@@ -24,9 +24,11 @@ func TestUsage(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	response, err := client.Health.Check(context.TODO())
+	streamChunk, err := client.Chat.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatNewParams{
+		CompletionRequest: githubcomdedaluslabsdedalussdkgo.CompletionRequestParam{},
+	})
 	if err != nil {
 		t.Fatalf("err should be nil: %s", err.Error())
 	}
-	t.Logf("%+v\n", response.Status)
+	t.Logf("%+v\n", streamChunk.ID)
 }
