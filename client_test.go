@@ -271,7 +271,7 @@ func TestContextDeadlineStreaming(t *testing.T) {
 				},
 			}),
 		)
-		stream := client.Chat.NewStreaming(deadlineCtx, githubcomdedaluslabsdedalussdkgo.ChatNewParams{
+		stream := client.Chat.Completions.NewStreaming(deadlineCtx, githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
 			CompletionRequest: githubcomdedaluslabsdedalussdkgo.CompletionRequestParam{},
 		})
 		for stream.Next() {
@@ -318,9 +318,9 @@ func TestContextDeadlineStreamingWithRequestTimeout(t *testing.T) {
 				},
 			}),
 		)
-		stream := client.Chat.NewStreaming(
+		stream := client.Chat.Completions.NewStreaming(
 			context.Background(),
-			githubcomdedaluslabsdedalussdkgo.ChatNewParams{
+			githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
 				CompletionRequest: githubcomdedaluslabsdedalussdkgo.CompletionRequestParam{},
 			},
 			option.WithRequestTimeout((100 * time.Millisecond)),
