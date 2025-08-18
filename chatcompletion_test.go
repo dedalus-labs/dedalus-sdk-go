@@ -13,7 +13,7 @@ import (
 	"github.com/dedalus-labs/dedalus-sdk-go/option"
 )
 
-func TestChatNewWithOptionalParams(t *testing.T) {
+func TestChatCompletionNewWithOptionalParams(t *testing.T) {
 	t.Skip("Prism tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -26,7 +26,7 @@ func TestChatNewWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Chat.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatNewParams{
+	_, err := client.Chat.Completions.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
 		CompletionRequest: githubcomdedaluslabsdedalussdkgo.CompletionRequestParam{
 			AgentAttributes: map[string]float64{
 				"accuracy":   0.9,
