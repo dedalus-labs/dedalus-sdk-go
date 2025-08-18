@@ -8,6 +8,8 @@ Methods:
 
 - <code title="get /">client.Root.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#RootService.Get">Get</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>) (<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#RootGetResponse">RootGetResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
+# \_Private
+
 # Health
 
 Response Types:
@@ -19,6 +21,10 @@ Methods:
 - <code title="get /health">client.Health.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#HealthService.Check">Check</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>) (<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#HealthCheckResponse">HealthCheckResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
 # Models
+
+Params Types:
+
+- <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#ModelParam">ModelParam</a>
 
 Response Types:
 
@@ -38,9 +44,10 @@ Params Types:
 
 Response Types:
 
-- <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#Completion">Completion</a>
+- <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#ChatCompletionTokenLogprob">ChatCompletionTokenLogprob</a>
+- <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#StreamChunk">StreamChunk</a>
 - <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#TopLogprob">TopLogprob</a>
 
 Methods:
 
-- <code title="post /v1/chat">client.Chat.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#ChatService.New">New</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#ChatNewParams">ChatNewParams</a>) (<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#Completion">Completion</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="post /v1/chat/completions">client.Chat.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#ChatService.New">New</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#ChatNewParams">ChatNewParams</a>) (<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#StreamChunk">StreamChunk</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>

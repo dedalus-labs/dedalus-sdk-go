@@ -2,7 +2,7 @@
 
 <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go"><img src="https://pkg.go.dev/badge/github.com/dedalus-labs/dedalus-sdk-go.svg" alt="Go Reference"></a>
 
-The Dedalus Go library provides convenient access to the [Dedalus REST API](docs.dedaluslabs.ai)
+The Dedalus Go library provides convenient access to the [Dedalus REST API](https://docs.dedaluslabs.ai)
 from applications written in Go.
 
 It is generated with [Stainless](https://www.stainless.com/).
@@ -51,14 +51,15 @@ import (
 func main() {
 	client := githubcomdedaluslabsdedalussdkgo.NewClient(
 		option.WithAPIKey("My API Key"), // defaults to os.LookupEnv("DEDALUS_API_KEY")
+		option.WithEnvironmentStaging(), // or option.WithEnvironmentProduction() | option.WithEnvironmentDevelopment(); defaults to option.WithEnvironmentProduction()
 	)
-	completion, err := client.Chat.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatNewParams{
+	streamChunk, err := client.Chat.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatNewParams{
 		CompletionRequest: githubcomdedaluslabsdedalussdkgo.CompletionRequestParam{},
 	})
 	if err != nil {
 		panic(err.Error())
 	}
-	fmt.Printf("%+v\n", completion.ID)
+	fmt.Printf("%+v\n", streamChunk.ID)
 }
 
 ```

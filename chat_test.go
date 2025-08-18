@@ -49,22 +49,22 @@ func TestChatNewWithOptionalParams(t *testing.T) {
 			},
 			MaxTokens:  githubcomdedaluslabsdedalussdkgo.Int(100),
 			MaxTurns:   githubcomdedaluslabsdedalussdkgo.Int(5),
-			McpServers: []string{"dedalus-labs/brave-search", "dedalus-labs/github-api"},
+			MCPServers: []string{"dedalus-labs/brave-search", "dedalus-labs/github-api"},
 			Model: githubcomdedaluslabsdedalussdkgo.CompletionRequestModelUnionParam{
-				OfString: githubcomdedaluslabsdedalussdkgo.String("gpt-4"),
+				OfModelID: githubcomdedaluslabsdedalussdkgo.String("openai/gpt-4"),
 			},
 			ModelAttributes: map[string]map[string]float64{
-				"claude-3-5-sonnet": {
+				"anthropic/claude-3-5-sonnet": {
 					"cost":         0.7,
 					"creativity":   0.8,
 					"intelligence": 0.95,
 				},
-				"gpt-4": {
+				"openai/gpt-4": {
 					"cost":         0.8,
 					"intelligence": 0.9,
 					"speed":        0.6,
 				},
-				"gpt-4o-mini": {
+				"openai/gpt-4o-mini": {
 					"cost":         0.2,
 					"intelligence": 0.7,
 					"speed":        0.9,

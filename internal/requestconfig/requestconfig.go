@@ -22,6 +22,7 @@ import (
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/apierror"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/apiform"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/apiquery"
+	"github.com/google/uuid"
 )
 
 func getDefaultHeaders() map[string]string {
@@ -152,14 +153,18 @@ func NewRequestConfig(ctx context.Context, method string, u string, body any, ds
 	if reader != nil {
 		req.Header.Set("Content-Type", contentType)
 	}
-
+	if method != http.MethodGet {
+		// Note this can be overridden with `WithHeader("Idempotency-Key", myIdempotencyKey)`
+		req.Header.Set("Idempotency-Key", "stainless-go-"+uuid.New().String())
+	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("X-Stainless-Retry-Count", "0")
 	req.Header.Set("X-Stainless-Timeout", "0")
 	for k, v := range getDefaultHeaders() {
 		req.Header.Add(k, v)
 	}
-
+	req.Header.Set("User-Agent", "Dedalus-SDK")
+	req.Header.Set("X-SDK-Version", "1.0.0")
 	for k, v := range getPlatformProperties() {
 		req.Header.Add(k, v)
 	}
@@ -213,6 +218,8 @@ type RequestConfig struct {
 	HTTPClient     *http.Client
 	Middlewares    []middleware
 	APIKey         string
+	APIKeyHeader   string
+	Organization   string
 	// If ResponseBodyInto not nil, then we will attempt to deserialize into
 	// ResponseBodyInto. If Destination is a []byte, then it will return the body as
 	// is.
@@ -580,8 +587,10 @@ func (cfg *RequestConfig) Clone(ctx context.Context) *RequestConfig {
 		HTTPClient:     cfg.HTTPClient,
 		Middlewares:    cfg.Middlewares,
 		APIKey:         cfg.APIKey,
+		APIKeyHeader:   cfg.APIKeyHeader,
+		Organization:   cfg.Organization,
 	}
-
+	new.Request.Header.Set("Idempotency-Key", "stainless-go-"+uuid.New().String())
 	return new
 }
 
