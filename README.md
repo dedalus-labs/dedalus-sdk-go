@@ -50,16 +50,15 @@ import (
 
 func main() {
 	client := githubcomdedaluslabsdedalussdkgo.NewClient(
-		option.WithAPIKey("My API Key"), // defaults to os.LookupEnv("DEDALUS_API_KEY")
-		option.WithEnvironmentStaging(), // or option.WithEnvironmentProduction() | option.WithEnvironmentDevelopment(); defaults to option.WithEnvironmentProduction()
+		option.WithAPIKey("My API Key"),     // defaults to os.LookupEnv("DEDALUS_API_KEY")
+		option.WithEnvironmentDevelopment(), // defaults to option.WithEnvironmentProduction()
 	)
 	streamChunk, err := client.Chat.Completions.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
-		Messages: []map[string]any{{
-			"role":    "user",
-			"content": "Hello, how are you today?",
-		}},
-		Model: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion{
-			OfModelID: githubcomdedaluslabsdedalussdkgo.String("openai/gpt-5"),
+		CompletionRequestMessages: githubcomdedaluslabsdedalussdkgo.CompletionRequestMessagesParam{
+			Messages: []map[string]any{{
+				"content": "bar",
+				"role":    "bar",
+			}},
 		},
 	})
 	if err != nil {

@@ -266,13 +266,6 @@ func WithEnvironmentProduction() RequestOption {
 	return requestconfig.WithDefaultBaseURL("https://api.dedaluslabs.ai/")
 }
 
-// WithEnvironmentStaging returns a RequestOption that sets the current
-// environment to be the "staging" environment. An environment specifies which base URL
-// to use by default.
-func WithEnvironmentStaging() RequestOption {
-	return requestconfig.WithDefaultBaseURL("https://staging-api.dedaluslabs.ai/")
-}
-
 // WithEnvironmentDevelopment returns a RequestOption that sets the current
 // environment to be the "development" environment. An environment specifies which base URL
 // to use by default.
