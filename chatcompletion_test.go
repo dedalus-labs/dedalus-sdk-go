@@ -27,7 +27,11 @@ func TestChatCompletionNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Chat.Completions.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
-		CompletionRequest: githubcomdedaluslabsdedalussdkgo.CompletionRequestParam{
+		CompletionRequestMessages: githubcomdedaluslabsdedalussdkgo.CompletionRequestMessagesParam{
+			Messages: []map[string]any{{
+				"content": "bar",
+				"role":    "bar",
+			}},
 			AgentAttributes: map[string]float64{
 				"accuracy":   0.9,
 				"complexity": 0.8,
@@ -46,11 +50,7 @@ func TestChatCompletionNewWithOptionalParams(t *testing.T) {
 			MaxTokens:  githubcomdedaluslabsdedalussdkgo.Int(100),
 			MaxTurns:   githubcomdedaluslabsdedalussdkgo.Int(5),
 			MCPServers: []string{"dedalus-labs/brave-search", "dedalus-labs/github-api"},
-			Messages: []map[string]any{{
-				"content": "bar",
-				"role":    "bar",
-			}},
-			Model: githubcomdedaluslabsdedalussdkgo.CompletionRequestModelUnionParam{
+			Model: githubcomdedaluslabsdedalussdkgo.CompletionRequestMessagesModelUnionParam{
 				OfModelID: githubcomdedaluslabsdedalussdkgo.String("openai/gpt-4"),
 			},
 			ModelAttributes: map[string]map[string]float64{
@@ -75,7 +75,7 @@ func TestChatCompletionNewWithOptionalParams(t *testing.T) {
 			Stop:            []string{"\\n", "END"},
 			Stream:          githubcomdedaluslabsdedalussdkgo.Bool(true),
 			Temperature:     githubcomdedaluslabsdedalussdkgo.Float(0),
-			ToolChoice: githubcomdedaluslabsdedalussdkgo.CompletionRequestToolChoiceUnionParam{
+			ToolChoice: githubcomdedaluslabsdedalussdkgo.CompletionRequestMessagesToolChoiceUnionParam{
 				OfString: githubcomdedaluslabsdedalussdkgo.String("auto"),
 			},
 			Tools: []map[string]any{{

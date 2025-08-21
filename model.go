@@ -129,11 +129,11 @@ func (r *ModelService) List(ctx context.Context, opts ...option.RequestOption) (
 	return
 }
 
-// Extended model with configuration capabilities.
+// Model configuration for chat completions.
 //
-// Inherits basic metadata from Model and adds configuration fields that can be
-// used when creating chat completions. This allows bundling model selection with
-// model-specific parameters.
+// A user-friendly model configuration object that bundles model selection with
+// model-specific parameters. Unlike the Model class (which represents API response
+// data), this class is designed for request configuration.
 //
 // Use this when you want to:
 //
@@ -141,7 +141,7 @@ func (r *ModelService) List(ctx context.Context, opts ...option.RequestOption) (
 // - Pass model-specific settings
 // - Use intelligent routing with attributes
 //
-// Example: model = DedalusModel( id="gpt-4", temperature=0.7, max_tokens=1000,
+// Example: model = DedalusModel( name="gpt-4", temperature=0.7, max_tokens=1000,
 // attributes={"intelligence": 0.9, "cost": 0.8} )
 //
 //	completion = client.chat.completions.create(
@@ -149,13 +149,11 @@ func (r *ModelService) List(ctx context.Context, opts ...option.RequestOption) (
 //	    messages=[...]
 //	)
 type DedalusModel struct {
-	// Model identifier
-	ID string `json:"id,required"`
+	// Model name (e.g., 'gpt-4', 'claude-3-5-sonnet')
+	Name string `json:"name,required"`
 	// [Dedalus] Custom attributes for intelligent model routing (e.g., intelligence,
 	// speed, creativity, cost).
 	Attributes map[string]float64 `json:"attributes,nullable"`
-	// Unix timestamp of model creation
-	Created int64 `json:"created"`
 	// Penalize new tokens based on their frequency in the text so far.
 	FrequencyPenalty float64 `json:"frequency_penalty,nullable"`
 	// Modify the likelihood of specified tokens appearing.
@@ -170,12 +168,6 @@ type DedalusModel struct {
 	Metadata map[string]string `json:"metadata,nullable"`
 	// Number of completions to generate for each prompt.
 	N int64 `json:"n,nullable"`
-	// Model name (alias for id)
-	Name string `json:"name,nullable"`
-	// Object type, always 'model'
-	Object string `json:"object"`
-	// Organization that owns this model
-	OwnedBy string `json:"owned_by"`
 	// Whether to enable parallel function calling.
 	ParallelToolCalls bool `json:"parallel_tool_calls,nullable"`
 	// Penalize new tokens based on whether they appear in the text so far.
@@ -206,9 +198,8 @@ type DedalusModel struct {
 	User string `json:"user,nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID                  respjson.Field
+		Name                respjson.Field
 		Attributes          respjson.Field
-		Created             respjson.Field
 		FrequencyPenalty    respjson.Field
 		LogitBias           respjson.Field
 		Logprobs            respjson.Field
@@ -216,9 +207,6 @@ type DedalusModel struct {
 		MaxTokens           respjson.Field
 		Metadata            respjson.Field
 		N                   respjson.Field
-		Name                respjson.Field
-		Object              respjson.Field
-		OwnedBy             respjson.Field
 		ParallelToolCalls   respjson.Field
 		PresencePenalty     respjson.Field
 		ResponseFormat      respjson.Field
@@ -325,11 +313,11 @@ func (r *DedalusModelToolChoiceUnion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Extended model with configuration capabilities.
+// Model configuration for chat completions.
 //
-// Inherits basic metadata from Model and adds configuration fields that can be
-// used when creating chat completions. This allows bundling model selection with
-// model-specific parameters.
+// A user-friendly model configuration object that bundles model selection with
+// model-specific parameters. Unlike the Model class (which represents API response
+// data), this class is designed for request configuration.
 //
 // Use this when you want to:
 //
@@ -337,7 +325,7 @@ func (r *DedalusModelToolChoiceUnion) UnmarshalJSON(data []byte) error {
 // - Pass model-specific settings
 // - Use intelligent routing with attributes
 //
-// Example: model = DedalusModel( id="gpt-4", temperature=0.7, max_tokens=1000,
+// Example: model = DedalusModel( name="gpt-4", temperature=0.7, max_tokens=1000,
 // attributes={"intelligence": 0.9, "cost": 0.8} )
 //
 //	completion = client.chat.completions.create(
@@ -345,10 +333,10 @@ func (r *DedalusModelToolChoiceUnion) UnmarshalJSON(data []byte) error {
 //	    messages=[...]
 //	)
 //
-// The property ID is required.
+// The property Name is required.
 type DedalusModelParam struct {
-	// Model identifier
-	ID string `json:"id,required"`
+	// Model name (e.g., 'gpt-4', 'claude-3-5-sonnet')
+	Name string `json:"name,required"`
 	// Penalize new tokens based on their frequency in the text so far.
 	FrequencyPenalty param.Opt[float64] `json:"frequency_penalty,omitzero"`
 	// Whether to return log probabilities of the output tokens.
@@ -359,8 +347,6 @@ type DedalusModelParam struct {
 	MaxTokens param.Opt[int64] `json:"max_tokens,omitzero"`
 	// Number of completions to generate for each prompt.
 	N param.Opt[int64] `json:"n,omitzero"`
-	// Model name (alias for id)
-	Name param.Opt[string] `json:"name,omitzero"`
 	// Whether to enable parallel function calling.
 	ParallelToolCalls param.Opt[bool] `json:"parallel_tool_calls,omitzero"`
 	// Penalize new tokens based on whether they appear in the text so far.
@@ -379,12 +365,6 @@ type DedalusModelParam struct {
 	TopP param.Opt[float64] `json:"top_p,omitzero"`
 	// A unique identifier representing your end-user.
 	User param.Opt[string] `json:"user,omitzero"`
-	// Unix timestamp of model creation
-	Created param.Opt[int64] `json:"created,omitzero"`
-	// Object type, always 'model'
-	Object param.Opt[string] `json:"object,omitzero"`
-	// Organization that owns this model
-	OwnedBy param.Opt[string] `json:"owned_by,omitzero"`
 	// [Dedalus] Custom attributes for intelligent model routing (e.g., intelligence,
 	// speed, creativity, cost).
 	Attributes map[string]float64 `json:"attributes,omitzero"`
