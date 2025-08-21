@@ -277,7 +277,7 @@ func WithEnvironmentStaging() RequestOption {
 // environment to be the "development" environment. An environment specifies which base URL
 // to use by default.
 func WithEnvironmentDevelopment() RequestOption {
-	return requestconfig.WithDefaultBaseURL("http://localhost:8000/")
+	return requestconfig.WithDefaultBaseURL("http://localhost:8080/")
 }
 
 // WithAPIKey returns a RequestOption that sets the client setting "api_key".

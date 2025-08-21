@@ -155,57 +155,13 @@ func (r *ChatCompletionTokenLogprob) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Request model for chat completions.
+// Chat completion request with 'messages' field (OpenAI standard).
 //
-// Validates incoming chat requests with support for multimodality, multi-model
-// routing, and agent-enhanced features. Compatible with OpenAI API format while
-// extending functionality for advanced use cases.
-//
-// This model supports both the 'messages' field and the 'input' field for maximum
-// compatibility. The 'input' field can handle various modalities beyond text
-// messages.
-//
-// Key Features: - Multi-model routing with intelligent handoffs - MCP (Model
-// Context Protocol) server integration - Advanced agent attributes for routing
-// decisions - Client-side and server-side tool execution - Streaming and
-// non-streaming responses - Automatic usage tracking and billing
-//
-// Examples: Basic chat completion:
-// `python request = ChatCompletionRequest( model="openai/gpt-4", messages=[{"role": "user", "content": "Hello, how are you?"}], ) `
-//
-//	Multi-model routing with attributes:
-//	```python
-//	request = ChatCompletionRequest(
-//	    model=["openai/gpt-4o-mini", "openai/gpt-4", "anthropic/claude-3-5-sonnet"],
-//	    messages=[{"role": "user", "content": "Analyze this complex problem"}],
-//	    agent_attributes={"complexity": 0.8, "accuracy": 0.9},
-//	    model_attributes={
-//	        "gpt-4": {"intelligence": 0.9, "cost": 0.8},
-//	        "claude-3-5-sonnet": {"intelligence": 0.95, "cost": 0.7},
-//	    },
-//	)
-//	```
-//
-//	With tools and MCP servers:
-//	```python
-//	request = ChatCompletionRequest(
-//	    model="openai/gpt-5",
-//	    messages=[{"role": "user", "content": "Search for AI news"}],
-//	    tools=[
-//	        {
-//	            "type": "function",
-//	            "function": {
-//	                "name": "search_web",
-//	                "description": "Search the web",
-//	            },
-//	        }
-//	    ],
-//	    mcp_servers=["dedalus-labs/brave-search"],
-//	    temperature=0.7,
-//	    max_tokens=1000,
-//	)
-//	```
-type CompletionRequestParam struct {
+// The property Messages is required.
+type CompletionRequestMessagesParam struct {
+	// Messages to the model. Supports role/content structure and multimodal content
+	// arrays.
+	Messages []map[string]any `json:"messages,omitzero,required"`
 	// Frequency penalty (-2 to 2). Positive values penalize new tokens based on their
 	// existing frequency in the text so far, decreasing likelihood of repeated
 	// phrases.
@@ -255,16 +211,13 @@ type CompletionRequestParam struct {
 	// 'dedalus-labs/brave-search'). MCP tools are executed server-side and billed
 	// separately.
 	MCPServers []string `json:"mcp_servers,omitzero"`
-	// Messages to the model - accepts either 'messages' (OpenAI) or 'input' (Dedalus).
-	// Supports role/content structure and multimodal content arrays.
-	Messages []map[string]any `json:"messages,omitzero"`
 	// Model(s) to use for completion. Can be a single model ID, a DedalusModel object,
 	// or a list for multi-model routing. Single model: 'openai/gpt-4',
 	// 'anthropic/claude-3-5-sonnet-20241022', 'openai/gpt-4o-mini', or a DedalusModel
 	// instance. Multi-model routing: ['openai/gpt-4o-mini', 'openai/gpt-4',
 	// 'anthropic/claude-3-5-sonnet'] or list of DedalusModel objects - agent will
 	// choose optimal model based on task complexity.
-	Model CompletionRequestModelUnionParam `json:"model,omitzero"`
+	Model CompletionRequestMessagesModelUnionParam `json:"model,omitzero"`
 	// Attributes for individual models used in routing decisions during multi-model
 	// execution. Format: {'model_name': {'attribute': value}}, where values are
 	// 0.0-1.0. Common attributes: 'intelligence', 'speed', 'cost', 'creativity',
@@ -276,7 +229,7 @@ type CompletionRequestParam struct {
 	// Controls which tool is called by the model. Options: 'auto' (default), 'none',
 	// 'required', or specific tool name. Can also be a dict specifying a particular
 	// tool.
-	ToolChoice CompletionRequestToolChoiceUnionParam `json:"tool_choice,omitzero"`
+	ToolChoice CompletionRequestMessagesToolChoiceUnionParam `json:"tool_choice,omitzero"`
 	// list of tools available to the model in OpenAI function calling format. Tools
 	// are executed client-side and returned as JSON for the application to handle. Use
 	// 'mcp_servers' for server-side tool execution.
@@ -284,32 +237,32 @@ type CompletionRequestParam struct {
 	paramObj
 }
 
-func (r CompletionRequestParam) MarshalJSON() (data []byte, err error) {
-	type shadow CompletionRequestParam
+func (r CompletionRequestMessagesParam) MarshalJSON() (data []byte, err error) {
+	type shadow CompletionRequestMessagesParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
-func (r *CompletionRequestParam) UnmarshalJSON(data []byte) error {
+func (r *CompletionRequestMessagesParam) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 // Only one field can be non-zero.
 //
 // Use [param.IsOmitted] to confirm if a field is set.
-type CompletionRequestModelUnionParam struct {
+type CompletionRequestMessagesModelUnionParam struct {
 	OfModelID      param.Opt[ModelID] `json:",omitzero,inline"`
 	OfDedalusModel *DedalusModelParam `json:",omitzero,inline"`
 	OfModels       ModelsParam        `json:",omitzero,inline"`
 	paramUnion
 }
 
-func (u CompletionRequestModelUnionParam) MarshalJSON() ([]byte, error) {
+func (u CompletionRequestMessagesModelUnionParam) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion(u, u.OfModelID, u.OfDedalusModel, u.OfModels)
 }
-func (u *CompletionRequestModelUnionParam) UnmarshalJSON(data []byte) error {
+func (u *CompletionRequestMessagesModelUnionParam) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
 }
 
-func (u *CompletionRequestModelUnionParam) asAny() any {
+func (u *CompletionRequestMessagesModelUnionParam) asAny() any {
 	if !param.IsOmitted(u.OfModelID) {
 		return &u.OfModelID.Value
 	} else if !param.IsOmitted(u.OfDedalusModel) {
@@ -323,20 +276,20 @@ func (u *CompletionRequestModelUnionParam) asAny() any {
 // Only one field can be non-zero.
 //
 // Use [param.IsOmitted] to confirm if a field is set.
-type CompletionRequestToolChoiceUnionParam struct {
+type CompletionRequestMessagesToolChoiceUnionParam struct {
 	OfString param.Opt[string] `json:",omitzero,inline"`
 	OfAnyMap map[string]any    `json:",omitzero,inline"`
 	paramUnion
 }
 
-func (u CompletionRequestToolChoiceUnionParam) MarshalJSON() ([]byte, error) {
+func (u CompletionRequestMessagesToolChoiceUnionParam) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion(u, u.OfString, u.OfAnyMap)
 }
-func (u *CompletionRequestToolChoiceUnionParam) UnmarshalJSON(data []byte) error {
+func (u *CompletionRequestMessagesToolChoiceUnionParam) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
 }
 
-func (u *CompletionRequestToolChoiceUnionParam) asAny() any {
+func (u *CompletionRequestMessagesToolChoiceUnionParam) asAny() any {
 	if !param.IsOmitted(u.OfString) {
 		return &u.OfString.Value
 	} else if !param.IsOmitted(u.OfAnyMap) {
@@ -345,9 +298,9 @@ func (u *CompletionRequestToolChoiceUnionParam) asAny() any {
 	return nil
 }
 
-func DedalusModelChoiceParamOfDedalusModel(id string) DedalusModelChoiceUnionParam {
+func DedalusModelChoiceParamOfDedalusModel(name string) DedalusModelChoiceUnionParam {
 	var variant DedalusModelParam
-	variant.ID = id
+	variant.Name = name
 	return DedalusModelChoiceUnionParam{OfDedalusModel: &variant}
 }
 
@@ -676,63 +629,14 @@ func (r *TopLogprob) UnmarshalJSON(data []byte) error {
 }
 
 type ChatCompletionNewParams struct {
-	// Request model for chat completions.
-	//
-	// Validates incoming chat requests with support for multimodality, multi-model
-	// routing, and agent-enhanced features. Compatible with OpenAI API format while
-	// extending functionality for advanced use cases.
-	//
-	// This model supports both the 'messages' field and the 'input' field for maximum
-	// compatibility. The 'input' field can handle various modalities beyond text
-	// messages.
-	//
-	// Key Features: - Multi-model routing with intelligent handoffs - MCP (Model
-	// Context Protocol) server integration - Advanced agent attributes for routing
-	// decisions - Client-side and server-side tool execution - Streaming and
-	// non-streaming responses - Automatic usage tracking and billing
-	//
-	// Examples: Basic chat completion:
-	// `python request = ChatCompletionRequest( model="openai/gpt-4", messages=[{"role": "user", "content": "Hello, how are you?"}], ) `
-	//
-	//	Multi-model routing with attributes:
-	//	```python
-	//	request = ChatCompletionRequest(
-	//	    model=["openai/gpt-4o-mini", "openai/gpt-4", "anthropic/claude-3-5-sonnet"],
-	//	    messages=[{"role": "user", "content": "Analyze this complex problem"}],
-	//	    agent_attributes={"complexity": 0.8, "accuracy": 0.9},
-	//	    model_attributes={
-	//	        "gpt-4": {"intelligence": 0.9, "cost": 0.8},
-	//	        "claude-3-5-sonnet": {"intelligence": 0.95, "cost": 0.7},
-	//	    },
-	//	)
-	//	```
-	//
-	//	With tools and MCP servers:
-	//	```python
-	//	request = ChatCompletionRequest(
-	//	    model="openai/gpt-5",
-	//	    messages=[{"role": "user", "content": "Search for AI news"}],
-	//	    tools=[
-	//	        {
-	//	            "type": "function",
-	//	            "function": {
-	//	                "name": "search_web",
-	//	                "description": "Search the web",
-	//	            },
-	//	        }
-	//	    ],
-	//	    mcp_servers=["dedalus-labs/brave-search"],
-	//	    temperature=0.7,
-	//	    max_tokens=1000,
-	//	)
-	//	```
-	CompletionRequest CompletionRequestParam
+	// Chat completion request with 'messages' field (OpenAI standard).
+	CompletionRequestMessages CompletionRequestMessagesParam
 	paramObj
 }
 
 func (r ChatCompletionNewParams) MarshalJSON() (data []byte, err error) {
-	return shimjson.Marshal(r.CompletionRequest)
+	return shimjson.Marshal(r.CompletionRequestMessages)
 }
 func (r *ChatCompletionNewParams) UnmarshalJSON(data []byte) error {
-	return json.Unmarshal(data, &r.CompletionRequest)
+	return json.Unmarshal(data, &r.CompletionRequestMessages)
 }

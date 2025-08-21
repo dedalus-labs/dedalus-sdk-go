@@ -54,7 +54,12 @@ func main() {
 		option.WithEnvironmentStaging(), // or option.WithEnvironmentProduction() | option.WithEnvironmentDevelopment(); defaults to option.WithEnvironmentProduction()
 	)
 	streamChunk, err := client.Chat.Completions.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
-		CompletionRequest: githubcomdedaluslabsdedalussdkgo.CompletionRequestParam{},
+		CompletionRequestMessages: githubcomdedaluslabsdedalussdkgo.CompletionRequestMessagesParam{
+			Messages: []map[string]any{{
+				"content": "bar",
+				"role":    "bar",
+			}},
+		},
 	})
 	if err != nil {
 		panic(err.Error())

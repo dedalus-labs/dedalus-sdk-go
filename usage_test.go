@@ -25,7 +25,12 @@ func TestUsage(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	streamChunk, err := client.Chat.Completions.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
-		CompletionRequest: githubcomdedaluslabsdedalussdkgo.CompletionRequestParam{},
+		CompletionRequestMessages: githubcomdedaluslabsdedalussdkgo.CompletionRequestMessagesParam{
+			Messages: []map[string]any{{
+				"content": "bar",
+				"role":    "bar",
+			}},
+		},
 	})
 	if err != nil {
 		t.Fatalf("err should be nil: %s", err.Error())
