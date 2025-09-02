@@ -1,6 +1,10 @@
 # Dedalus Go API Library
 
+<!-- x-release-please-start-version -->
+
 <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go"><img src="https://pkg.go.dev/badge/github.com/dedalus-labs/dedalus-sdk-go.svg" alt="Go Reference"></a>
+
+<!-- x-release-please-end -->
 
 The Dedalus Go library provides convenient access to the [Dedalus REST API](https://docs.dedaluslabs.ai)
 from applications written in Go.
