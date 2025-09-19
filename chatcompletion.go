@@ -6,6 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"slices"
 
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/apijson"
 	shimjson "github.com/dedalus-labs/dedalus-sdk-go/internal/encoding/json"
@@ -122,7 +123,7 @@ func (r *ChatCompletionService) NewStreaming(ctx context.Context, body ChatCompl
 		raw *http.Response
 		err error
 	)
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/chat/completions"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &raw, opts...)
 	return ssestream.NewStream[StreamChunk](ssestream.NewDecoder(raw), err)

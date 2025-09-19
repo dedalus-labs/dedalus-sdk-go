@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"slices"
 
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/apijson"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/requestconfig"
@@ -70,7 +71,7 @@ func NewModelService(opts ...option.RequestOption) (r ModelService) {
 //	}
 //	```
 func (r *ModelService) Get(ctx context.Context, modelID string, opts ...option.RequestOption) (res *DedalusModel, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if modelID == "" {
 		err = errors.New("missing required model_id parameter")
 		return
@@ -123,7 +124,7 @@ func (r *ModelService) Get(ctx context.Context, modelID string, opts ...option.R
 //	}
 //	```
 func (r *ModelService) List(ctx context.Context, opts ...option.RequestOption) (res *ModelsResponse, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/models"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
