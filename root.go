@@ -5,6 +5,7 @@ package githubcomdedaluslabsdedalussdkgo
 import (
 	"context"
 	"net/http"
+	"slices"
 
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/apijson"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/requestconfig"
@@ -33,7 +34,7 @@ func NewRootService(opts ...option.RequestOption) (r RootService) {
 
 // Root
 func (r *RootService) Get(ctx context.Context, opts ...option.RequestOption) (res *RootGetResponse, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := ""
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
