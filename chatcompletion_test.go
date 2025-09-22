@@ -27,64 +27,61 @@ func TestChatCompletionNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Chat.Completions.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
-		CompletionRequestMessages: githubcomdedaluslabsdedalussdkgo.CompletionRequestMessagesParam{
-			Messages: []map[string]any{{
-				"content": "bar",
-				"role":    "bar",
-			}},
-			AgentAttributes: map[string]float64{
-				"accuracy":   0.9,
-				"complexity": 0.8,
-				"efficiency": 0.7,
-			},
-			FrequencyPenalty: githubcomdedaluslabsdedalussdkgo.Float(-0.5),
-			Guardrails: []map[string]any{{
-				"foo": "bar",
-			}},
-			HandoffConfig: map[string]any{
-				"foo": "bar",
-			},
-			LogitBias: map[string]int64{
-				"50256": -100,
-			},
-			MaxTokens:  githubcomdedaluslabsdedalussdkgo.Int(100),
-			MaxTurns:   githubcomdedaluslabsdedalussdkgo.Int(5),
-			MCPServers: []string{"dedalus-labs/brave-search", "dedalus-labs/github-api"},
-			Model: githubcomdedaluslabsdedalussdkgo.CompletionRequestMessagesModelUnionParam{
-				OfModelID: githubcomdedaluslabsdedalussdkgo.String("openai/gpt-4"),
-			},
-			ModelAttributes: map[string]map[string]float64{
-				"anthropic/claude-3-5-sonnet": {
-					"cost":         0.7,
-					"creativity":   0.8,
-					"intelligence": 0.95,
-				},
-				"openai/gpt-4": {
-					"cost":         0.8,
-					"intelligence": 0.9,
-					"speed":        0.6,
-				},
-				"openai/gpt-4o-mini": {
-					"cost":         0.2,
-					"intelligence": 0.7,
-					"speed":        0.9,
-				},
-			},
-			N:               githubcomdedaluslabsdedalussdkgo.Int(1),
-			PresencePenalty: githubcomdedaluslabsdedalussdkgo.Float(-0.5),
-			Stop:            []string{"\\n", "END"},
-			Stream:          githubcomdedaluslabsdedalussdkgo.Bool(true),
-			Temperature:     githubcomdedaluslabsdedalussdkgo.Float(0),
-			ToolChoice: githubcomdedaluslabsdedalussdkgo.CompletionRequestMessagesToolChoiceUnionParam{
-				OfString: githubcomdedaluslabsdedalussdkgo.String("auto"),
-			},
-			Tools: []map[string]any{{
-				"function": "bar",
-				"type":     "bar",
-			}},
-			TopP: githubcomdedaluslabsdedalussdkgo.Float(0.1),
-			User: githubcomdedaluslabsdedalussdkgo.String("user-123"),
+		Messages: []map[string]any{{
+			"content": "bar",
+			"role":    "bar",
+		}},
+		AgentAttributes: map[string]float64{
+			"accuracy":   0.9,
+			"complexity": 0.8,
+			"efficiency": 0.7,
 		},
+		FrequencyPenalty: githubcomdedaluslabsdedalussdkgo.Float(-0.5),
+		Guardrails: []map[string]any{{
+			"foo": "bar",
+		}},
+		HandoffConfig: map[string]any{
+			"foo": "bar",
+		},
+		LogitBias: map[string]int64{
+			"50256": -100,
+		},
+		MaxTokens:  githubcomdedaluslabsdedalussdkgo.Int(100),
+		MaxTurns:   githubcomdedaluslabsdedalussdkgo.Int(5),
+		MCPServers: []string{"dedalus-labs/brave-search", "dedalus-labs/github-api"},
+		Model: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion{
+			OfModelID: githubcomdedaluslabsdedalussdkgo.String("openai/gpt-4"),
+		},
+		ModelAttributes: map[string]map[string]float64{
+			"anthropic/claude-3-5-sonnet": {
+				"cost":         0.7,
+				"creativity":   0.8,
+				"intelligence": 0.95,
+			},
+			"openai/gpt-4": {
+				"cost":         0.8,
+				"intelligence": 0.9,
+				"speed":        0.6,
+			},
+			"openai/gpt-4o-mini": {
+				"cost":         0.2,
+				"intelligence": 0.7,
+				"speed":        0.9,
+			},
+		},
+		N:               githubcomdedaluslabsdedalussdkgo.Int(1),
+		PresencePenalty: githubcomdedaluslabsdedalussdkgo.Float(-0.5),
+		Stop:            []string{"\\n", "END"},
+		Temperature:     githubcomdedaluslabsdedalussdkgo.Float(0),
+		ToolChoice: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsToolChoiceUnion{
+			OfString: githubcomdedaluslabsdedalussdkgo.String("auto"),
+		},
+		Tools: []map[string]any{{
+			"function": "bar",
+			"type":     "bar",
+		}},
+		TopP: githubcomdedaluslabsdedalussdkgo.Float(0.1),
+		User: githubcomdedaluslabsdedalussdkgo.String("user-123"),
 	})
 	if err != nil {
 		var apierr *githubcomdedaluslabsdedalussdkgo.Error

@@ -272,12 +272,10 @@ func TestContextDeadlineStreaming(t *testing.T) {
 			}),
 		)
 		stream := client.Chat.Completions.NewStreaming(deadlineCtx, githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
-			CompletionRequestMessages: githubcomdedaluslabsdedalussdkgo.CompletionRequestMessagesParam{
-				Messages: []map[string]any{{
-					"content": "bar",
-					"role":    "bar",
-				}},
-			},
+			Messages: []map[string]any{{
+				"content": "bar",
+				"role":    "bar",
+			}},
 		})
 		for stream.Next() {
 			_ = stream.Current()
@@ -326,12 +324,10 @@ func TestContextDeadlineStreamingWithRequestTimeout(t *testing.T) {
 		stream := client.Chat.Completions.NewStreaming(
 			context.Background(),
 			githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
-				CompletionRequestMessages: githubcomdedaluslabsdedalussdkgo.CompletionRequestMessagesParam{
-					Messages: []map[string]any{{
-						"content": "bar",
-						"role":    "bar",
-					}},
-				},
+				Messages: []map[string]any{{
+					"content": "bar",
+					"role":    "bar",
+				}},
 			},
 			option.WithRequestTimeout((100 * time.Millisecond)),
 		)
