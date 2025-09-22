@@ -58,11 +58,12 @@ func main() {
 		option.WithEnvironmentDevelopment(), // defaults to option.WithEnvironmentProduction()
 	)
 	streamChunk, err := client.Chat.Completions.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
-		CompletionRequestMessages: githubcomdedaluslabsdedalussdkgo.CompletionRequestMessagesParam{
-			Messages: []map[string]any{{
-				"content": "bar",
-				"role":    "bar",
-			}},
+		Messages: []map[string]any{{
+			"role":    "user",
+			"content": "Hello, how are you today?",
+		}},
+		Model: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion{
+			OfModelID: githubcomdedaluslabsdedalussdkgo.String("openai/gpt-5"),
 		},
 	})
 	if err != nil {
