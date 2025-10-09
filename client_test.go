@@ -276,6 +276,9 @@ func TestContextDeadlineStreaming(t *testing.T) {
 				"content": "bar",
 				"role":    "bar",
 			}},
+			Model: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion{
+				OfModelID: githubcomdedaluslabsdedalussdkgo.String("openai/gpt-4"),
+			},
 		})
 		for stream.Next() {
 			_ = stream.Current()
@@ -328,6 +331,9 @@ func TestContextDeadlineStreamingWithRequestTimeout(t *testing.T) {
 					"content": "bar",
 					"role":    "bar",
 				}},
+				Model: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion{
+					OfModelID: githubcomdedaluslabsdedalussdkgo.String("openai/gpt-4"),
+				},
 			},
 			option.WithRequestTimeout((100 * time.Millisecond)),
 		)
