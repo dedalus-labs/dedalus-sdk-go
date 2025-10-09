@@ -351,6 +351,27 @@ file returned by `os.Open` will be sent with the file name on disk.
 We also provide a helper `githubcomdedaluslabsdedalussdkgo.File(reader io.Reader, filename string, contentType string)`
 which can be used to wrap any `io.Reader` with the appropriate file name and content type.
 
+```go
+// A file from the file system
+file, err := os.Open("/path/to/file")
+githubcomdedaluslabsdedalussdkgo.AudioTranscriptionNewParams{
+	File:  file,
+	Model: "model",
+}
+
+// A file from a string
+githubcomdedaluslabsdedalussdkgo.AudioTranscriptionNewParams{
+	File:  strings.NewReader("my file contents"),
+	Model: "model",
+}
+
+// With a custom filename and contentType
+githubcomdedaluslabsdedalussdkgo.AudioTranscriptionNewParams{
+	File:  githubcomdedaluslabsdedalussdkgo.File(strings.NewReader(`{"hello": "foo"}`), "file.go", "application/json"),
+	Model: "model",
+}
+```
+
 ### Retries
 
 Certain errors will be automatically retried 2 times by default, with a short exponential backoff.

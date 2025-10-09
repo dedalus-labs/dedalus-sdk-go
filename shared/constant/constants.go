@@ -20,16 +20,22 @@ func ValueOf[T Constant[T]]() T {
 
 type Assistant string   // Always "assistant"
 type Custom string      // Always "custom"
+type Disabled string    // Always "disabled"
+type Enabled string     // Always "enabled"
 type Function string    // Always "function"
 type URLCitation string // Always "url_citation"
 
 func (c Assistant) Default() Assistant     { return "assistant" }
 func (c Custom) Default() Custom           { return "custom" }
+func (c Disabled) Default() Disabled       { return "disabled" }
+func (c Enabled) Default() Enabled         { return "enabled" }
 func (c Function) Default() Function       { return "function" }
 func (c URLCitation) Default() URLCitation { return "url_citation" }
 
 func (c Assistant) MarshalJSON() ([]byte, error)   { return marshalString(c) }
 func (c Custom) MarshalJSON() ([]byte, error)      { return marshalString(c) }
+func (c Disabled) MarshalJSON() ([]byte, error)    { return marshalString(c) }
+func (c Enabled) MarshalJSON() ([]byte, error)     { return marshalString(c) }
 func (c Function) MarshalJSON() ([]byte, error)    { return marshalString(c) }
 func (c URLCitation) MarshalJSON() ([]byte, error) { return marshalString(c) }
 

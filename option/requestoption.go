@@ -281,14 +281,6 @@ func WithAPIKey(value string) RequestOption {
 	})
 }
 
-// WithAPIKeyHeader returns a RequestOption that sets the client setting "api_key_header".
-func WithAPIKeyHeader(value string) RequestOption {
-	return requestconfig.RequestOptionFunc(func(r *requestconfig.RequestConfig) error {
-		r.APIKeyHeader = value
-		return r.Apply(WithHeader("x-api-key", r.APIKeyHeader))
-	})
-}
-
 // WithOrganization returns a RequestOption that sets the client setting "organization".
 func WithOrganization(value string) RequestOption {
 	return requestconfig.RequestOptionFunc(func(r *requestconfig.RequestConfig) error {

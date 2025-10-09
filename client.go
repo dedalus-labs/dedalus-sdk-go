@@ -16,17 +16,19 @@ import (
 // interacting with the Dedalus API. You should not instantiate this client
 // directly, and instead use the [NewClient] method instead.
 type Client struct {
-	Options  []option.RequestOption
-	Root     RootService
-	_Private PrivateService
-	Health   HealthService
-	Models   ModelService
-	Chat     ChatService
+	Options    []option.RequestOption
+	Root       RootService
+	_Private   PrivateService
+	Health     HealthService
+	Models     ModelService
+	Embeddings EmbeddingService
+	Audio      AudioService
+	Images     ImageService
+	Chat       ChatService
 }
 
-// DefaultClientOptions read from the environment (DEDALUS_API_KEY,
-// DEDALUS_API_KEY, DEDALUS_ORG_ID, DEDALUS_BASE_URL). This should be used to
-// initialize new clients.
+// DefaultClientOptions read from the environment (DEDALUS_API_KEY, DEDALUS_ORG_ID,
+// DEDALUS_BASE_URL). This should be used to initialize new clients.
 func DefaultClientOptions() []option.RequestOption {
 	defaults := []option.RequestOption{option.WithEnvironmentProduction()}
 	if o, ok := os.LookupEnv("DEDALUS_BASE_URL"); ok {
@@ -35,9 +37,6 @@ func DefaultClientOptions() []option.RequestOption {
 	if o, ok := os.LookupEnv("DEDALUS_API_KEY"); ok {
 		defaults = append(defaults, option.WithAPIKey(o))
 	}
-	if o, ok := os.LookupEnv("DEDALUS_API_KEY"); ok {
-		defaults = append(defaults, option.WithAPIKeyHeader(o))
-	}
 	if o, ok := os.LookupEnv("DEDALUS_ORG_ID"); ok {
 		defaults = append(defaults, option.WithOrganization(o))
 	}
@@ -45,10 +44,9 @@ func DefaultClientOptions() []option.RequestOption {
 }
 
 // NewClient generates a new client with the default option read from the
-// environment (DEDALUS_API_KEY, DEDALUS_API_KEY, DEDALUS_ORG_ID,
-// DEDALUS_BASE_URL). The option passed in as arguments are applied after these
-// default arguments, and all option will be passed down to the services and
-// requests that this client makes.
+// environment (DEDALUS_API_KEY, DEDALUS_ORG_ID, DEDALUS_BASE_URL). The option
+// passed in as arguments are applied after these default arguments, and all option
+// will be passed down to the services and requests that this client makes.
 func NewClient(opts ...option.RequestOption) (r Client) {
 	opts = append(DefaultClientOptions(), opts...)
 
@@ -58,6 +56,9 @@ func NewClient(opts ...option.RequestOption) (r Client) {
 	r._Private = NewPrivateService(opts...)
 	r.Health = NewHealthService(opts...)
 	r.Models = NewModelService(opts...)
+	r.Embeddings = NewEmbeddingService(opts...)
+	r.Audio = NewAudioService(opts...)
+	r.Images = NewImageService(opts...)
 	r.Chat = NewChatService(opts...)
 
 	return

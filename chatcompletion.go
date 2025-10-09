@@ -13,6 +13,7 @@ import (
 	"github.com/dedalus-labs/dedalus-sdk-go/packages/param"
 	"github.com/dedalus-labs/dedalus-sdk-go/packages/respjson"
 	"github.com/dedalus-labs/dedalus-sdk-go/packages/ssestream"
+	"github.com/dedalus-labs/dedalus-sdk-go/shared/constant"
 )
 
 // ChatCompletionService contains methods and other services that help with
@@ -34,28 +35,22 @@ func NewChatCompletionService(opts ...option.RequestOption) (r ChatCompletionSer
 	return
 }
 
-// Create a chat completion using the Agent framework.
+// Create a chat completion.
 //
-// This endpoint provides a vendor-agnostic chat completion API that works with
-// 100+ LLM providers via the Agent framework. It supports both single and
-// multi-model routing, client-side and server-side tool execution, and integration
-// with MCP (Model Context Protocol) servers.
+// This endpoint provides a vendor-agnostic chat completions API that works with
+// thousands of LLMs. It supports MCP integration, multi-model routing with
+// intelligent agentic handoffs, client-side and server-side tool execution, and
+// streaming and non-streaming responses.
 //
-// Features: - Cross-vendor compatibility (OpenAI, Anthropic, Cohere, etc.) -
-// Multi-model routing with intelligent agentic handoffs - Client-side tool
-// execution (tools returned as JSON) - Server-side MCP tool execution with
-// automatic billing - Streaming and non-streaming responses - Advanced agent
-// attributes for routing decisions - Automatic usage tracking and billing
+// Args: request: Chat completion request with messages, model, and configuration.
+// http_request: FastAPI request object for accessing headers and state.
+// background_tasks: FastAPI background tasks for async billing operations. user:
+// Authenticated user with validated API key and sufficient balance.
 //
-// Args: request: Chat completion request with messages, model, and configuration
-// http_request: FastAPI request object for accessing headers and state
-// background_tasks: FastAPI background tasks for async billing operations user:
-// Authenticated user with validated API key and sufficient balance
+// Returns: ChatCompletion: OpenAI-compatible completion response with usage data.
 //
-// Returns: ChatCompletion: OpenAI-compatible completion response with usage data
-//
-// Raises: HTTPException: - 401 if authentication fails or insufficient balance -
-// 400 if request validation fails - 500 if internal processing error occurs
+// Raises: HTTPException: - 401 if authentication fails or insufficient balance. -
+// 400 if request validation fails. - 500 if internal processing error occurs.
 //
 // Billing: - Token usage billed automatically based on model pricing - MCP tool
 // calls billed separately using credits system - Streaming responses billed after
@@ -123,28 +118,22 @@ func (r *ChatCompletionService) New(ctx context.Context, body ChatCompletionNewP
 	return
 }
 
-// Create a chat completion using the Agent framework.
+// Create a chat completion.
 //
-// This endpoint provides a vendor-agnostic chat completion API that works with
-// 100+ LLM providers via the Agent framework. It supports both single and
-// multi-model routing, client-side and server-side tool execution, and integration
-// with MCP (Model Context Protocol) servers.
+// This endpoint provides a vendor-agnostic chat completions API that works with
+// thousands of LLMs. It supports MCP integration, multi-model routing with
+// intelligent agentic handoffs, client-side and server-side tool execution, and
+// streaming and non-streaming responses.
 //
-// Features: - Cross-vendor compatibility (OpenAI, Anthropic, Cohere, etc.) -
-// Multi-model routing with intelligent agentic handoffs - Client-side tool
-// execution (tools returned as JSON) - Server-side MCP tool execution with
-// automatic billing - Streaming and non-streaming responses - Advanced agent
-// attributes for routing decisions - Automatic usage tracking and billing
+// Args: request: Chat completion request with messages, model, and configuration.
+// http_request: FastAPI request object for accessing headers and state.
+// background_tasks: FastAPI background tasks for async billing operations. user:
+// Authenticated user with validated API key and sufficient balance.
 //
-// Args: request: Chat completion request with messages, model, and configuration
-// http_request: FastAPI request object for accessing headers and state
-// background_tasks: FastAPI background tasks for async billing operations user:
-// Authenticated user with validated API key and sufficient balance
+// Returns: ChatCompletion: OpenAI-compatible completion response with usage data.
 //
-// Returns: ChatCompletion: OpenAI-compatible completion response with usage data
-//
-// Raises: HTTPException: - 401 if authentication fails or insufficient balance -
-// 400 if request validation fails - 500 if internal processing error occurs
+// Raises: HTTPException: - 401 if authentication fails or insufficient balance. -
+// 400 if request validation fails. - 500 if internal processing error occurs.
 //
 // Billing: - Token usage billed automatically based on model pricing - MCP tool
 // calls billed separately using credits system - Streaming responses billed after
@@ -219,13 +208,13 @@ func (r *ChatCompletionService) NewStreaming(ctx context.Context, body ChatCompl
 
 // Token log probability information.
 type ChatCompletionTokenLogprob struct {
-	// The token
+	// The token.
 	Token string `json:"token,required"`
-	// Log probability of this token
+	// Log probability of this token.
 	Logprob float64 `json:"logprob,required"`
-	// List of most likely tokens and their log probabilities
+	// List of the most likely tokens and their log probability information.
 	TopLogprobs []TopLogprob `json:"top_logprobs,required"`
-	// Bytes representation of the token
+	// Bytes representation of the token.
 	Bytes []int64 `json:"bytes,nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -244,9 +233,9 @@ func (r *ChatCompletionTokenLogprob) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func DedalusModelChoiceParamOfDedalusModel(name string) DedalusModelChoiceUnionParam {
+func DedalusModelChoiceParamOfDedalusModel(model string) DedalusModelChoiceUnionParam {
 	var variant DedalusModelParam
-	variant.Name = name
+	variant.Model = model
 	return DedalusModelChoiceUnionParam{OfDedalusModel: &variant}
 }
 
@@ -445,9 +434,9 @@ func (r *StreamChunkChoiceDeltaToolCallFunction) UnmarshalJSON(data []byte) erro
 
 // Log probability information for the choice.
 type StreamChunkChoiceLogprobs struct {
-	// Log probabilities for the content tokens
+	// A list of message content tokens with log probability information.
 	Content []ChatCompletionTokenLogprob `json:"content,nullable"`
-	// Log probabilities for refusal tokens, if any
+	// A list of message refusal tokens with log probability information.
 	Refusal []ChatCompletionTokenLogprob `json:"refusal,nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -552,11 +541,11 @@ func (r *StreamChunkUsagePromptTokensDetails) UnmarshalJSON(data []byte) error {
 
 // Token and its log probability.
 type TopLogprob struct {
-	// The token
+	// The token.
 	Token string `json:"token,required"`
-	// Log probability of this token
+	// Log probability of this token.
 	Logprob float64 `json:"logprob,required"`
-	// Bytes representation of the token
+	// Bytes representation of the token.
 	Bytes []int64 `json:"bytes,nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -575,78 +564,173 @@ func (r *TopLogprob) UnmarshalJSON(data []byte) error {
 }
 
 type ChatCompletionNewParams struct {
-	// Messages to the model. Supports role/content structure and multimodal content
-	// arrays.
+	// A list of messages comprising the conversation so far. Depending on the model
+	// you use, different message types (modalities) are supported, like text, images,
+	// and audio.
 	Messages []map[string]any `json:"messages,omitzero,required"`
-	// Frequency penalty (-2 to 2). Positive values penalize new tokens based on their
-	// existing frequency in the text so far, decreasing likelihood of repeated
-	// phrases.
-	FrequencyPenalty param.Opt[float64] `json:"frequency_penalty,omitzero"`
-	// Maximum number of tokens to generate in the completion. Does not include tokens
-	// in the input messages.
-	MaxTokens param.Opt[int64] `json:"max_tokens,omitzero"`
-	// Maximum number of turns for agent execution before terminating (default: 10).
-	// Each turn represents one model inference cycle. Higher values allow more complex
-	// reasoning but increase cost and latency.
-	MaxTurns param.Opt[int64] `json:"max_turns,omitzero"`
-	// Number of completions to generate. Note: only n=1 is currently supported.
-	N param.Opt[int64] `json:"n,omitzero"`
-	// Presence penalty (-2 to 2). Positive values penalize new tokens based on whether
-	// they appear in the text so far, encouraging the model to talk about new topics.
-	PresencePenalty param.Opt[float64] `json:"presence_penalty,omitzero"`
-	// Sampling temperature (0 to 2). Higher values make output more random, lower
-	// values make it more focused and deterministic. 0 = deterministic, 1 = balanced,
-	// 2 = very creative.
-	Temperature param.Opt[float64] `json:"temperature,omitzero"`
-	// Nucleus sampling parameter (0 to 1). Alternative to temperature. 0.1 = only top
-	// 10% probability mass, 1.0 = consider all tokens.
-	TopP param.Opt[float64] `json:"top_p,omitzero"`
-	// Unique identifier representing your end-user. Used for monitoring and abuse
-	// detection. Should be consistent across requests from the same user.
-	User param.Opt[string] `json:"user,omitzero"`
-	// Attributes for the agent itself, influencing behavior and model selection.
-	// Format: {'attribute': value}, where values are 0.0-1.0. Common attributes:
-	// 'complexity', 'accuracy', 'efficiency', 'creativity', 'friendliness'. Higher
-	// values indicate stronger preference for that characteristic.
-	AgentAttributes map[string]float64 `json:"agent_attributes,omitzero"`
-	// Guardrails to apply to the agent for input/output validation and safety checks.
-	// Reserved for future use - guardrails configuration format not yet finalized.
-	Guardrails []map[string]any `json:"guardrails,omitzero"`
-	// Configuration for multi-model handoffs and agent orchestration. Reserved for
-	// future use - handoff configuration format not yet finalized.
-	HandoffConfig map[string]any `json:"handoff_config,omitzero"`
-	// Modify likelihood of specified tokens appearing in the completion. Maps token
-	// IDs (as strings) to bias values (-100 to 100). -100 = completely ban token, +100
-	// = strongly favor token.
-	LogitBias map[string]int64 `json:"logit_bias,omitzero"`
-	// MCP (Model Context Protocol) server addresses to make available for server-side
-	// tool execution. Can be URLs (e.g., 'https://mcp.example.com') or slugs (e.g.,
-	// 'dedalus-labs/brave-search'). MCP tools are executed server-side and billed
-	// separately.
-	MCPServers []string `json:"mcp_servers,omitzero"`
 	// Model(s) to use for completion. Can be a single model ID, a DedalusModel object,
 	// or a list for multi-model routing. Single model: 'openai/gpt-4',
 	// 'anthropic/claude-3-5-sonnet-20241022', 'openai/gpt-4o-mini', or a DedalusModel
 	// instance. Multi-model routing: ['openai/gpt-4o-mini', 'openai/gpt-4',
 	// 'anthropic/claude-3-5-sonnet'] or list of DedalusModel objects - agent will
 	// choose optimal model based on task complexity.
-	Model ChatCompletionNewParamsModelUnion `json:"model,omitzero"`
+	Model ChatCompletionNewParamsModelUnion `json:"model,omitzero,required"`
+	// Number between -2.0 and 2.0. Positive values penalize new tokens based on their
+	// existing frequency in the text so far, decreasing the model's likelihood to
+	// repeat the same line verbatim.
+	FrequencyPenalty param.Opt[float64] `json:"frequency_penalty,omitzero"`
+	// Whether to return log probabilities of the output tokens. If true, returns the
+	// log probabilities for each token in the response content.
+	Logprobs param.Opt[bool] `json:"logprobs,omitzero"`
+	// An upper bound for the number of tokens that can be generated for a completion,
+	// including visible output and reasoning tokens.
+	MaxCompletionTokens param.Opt[int64] `json:"max_completion_tokens,omitzero"`
+	// The maximum number of tokens that can be generated in the chat completion. This
+	// value can be used to control costs for text generated via API. This value is now
+	// deprecated in favor of 'max_completion_tokens' and is not compatible with
+	// o-series models.
+	MaxTokens param.Opt[int64] `json:"max_tokens,omitzero"`
+	// Maximum number of turns for agent execution before terminating (default: 10).
+	// Each turn represents one model inference cycle. Higher values allow more complex
+	// reasoning but increase cost and latency.
+	MaxTurns param.Opt[int64] `json:"max_turns,omitzero"`
+	// How many chat completion choices to generate for each input message. Keep 'n' as
+	// 1 to minimize costs.
+	N param.Opt[int64] `json:"n,omitzero"`
+	// Whether to enable parallel function calling during tool use.
+	ParallelToolCalls param.Opt[bool] `json:"parallel_tool_calls,omitzero"`
+	// Number between -2.0 and 2.0. Positive values penalize new tokens based on
+	// whether they appear in the text so far, increasing the model's likelihood to
+	// talk about new topics.
+	PresencePenalty param.Opt[float64] `json:"presence_penalty,omitzero"`
+	// Used by OpenAI to cache responses for similar requests and optimize cache hit
+	// rates. Replaces the legacy 'user' field for caching.
+	PromptCacheKey param.Opt[string] `json:"prompt_cache_key,omitzero"`
+	// Stable identifier used to help detect users who might violate OpenAI usage
+	// policies. Consider hashing end-user identifiers before sending.
+	SafetyIdentifier param.Opt[string] `json:"safety_identifier,omitzero"`
+	// If specified, system will make a best effort to sample deterministically.
+	// Determinism is not guaranteed for the same seed across different models or API
+	// versions.
+	Seed param.Opt[int64] `json:"seed,omitzero"`
+	// Whether to store the output of this chat completion request for OpenAI model
+	// distillation or eval products. Image inputs over 8MB are dropped if storage is
+	// enabled.
+	Store param.Opt[bool] `json:"store,omitzero"`
+	// What sampling temperature to use, between 0 and 2. Higher values like 0.8 make
+	// the output more random, while lower values like 0.2 make it more focused and
+	// deterministic. We generally recommend altering this or 'top_p' but not both.
+	Temperature param.Opt[float64] `json:"temperature,omitzero"`
+	// Top-k sampling. Anthropic: pass-through. Google: injected into
+	// generationConfig.topK.
+	TopK param.Opt[int64] `json:"top_k,omitzero"`
+	// An integer between 0 and 20 specifying how many of the most likely tokens to
+	// return at each position, with log probabilities. Requires 'logprobs' to be true.
+	TopLogprobs param.Opt[int64] `json:"top_logprobs,omitzero"`
+	// An alternative to sampling with temperature, called nucleus sampling, where the
+	// model considers the results of the tokens with top_p probability mass. So 0.1
+	// means only the tokens comprising the top 10% probability mass are considered. We
+	// generally recommend altering this or 'temperature' but not both.
+	TopP param.Opt[float64] `json:"top_p,omitzero"`
+	// Stable identifier for your end-users. Helps OpenAI detect and prevent abuse and
+	// may boost cache hit rates. This field is being replaced by 'safety_identifier'
+	// and 'prompt_cache_key'.
+	User param.Opt[string] `json:"user,omitzero"`
+	// Attributes for the agent itself, influencing behavior and model selection.
+	// Format: {'attribute': value}, where values are 0.0-1.0. Common attributes:
+	// 'complexity', 'accuracy', 'efficiency', 'creativity', 'friendliness'. Higher
+	// values indicate stronger preference for that characteristic.
+	AgentAttributes map[string]float64 `json:"agent_attributes,omitzero"`
+	// Parameters for audio output. Required when requesting audio responses (for
+	// example, modalities including 'audio').
+	Audio map[string]any `json:"audio,omitzero"`
+	// Deprecated in favor of 'tool_choice'. Controls which function is called by the
+	// model (none, auto, or specific name).
+	FunctionCall ChatCompletionNewParamsFunctionCallUnion `json:"function_call,omitzero"`
+	// Deprecated in favor of 'tools'. Legacy list of function definitions the model
+	// may generate JSON inputs for.
+	Functions []map[string]any `json:"functions,omitzero"`
+	// Google generationConfig object. Merged with auto-generated config. Use for
+	// Google-specific params (candidateCount, responseMimeType, etc.).
+	GenerationConfig map[string]any `json:"generation_config,omitzero"`
+	// Guardrails to apply to the agent for input/output validation and safety checks.
+	// Reserved for future use - guardrails configuration format not yet finalized.
+	Guardrails []map[string]any `json:"guardrails,omitzero"`
+	// Configuration for multi-model handoffs and agent orchestration. Reserved for
+	// future use - handoff configuration format not yet finalized.
+	HandoffConfig map[string]any `json:"handoff_config,omitzero"`
+	// Modify the likelihood of specified tokens appearing in the completion. Accepts a
+	// JSON object mapping token IDs (as strings) to bias values from -100 to 100. The
+	// bias is added to the logits before sampling; values between -1 and 1 nudge
+	// selection probability, while values like -100 or 100 effectively ban or require
+	// a token.
+	LogitBias map[string]int64 `json:"logit_bias,omitzero"`
+	// MCP (Model Context Protocol) server addresses to make available for server-side
+	// tool execution. Entries can be URLs (e.g., 'https://mcp.example.com'), slugs
+	// (e.g., 'dedalus-labs/brave-search'), or structured objects specifying
+	// slug/version/url. MCP tools are executed server-side and billed separately.
+	MCPServers ChatCompletionNewParamsMCPServersUnion `json:"mcp_servers,omitzero"`
+	// Set of up to 16 key-value string pairs that can be attached to the request for
+	// structured metadata.
+	Metadata map[string]string `json:"metadata,omitzero"`
+	// Output types you would like the model to generate. Most models default to
+	// ['text']; some support ['text', 'audio'].
+	Modalities []string `json:"modalities,omitzero"`
 	// Attributes for individual models used in routing decisions during multi-model
 	// execution. Format: {'model_name': {'attribute': value}}, where values are
 	// 0.0-1.0. Common attributes: 'intelligence', 'speed', 'cost', 'creativity',
 	// 'accuracy'. Used by agent to select optimal model based on task requirements.
 	ModelAttributes map[string]map[string]float64 `json:"model_attributes,omitzero"`
-	// Up to 4 sequences where the API will stop generating further tokens. The model
-	// will stop as soon as it encounters any of these sequences.
+	// Configuration for predicted outputs. Improves response times when you already
+	// know large portions of the response content.
+	Prediction map[string]any `json:"prediction,omitzero"`
+	// Constrains effort on reasoning for supported reasoning models. Higher values use
+	// more compute, potentially improving reasoning quality at the cost of latency and
+	// tokens.
+	//
+	// Any of "low", "medium", "high".
+	ReasoningEffort ChatCompletionNewParamsReasoningEffort `json:"reasoning_effort,omitzero"`
+	// An object specifying the format that the model must output. Use {'type':
+	// 'json_schema', 'json_schema': {...}} for structured outputs or {'type':
+	// 'json_object'} for the legacy JSON mode.
+	ResponseFormat map[string]any `json:"response_format,omitzero"`
+	// Google safety settings (harm categories and thresholds).
+	SafetySettings []map[string]any `json:"safety_settings,omitzero"`
+	// Specifies the processing tier used for the request. 'auto' uses project
+	// defaults, while 'default' forces standard pricing and performance.
+	//
+	// Any of "auto", "default".
+	ServiceTier ChatCompletionNewParamsServiceTier `json:"service_tier,omitzero"`
+	// Not supported with latest reasoning models 'o3' and 'o4-mini'.
+	//
+	//	Up to 4 sequences where the API will stop generating further tokens; the returned text will not contain the stop sequence.
 	Stop []string `json:"stop,omitzero"`
-	// Controls which tool is called by the model. Options: 'auto' (default), 'none',
-	// 'required', or specific tool name. Can also be a dict specifying a particular
-	// tool.
+	// Options for streaming responses. Only set when 'stream' is true (supports
+	// 'include_usage' and 'include_obfuscation').
+	StreamOptions map[string]any `json:"stream_options,omitzero"`
+	// System prompt/instructions. Anthropic: pass-through. Google: converted to
+	// systemInstruction. OpenAI: extracted from messages.
+	System ChatCompletionNewParamsSystemUnion `json:"system,omitzero"`
+	// Extended thinking configuration (Anthropic only). Enables thinking blocks
+	// showing reasoning process. Requires min 1,024 token budget.
+	Thinking ChatCompletionNewParamsThinkingUnion `json:"thinking,omitzero"`
+	// Controls which (if any) tool is called by the model. 'none' stops tool calling,
+	// 'auto' lets the model decide, and 'required' forces at least one tool
+	// invocation. Specific tool payloads force that tool.
 	ToolChoice ChatCompletionNewParamsToolChoiceUnion `json:"tool_choice,omitzero"`
-	// list of tools available to the model in OpenAI function calling format. Tools
-	// are executed client-side and returned as JSON for the application to handle. Use
-	// 'mcp_servers' for server-side tool execution.
+	// Google tool configuration (function calling mode, etc.).
+	ToolConfig map[string]any `json:"tool_config,omitzero"`
+	// A list of tools the model may call. Supports OpenAI function tools and custom
+	// tools; use 'mcp_servers' for Dedalus-managed server-side tools.
 	Tools []map[string]any `json:"tools,omitzero"`
+	// Constrains the verbosity of the model's response. Lower values produce concise
+	// answers, higher values allow more detail.
+	//
+	// Any of "low", "medium", "high".
+	Verbosity ChatCompletionNewParamsVerbosity `json:"verbosity,omitzero"`
+	// Configuration for OpenAI's web search tool. Learn more at
+	// https://platform.openai.com/docs/guides/tools-web-search?api-mode=chat.
+	WebSearchOptions map[string]any `json:"web_search_options,omitzero"`
 	paramObj
 }
 
@@ -689,6 +773,279 @@ func (u *ChatCompletionNewParamsModelUnion) asAny() any {
 // Only one field can be non-zero.
 //
 // Use [param.IsOmitted] to confirm if a field is set.
+type ChatCompletionNewParamsFunctionCallUnion struct {
+	OfString param.Opt[string] `json:",omitzero,inline"`
+	OfAnyMap map[string]any    `json:",omitzero,inline"`
+	paramUnion
+}
+
+func (u ChatCompletionNewParamsFunctionCallUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfString, u.OfAnyMap)
+}
+func (u *ChatCompletionNewParamsFunctionCallUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
+}
+
+func (u *ChatCompletionNewParamsFunctionCallUnion) asAny() any {
+	if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	} else if !param.IsOmitted(u.OfAnyMap) {
+		return &u.OfAnyMap
+	}
+	return nil
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ChatCompletionNewParamsMCPServersUnion struct {
+	OfMCPServers    []ChatCompletionNewParamsMCPServersMCPServerUnion `json:",omitzero,inline"`
+	OfMCPServerSlug param.Opt[string]                                 `json:",omitzero,inline"`
+	OfMCPServerSpec *ChatCompletionNewParamsMCPServersMCPServerSpec   `json:",omitzero,inline"`
+	paramUnion
+}
+
+func (u ChatCompletionNewParamsMCPServersUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfMCPServers, u.OfMCPServerSlug, u.OfMCPServerSpec)
+}
+func (u *ChatCompletionNewParamsMCPServersUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
+}
+
+func (u *ChatCompletionNewParamsMCPServersUnion) asAny() any {
+	if !param.IsOmitted(u.OfMCPServers) {
+		return &u.OfMCPServers
+	} else if !param.IsOmitted(u.OfMCPServerSlug) {
+		return &u.OfMCPServerSlug.Value
+	} else if !param.IsOmitted(u.OfMCPServerSpec) {
+		return u.OfMCPServerSpec
+	}
+	return nil
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ChatCompletionNewParamsMCPServersMCPServerUnion struct {
+	OfMCPServerSlug param.Opt[string]                                        `json:",omitzero,inline"`
+	OfMCPServerSpec *ChatCompletionNewParamsMCPServersMCPServerMCPServerSpec `json:",omitzero,inline"`
+	paramUnion
+}
+
+func (u ChatCompletionNewParamsMCPServersMCPServerUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfMCPServerSlug, u.OfMCPServerSpec)
+}
+func (u *ChatCompletionNewParamsMCPServersMCPServerUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
+}
+
+func (u *ChatCompletionNewParamsMCPServersMCPServerUnion) asAny() any {
+	if !param.IsOmitted(u.OfMCPServerSlug) {
+		return &u.OfMCPServerSlug.Value
+	} else if !param.IsOmitted(u.OfMCPServerSpec) {
+		return u.OfMCPServerSpec
+	}
+	return nil
+}
+
+// Structured representation of an MCP server reference.
+type ChatCompletionNewParamsMCPServersMCPServerMCPServerSpec struct {
+	// Slug identifying an MCP server (e.g., 'dedalus-labs/brave-search').
+	Slug param.Opt[string] `json:"slug,omitzero"`
+	// Explicit MCP server URL.
+	URL param.Opt[string] `json:"url,omitzero" format:"uri"`
+	// Optional explicit version to target when using a slug.
+	Version param.Opt[string] `json:"version,omitzero"`
+	// Optional metadata associated with the MCP server entry.
+	Metadata    map[string]any `json:"metadata,omitzero"`
+	ExtraFields map[string]any `json:"-"`
+	paramObj
+}
+
+func (r ChatCompletionNewParamsMCPServersMCPServerMCPServerSpec) MarshalJSON() (data []byte, err error) {
+	type shadow ChatCompletionNewParamsMCPServersMCPServerMCPServerSpec
+	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
+}
+func (r *ChatCompletionNewParamsMCPServersMCPServerMCPServerSpec) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Structured representation of an MCP server reference.
+type ChatCompletionNewParamsMCPServersMCPServerSpec struct {
+	// Slug identifying an MCP server (e.g., 'dedalus-labs/brave-search').
+	Slug param.Opt[string] `json:"slug,omitzero"`
+	// Explicit MCP server URL.
+	URL param.Opt[string] `json:"url,omitzero" format:"uri"`
+	// Optional explicit version to target when using a slug.
+	Version param.Opt[string] `json:"version,omitzero"`
+	// Optional metadata associated with the MCP server entry.
+	Metadata    map[string]any `json:"metadata,omitzero"`
+	ExtraFields map[string]any `json:"-"`
+	paramObj
+}
+
+func (r ChatCompletionNewParamsMCPServersMCPServerSpec) MarshalJSON() (data []byte, err error) {
+	type shadow ChatCompletionNewParamsMCPServersMCPServerSpec
+	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
+}
+func (r *ChatCompletionNewParamsMCPServersMCPServerSpec) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Constrains effort on reasoning for supported reasoning models. Higher values use
+// more compute, potentially improving reasoning quality at the cost of latency and
+// tokens.
+type ChatCompletionNewParamsReasoningEffort string
+
+const (
+	ChatCompletionNewParamsReasoningEffortLow    ChatCompletionNewParamsReasoningEffort = "low"
+	ChatCompletionNewParamsReasoningEffortMedium ChatCompletionNewParamsReasoningEffort = "medium"
+	ChatCompletionNewParamsReasoningEffortHigh   ChatCompletionNewParamsReasoningEffort = "high"
+)
+
+// Specifies the processing tier used for the request. 'auto' uses project
+// defaults, while 'default' forces standard pricing and performance.
+type ChatCompletionNewParamsServiceTier string
+
+const (
+	ChatCompletionNewParamsServiceTierAuto    ChatCompletionNewParamsServiceTier = "auto"
+	ChatCompletionNewParamsServiceTierDefault ChatCompletionNewParamsServiceTier = "default"
+)
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ChatCompletionNewParamsSystemUnion struct {
+	OfString      param.Opt[string] `json:",omitzero,inline"`
+	OfMapOfAnyMap []map[string]any  `json:",omitzero,inline"`
+	paramUnion
+}
+
+func (u ChatCompletionNewParamsSystemUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfString, u.OfMapOfAnyMap)
+}
+func (u *ChatCompletionNewParamsSystemUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
+}
+
+func (u *ChatCompletionNewParamsSystemUnion) asAny() any {
+	if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	} else if !param.IsOmitted(u.OfMapOfAnyMap) {
+		return &u.OfMapOfAnyMap
+	}
+	return nil
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ChatCompletionNewParamsThinkingUnion struct {
+	OfDisabled *ChatCompletionNewParamsThinkingDisabled `json:",omitzero,inline"`
+	OfEnabled  *ChatCompletionNewParamsThinkingEnabled  `json:",omitzero,inline"`
+	paramUnion
+}
+
+func (u ChatCompletionNewParamsThinkingUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfDisabled, u.OfEnabled)
+}
+func (u *ChatCompletionNewParamsThinkingUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
+}
+
+func (u *ChatCompletionNewParamsThinkingUnion) asAny() any {
+	if !param.IsOmitted(u.OfDisabled) {
+		return u.OfDisabled
+	} else if !param.IsOmitted(u.OfEnabled) {
+		return u.OfEnabled
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u ChatCompletionNewParamsThinkingUnion) GetBudgetTokens() *int64 {
+	if vt := u.OfEnabled; vt != nil {
+		return &vt.BudgetTokens
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u ChatCompletionNewParamsThinkingUnion) GetType() *string {
+	if vt := u.OfDisabled; vt != nil {
+		return (*string)(&vt.Type)
+	} else if vt := u.OfEnabled; vt != nil {
+		return (*string)(&vt.Type)
+	}
+	return nil
+}
+
+func init() {
+	apijson.RegisterUnion[ChatCompletionNewParamsThinkingUnion](
+		"type",
+		apijson.Discriminator[ChatCompletionNewParamsThinkingDisabled]("disabled"),
+		apijson.Discriminator[ChatCompletionNewParamsThinkingEnabled]("enabled"),
+	)
+}
+
+func NewChatCompletionNewParamsThinkingDisabled() ChatCompletionNewParamsThinkingDisabled {
+	return ChatCompletionNewParamsThinkingDisabled{
+		Type: "disabled",
+	}
+}
+
+// Fields:
+//
+// - type (required): Literal['disabled']
+//
+// This struct has a constant value, construct it with
+// [NewChatCompletionNewParamsThinkingDisabled].
+type ChatCompletionNewParamsThinkingDisabled struct {
+	Type constant.Disabled `json:"type,required"`
+	paramObj
+}
+
+func (r ChatCompletionNewParamsThinkingDisabled) MarshalJSON() (data []byte, err error) {
+	type shadow ChatCompletionNewParamsThinkingDisabled
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ChatCompletionNewParamsThinkingDisabled) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Fields:
+//
+// - budget_tokens (required): int
+// - type (required): Literal['enabled']
+//
+// The properties BudgetTokens, Type are required.
+type ChatCompletionNewParamsThinkingEnabled struct {
+	// Determines how many tokens Claude can use for its internal reasoning process.
+	// Larger budgets can enable more thorough analysis for complex problems, improving
+	// response quality.
+	//
+	// Must be ≥1024 and less than `max_tokens`.
+	//
+	// See
+	// [extended thinking](https://docs.anthropic.com/en/docs/build-with-claude/extended-thinking)
+	// for details.
+	BudgetTokens int64 `json:"budget_tokens,required"`
+	// This field can be elided, and will marshal its zero value as "enabled".
+	Type constant.Enabled `json:"type,required"`
+	paramObj
+}
+
+func (r ChatCompletionNewParamsThinkingEnabled) MarshalJSON() (data []byte, err error) {
+	type shadow ChatCompletionNewParamsThinkingEnabled
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ChatCompletionNewParamsThinkingEnabled) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
 type ChatCompletionNewParamsToolChoiceUnion struct {
 	OfString param.Opt[string] `json:",omitzero,inline"`
 	OfAnyMap map[string]any    `json:",omitzero,inline"`
@@ -710,3 +1067,13 @@ func (u *ChatCompletionNewParamsToolChoiceUnion) asAny() any {
 	}
 	return nil
 }
+
+// Constrains the verbosity of the model's response. Lower values produce concise
+// answers, higher values allow more detail.
+type ChatCompletionNewParamsVerbosity string
+
+const (
+	ChatCompletionNewParamsVerbosityLow    ChatCompletionNewParamsVerbosity = "low"
+	ChatCompletionNewParamsVerbosityMedium ChatCompletionNewParamsVerbosity = "medium"
+	ChatCompletionNewParamsVerbosityHigh   ChatCompletionNewParamsVerbosity = "high"
+)
