@@ -564,10 +564,9 @@ func (r *TopLogprob) UnmarshalJSON(data []byte) error {
 }
 
 type ChatCompletionNewParams struct {
-	// A list of messages comprising the conversation so far. Depending on the model
-	// you use, different message types (modalities) are supported, like text, images,
-	// and audio.
-	Messages []map[string]any `json:"messages,omitzero,required"`
+	// Conversation history. Accepts either a list of message objects or a string,
+	// which is treated as a single user message.
+	Messages ChatCompletionNewParamsMessagesUnion `json:"messages,omitzero,required"`
 	// Model(s) to use for completion. Can be a single model ID, a DedalusModel object,
 	// or a list for multi-model routing. Single model: 'openai/gpt-4',
 	// 'anthropic/claude-3-5-sonnet-20241022', 'openai/gpt-4o-mini', or a DedalusModel
@@ -575,6 +574,9 @@ type ChatCompletionNewParams struct {
 	// 'anthropic/claude-3-5-sonnet'] or list of DedalusModel objects - agent will
 	// choose optimal model based on task complexity.
 	Model ChatCompletionNewParamsModelUnion `json:"model,omitzero,required"`
+	// Google-only flag to disable the SDK's automatic function execution. When true,
+	// the model returns function calls for the client to execute manually.
+	DisableAutomaticFunctionCalling param.Opt[bool] `json:"disable_automatic_function_calling,omitzero"`
 	// Number between -2.0 and 2.0. Positive values penalize new tokens based on their
 	// existing frequency in the text so far, decreasing the model's likelihood to
 	// repeat the same line verbatim.
@@ -659,6 +661,12 @@ type ChatCompletionNewParams struct {
 	// Configuration for multi-model handoffs and agent orchestration. Reserved for
 	// future use - handoff configuration format not yet finalized.
 	HandoffConfig map[string]any `json:"handoff_config,omitzero"`
+	// Convenience alias for Responses-style `input`. Used when `messages` is omitted
+	// to provide the user prompt directly.
+	Input ChatCompletionNewParamsInputUnion `json:"input,omitzero"`
+	// Convenience alias for Responses-style `instructions`. Takes precedence over
+	// `system` and over system-role messages when provided.
+	Instructions ChatCompletionNewParamsInstructionsUnion `json:"instructions,omitzero"`
 	// Modify the likelihood of specified tokens appearing in the completion. Accepts a
 	// JSON object mapping token IDs (as strings) to bias values from -100 to 100. The
 	// bias is added to the logits before sampling; values between -1 and 1 nudge
@@ -692,7 +700,9 @@ type ChatCompletionNewParams struct {
 	ReasoningEffort ChatCompletionNewParamsReasoningEffort `json:"reasoning_effort,omitzero"`
 	// An object specifying the format that the model must output. Use {'type':
 	// 'json_schema', 'json_schema': {...}} for structured outputs or {'type':
-	// 'json_object'} for the legacy JSON mode.
+	// 'json_object'} for the legacy JSON mode. Currently only OpenAI-prefixed models
+	// honour this field; Anthropic and Google requests will return an
+	// invalid_request_error if it is supplied.
 	ResponseFormat map[string]any `json:"response_format,omitzero"`
 	// Google safety settings (harm categories and thresholds).
 	SafetySettings []map[string]any `json:"safety_settings,omitzero"`
@@ -745,6 +755,31 @@ func (r *ChatCompletionNewParams) UnmarshalJSON(data []byte) error {
 // Only one field can be non-zero.
 //
 // Use [param.IsOmitted] to confirm if a field is set.
+type ChatCompletionNewParamsMessagesUnion struct {
+	OfMapOfAnyMap []map[string]any  `json:",omitzero,inline"`
+	OfString      param.Opt[string] `json:",omitzero,inline"`
+	paramUnion
+}
+
+func (u ChatCompletionNewParamsMessagesUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfMapOfAnyMap, u.OfString)
+}
+func (u *ChatCompletionNewParamsMessagesUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
+}
+
+func (u *ChatCompletionNewParamsMessagesUnion) asAny() any {
+	if !param.IsOmitted(u.OfMapOfAnyMap) {
+		return &u.OfMapOfAnyMap
+	} else if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	}
+	return nil
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
 type ChatCompletionNewParamsModelUnion struct {
 	OfModelID      param.Opt[ModelID] `json:",omitzero,inline"`
 	OfDedalusModel *DedalusModelParam `json:",omitzero,inline"`
@@ -791,6 +826,56 @@ func (u *ChatCompletionNewParamsFunctionCallUnion) asAny() any {
 		return &u.OfString.Value
 	} else if !param.IsOmitted(u.OfAnyMap) {
 		return &u.OfAnyMap
+	}
+	return nil
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ChatCompletionNewParamsInputUnion struct {
+	OfMapOfAnyMap []map[string]any  `json:",omitzero,inline"`
+	OfString      param.Opt[string] `json:",omitzero,inline"`
+	paramUnion
+}
+
+func (u ChatCompletionNewParamsInputUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfMapOfAnyMap, u.OfString)
+}
+func (u *ChatCompletionNewParamsInputUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
+}
+
+func (u *ChatCompletionNewParamsInputUnion) asAny() any {
+	if !param.IsOmitted(u.OfMapOfAnyMap) {
+		return &u.OfMapOfAnyMap
+	} else if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	}
+	return nil
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ChatCompletionNewParamsInstructionsUnion struct {
+	OfString      param.Opt[string] `json:",omitzero,inline"`
+	OfMapOfAnyMap []map[string]any  `json:",omitzero,inline"`
+	paramUnion
+}
+
+func (u ChatCompletionNewParamsInstructionsUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfString, u.OfMapOfAnyMap)
+}
+func (u *ChatCompletionNewParamsInstructionsUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
+}
+
+func (u *ChatCompletionNewParamsInstructionsUnion) asAny() any {
+	if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	} else if !param.IsOmitted(u.OfMapOfAnyMap) {
+		return &u.OfMapOfAnyMap
 	}
 	return nil
 }

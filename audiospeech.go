@@ -34,7 +34,8 @@ func NewAudioSpeechService(opts ...option.RequestOption) (r AudioSpeechService) 
 
 // Generate audio from text using text-to-speech.
 //
-// OpenAI only endpoint.
+// OpenAI models only. Gemini TTS uses different architecture (audio modalities in
+// chat).
 func (r *AudioSpeechService) New(ctx context.Context, body AudioSpeechNewParams, opts ...option.RequestOption) (res *http.Response, err error) {
 	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "audio/mpeg")}, opts...)

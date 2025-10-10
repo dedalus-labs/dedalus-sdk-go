@@ -39,7 +39,7 @@ func NewAudioTranslationService(opts ...option.RequestOption) (r AudioTranslatio
 
 // Translate audio to English text.
 //
-// OpenAI only endpoint.
+// OpenAI Whisper models only.
 func (r *AudioTranslationService) New(ctx context.Context, body AudioTranslationNewParams, opts ...option.RequestOption) (res *AudioTranslationNewResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	path := "v1/audio/translations"
