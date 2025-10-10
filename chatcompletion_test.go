@@ -45,6 +45,7 @@ func TestChatCompletionNewWithOptionalParams(t *testing.T) {
 			"format": "bar",
 			"voice":  "bar",
 		},
+		AutoExecuteTools:                githubcomdedaluslabsdedalussdkgo.Bool(true),
 		DisableAutomaticFunctionCalling: githubcomdedaluslabsdedalussdkgo.Bool(true),
 		FrequencyPenalty:                githubcomdedaluslabsdedalussdkgo.Float(-0.5),
 		FunctionCall: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsFunctionCallUnion{
