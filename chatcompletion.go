@@ -638,6 +638,9 @@ type ChatCompletionNewParams struct {
 	// may boost cache hit rates. This field is being replaced by 'safety_identifier'
 	// and 'prompt_cache_key'.
 	User param.Opt[string] `json:"user,omitzero"`
+	// When False, skip server-side tool execution and return raw OpenAI-style
+	// tool_calls in the response.
+	AutoExecuteTools param.Opt[bool] `json:"auto_execute_tools,omitzero"`
 	// Attributes for the agent itself, influencing behavior and model selection.
 	// Format: {'attribute': value}, where values are 0.0-1.0. Common attributes:
 	// 'complexity', 'accuracy', 'efficiency', 'creativity', 'friendliness'. Higher
