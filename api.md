@@ -1,3 +1,11 @@
+# Shared Params Types
+
+- <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared#DedalusModelParam">DedalusModelParam</a>
+
+# Shared Response Types
+
+- <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared#Model">Model</a>
+
 # Root
 
 Response Types:
@@ -22,18 +30,13 @@ Methods:
 
 # Models
 
-Params Types:
-
-- <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#DedalusModelParam">DedalusModelParam</a>
-
 Response Types:
 
 - <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#ListModelsResponse">ListModelsResponse</a>
-- <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#Model">Model</a>
 
 Methods:
 
-- <code title="get /v1/models/{model_id}">client.Models.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#ModelService.Get">Get</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, modelID <a href="https://pkg.go.dev/builtin#string">string</a>) (<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#Model">Model</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="get /v1/models/{model_id}">client.Models.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#ModelService.Get">Get</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, modelID <a href="https://pkg.go.dev/builtin#string">string</a>) (<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared#Model">Model</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="get /v1/models">client.Models.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#ModelService.List">List</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>) (<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#ListModelsResponse">ListModelsResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
 # Embeddings

@@ -13,6 +13,7 @@ import (
 	"github.com/dedalus-labs/dedalus-sdk-go/packages/param"
 	"github.com/dedalus-labs/dedalus-sdk-go/packages/respjson"
 	"github.com/dedalus-labs/dedalus-sdk-go/packages/ssestream"
+	"github.com/dedalus-labs/dedalus-sdk-go/shared"
 	"github.com/dedalus-labs/dedalus-sdk-go/shared/constant"
 )
 
@@ -234,7 +235,7 @@ func (r *ChatCompletionTokenLogprob) UnmarshalJSON(data []byte) error {
 }
 
 func DedalusModelChoiceParamOfDedalusModel(model string) DedalusModelChoiceUnionParam {
-	var variant DedalusModelParam
+	var variant shared.DedalusModelParam
 	variant.Model = model
 	return DedalusModelChoiceUnionParam{OfDedalusModel: &variant}
 }
@@ -243,8 +244,8 @@ func DedalusModelChoiceParamOfDedalusModel(model string) DedalusModelChoiceUnion
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type DedalusModelChoiceUnionParam struct {
-	OfModelID      param.Opt[ModelID] `json:",omitzero,inline"`
-	OfDedalusModel *DedalusModelParam `json:",omitzero,inline"`
+	OfModelID      param.Opt[ModelID]        `json:",omitzero,inline"`
+	OfDedalusModel *shared.DedalusModelParam `json:",omitzero,inline"`
 	paramUnion
 }
 
@@ -784,9 +785,9 @@ func (u *ChatCompletionNewParamsMessagesUnion) asAny() any {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type ChatCompletionNewParamsModelUnion struct {
-	OfModelID      param.Opt[ModelID] `json:",omitzero,inline"`
-	OfDedalusModel *DedalusModelParam `json:",omitzero,inline"`
-	OfModels       ModelsParam        `json:",omitzero,inline"`
+	OfModelID      param.Opt[ModelID]        `json:",omitzero,inline"`
+	OfDedalusModel *shared.DedalusModelParam `json:",omitzero,inline"`
+	OfModels       ModelsParam               `json:",omitzero,inline"`
 	paramUnion
 }
 
