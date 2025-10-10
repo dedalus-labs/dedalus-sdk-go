@@ -121,41 +121,45 @@ func (r *DedalusModelParam) UnmarshalJSON(data []byte) error {
 // Optional default generation settings (e.g., temperature, max_tokens) applied
 // when this model is selected.
 type DedalusModelSettingsParam struct {
-	FrequencyPenalty        param.Opt[float64]                 `json:"frequency_penalty,omitzero"`
-	IncludeUsage            param.Opt[bool]                    `json:"include_usage,omitzero"`
-	InputAudioFormat        param.Opt[string]                  `json:"input_audio_format,omitzero"`
-	Logprobs                param.Opt[bool]                    `json:"logprobs,omitzero"`
-	MaxCompletionTokens     param.Opt[int64]                   `json:"max_completion_tokens,omitzero"`
-	MaxTokens               param.Opt[int64]                   `json:"max_tokens,omitzero"`
-	N                       param.Opt[int64]                   `json:"n,omitzero"`
-	OutputAudioFormat       param.Opt[string]                  `json:"output_audio_format,omitzero"`
-	ParallelToolCalls       param.Opt[bool]                    `json:"parallel_tool_calls,omitzero"`
-	PresencePenalty         param.Opt[float64]                 `json:"presence_penalty,omitzero"`
-	ReasoningEffort         param.Opt[string]                  `json:"reasoning_effort,omitzero"`
-	Seed                    param.Opt[int64]                   `json:"seed,omitzero"`
-	ServiceTier             param.Opt[string]                  `json:"service_tier,omitzero"`
-	Store                   param.Opt[bool]                    `json:"store,omitzero"`
-	Stream                  param.Opt[bool]                    `json:"stream,omitzero"`
-	Temperature             param.Opt[float64]                 `json:"temperature,omitzero"`
-	TopK                    param.Opt[int64]                   `json:"top_k,omitzero"`
-	TopLogprobs             param.Opt[int64]                   `json:"top_logprobs,omitzero"`
-	TopP                    param.Opt[float64]                 `json:"top_p,omitzero"`
-	User                    param.Opt[string]                  `json:"user,omitzero"`
-	Voice                   param.Opt[string]                  `json:"voice,omitzero"`
-	UseResponses            param.Opt[bool]                    `json:"use_responses,omitzero"`
-	Audio                   map[string]any                     `json:"audio,omitzero"`
-	ExtraArgs               map[string]any                     `json:"extra_args,omitzero"`
-	ExtraBody               map[string]any                     `json:"extra_body,omitzero"`
-	ExtraHeaders            map[string]string                  `json:"extra_headers,omitzero"`
-	ExtraQuery              map[string]any                     `json:"extra_query,omitzero"`
-	GenerationConfig        map[string]any                     `json:"generation_config,omitzero"`
-	InputAudioTranscription map[string]any                     `json:"input_audio_transcription,omitzero"`
-	LogitBias               map[string]int64                   `json:"logit_bias,omitzero"`
-	Metadata                map[string]string                  `json:"metadata,omitzero"`
-	Modalities              []string                           `json:"modalities,omitzero"`
-	Prediction              map[string]any                     `json:"prediction,omitzero"`
-	Reasoning               DedalusModelSettingsReasoningParam `json:"reasoning,omitzero"`
-	ResponseFormat          map[string]any                     `json:"response_format,omitzero"`
+	FrequencyPenalty                param.Opt[float64]                 `json:"frequency_penalty,omitzero"`
+	IncludeUsage                    param.Opt[bool]                    `json:"include_usage,omitzero"`
+	InputAudioFormat                param.Opt[string]                  `json:"input_audio_format,omitzero"`
+	Logprobs                        param.Opt[bool]                    `json:"logprobs,omitzero"`
+	MaxCompletionTokens             param.Opt[int64]                   `json:"max_completion_tokens,omitzero"`
+	MaxTokens                       param.Opt[int64]                   `json:"max_tokens,omitzero"`
+	N                               param.Opt[int64]                   `json:"n,omitzero"`
+	OutputAudioFormat               param.Opt[string]                  `json:"output_audio_format,omitzero"`
+	ParallelToolCalls               param.Opt[bool]                    `json:"parallel_tool_calls,omitzero"`
+	PresencePenalty                 param.Opt[float64]                 `json:"presence_penalty,omitzero"`
+	PromptCacheKey                  param.Opt[string]                  `json:"prompt_cache_key,omitzero"`
+	ReasoningEffort                 param.Opt[string]                  `json:"reasoning_effort,omitzero"`
+	SafetyIdentifier                param.Opt[string]                  `json:"safety_identifier,omitzero"`
+	Seed                            param.Opt[int64]                   `json:"seed,omitzero"`
+	ServiceTier                     param.Opt[string]                  `json:"service_tier,omitzero"`
+	Store                           param.Opt[bool]                    `json:"store,omitzero"`
+	Stream                          param.Opt[bool]                    `json:"stream,omitzero"`
+	Temperature                     param.Opt[float64]                 `json:"temperature,omitzero"`
+	Timeout                         param.Opt[float64]                 `json:"timeout,omitzero"`
+	TopK                            param.Opt[int64]                   `json:"top_k,omitzero"`
+	TopLogprobs                     param.Opt[int64]                   `json:"top_logprobs,omitzero"`
+	TopP                            param.Opt[float64]                 `json:"top_p,omitzero"`
+	User                            param.Opt[string]                  `json:"user,omitzero"`
+	Verbosity                       param.Opt[string]                  `json:"verbosity,omitzero"`
+	Voice                           param.Opt[string]                  `json:"voice,omitzero"`
+	DisableAutomaticFunctionCalling param.Opt[bool]                    `json:"disable_automatic_function_calling,omitzero"`
+	UseResponses                    param.Opt[bool]                    `json:"use_responses,omitzero"`
+	Audio                           map[string]any                     `json:"audio,omitzero"`
+	ExtraArgs                       map[string]any                     `json:"extra_args,omitzero"`
+	ExtraHeaders                    map[string]string                  `json:"extra_headers,omitzero"`
+	ExtraQuery                      map[string]any                     `json:"extra_query,omitzero"`
+	GenerationConfig                map[string]any                     `json:"generation_config,omitzero"`
+	InputAudioTranscription         map[string]any                     `json:"input_audio_transcription,omitzero"`
+	LogitBias                       map[string]int64                   `json:"logit_bias,omitzero"`
+	Metadata                        map[string]string                  `json:"metadata,omitzero"`
+	Modalities                      []string                           `json:"modalities,omitzero"`
+	Prediction                      map[string]any                     `json:"prediction,omitzero"`
+	Reasoning                       DedalusModelSettingsReasoningParam `json:"reasoning,omitzero"`
+	ResponseFormat                  map[string]any                     `json:"response_format,omitzero"`
 	// Any of "code_interpreter_call.outputs", "computer_call_output.output.image_url",
 	// "file_search_call.results", "message.input_image.image_url",
 	// "message.output_text.logprobs", "reasoning.encrypted_content".
@@ -166,10 +170,13 @@ type DedalusModelSettingsParam struct {
 	SystemInstruction map[string]any                           `json:"system_instruction,omitzero"`
 	Thinking          map[string]any                           `json:"thinking,omitzero"`
 	ToolChoice        DedalusModelSettingsToolChoiceUnionParam `json:"tool_choice,omitzero"`
+	ToolConfig        map[string]any                           `json:"tool_config,omitzero"`
 	// Any of "auto", "disabled".
-	Truncation    string         `json:"truncation,omitzero"`
-	TurnDetection map[string]any `json:"turn_detection,omitzero"`
-	Attributes    map[string]any `json:"attributes,omitzero"`
+	Truncation       string         `json:"truncation,omitzero"`
+	TurnDetection    map[string]any `json:"turn_detection,omitzero"`
+	WebSearchOptions map[string]any `json:"web_search_options,omitzero"`
+	Attributes       map[string]any `json:"attributes,omitzero"`
+	StructuredOutput any            `json:"structured_output,omitzero"`
 	paramObj
 }
 

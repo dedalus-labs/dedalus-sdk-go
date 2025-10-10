@@ -39,7 +39,7 @@ func NewAudioTranscriptionService(opts ...option.RequestOption) (r AudioTranscri
 
 // Transcribe audio to text.
 //
-// OpenAI only endpoint.
+// OpenAI Whisper models only.
 func (r *AudioTranscriptionService) New(ctx context.Context, body AudioTranscriptionNewParams, opts ...option.RequestOption) (res *AudioTranscriptionNewResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	path := "v1/audio/transcriptions"

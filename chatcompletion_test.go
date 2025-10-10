@@ -27,10 +27,12 @@ func TestChatCompletionNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Chat.Completions.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
-		Messages: []map[string]any{{
-			"content": "bar",
-			"role":    "bar",
-		}},
+		Messages: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesUnion{
+			OfMapOfAnyMap: []map[string]any{{
+				"content": "bar",
+				"role":    "bar",
+			}},
+		},
 		Model: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion{
 			OfModelID: githubcomdedaluslabsdedalussdkgo.String("openai/gpt-4"),
 		},
@@ -43,7 +45,8 @@ func TestChatCompletionNewWithOptionalParams(t *testing.T) {
 			"format": "bar",
 			"voice":  "bar",
 		},
-		FrequencyPenalty: githubcomdedaluslabsdedalussdkgo.Float(-0.5),
+		DisableAutomaticFunctionCalling: githubcomdedaluslabsdedalussdkgo.Bool(true),
+		FrequencyPenalty:                githubcomdedaluslabsdedalussdkgo.Float(-0.5),
 		FunctionCall: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsFunctionCallUnion{
 			OfString: githubcomdedaluslabsdedalussdkgo.String("string"),
 		},
@@ -59,6 +62,12 @@ func TestChatCompletionNewWithOptionalParams(t *testing.T) {
 		}},
 		HandoffConfig: map[string]any{
 			"foo": "bar",
+		},
+		Input: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsInputUnion{
+			OfString: githubcomdedaluslabsdedalussdkgo.String("Translate this paragraph into French."),
+		},
+		Instructions: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsInstructionsUnion{
+			OfString: githubcomdedaluslabsdedalussdkgo.String("You are a concise assistant."),
 		},
 		LogitBias: map[string]int64{
 			"50256": -100,
