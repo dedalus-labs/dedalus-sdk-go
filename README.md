@@ -57,7 +57,7 @@ func main() {
 		option.WithAPIKey("My API Key"),     // defaults to os.LookupEnv("DEDALUS_API_KEY")
 		option.WithEnvironmentDevelopment(), // defaults to option.WithEnvironmentProduction()
 	)
-	streamChunk, err := client.Chat.Completions.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
+	completion, err := client.Chat.Completions.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
 		Messages: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesUnion{
 			OfMapOfAnyMap: []map[string]any{{
 				"role":    "user",
@@ -71,7 +71,7 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
-	fmt.Printf("%+v\n", streamChunk.ID)
+	fmt.Printf("%+v\n", completion.ID)
 }
 
 ```

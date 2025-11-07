@@ -43,6 +43,7 @@ func (r *DedalusModelParam) UnmarshalJSON(data []byte) error {
 // Optional default generation settings (e.g., temperature, max_tokens) applied
 // when this model is selected.
 type DedalusModelSettingsParam struct {
+	Deferred                        param.Opt[bool]                    `json:"deferred,omitzero"`
 	FrequencyPenalty                param.Opt[float64]                 `json:"frequency_penalty,omitzero"`
 	IncludeUsage                    param.Opt[bool]                    `json:"include_usage,omitzero"`
 	InputAudioFormat                param.Opt[string]                  `json:"input_audio_format,omitzero"`
@@ -87,6 +88,7 @@ type DedalusModelSettingsParam struct {
 	// "message.output_text.logprobs", "reasoning.encrypted_content".
 	ResponseInclude   []string                                 `json:"response_include,omitzero"`
 	SafetySettings    []map[string]any                         `json:"safety_settings,omitzero"`
+	SearchParameters  map[string]any                           `json:"search_parameters,omitzero"`
 	Stop              DedalusModelSettingsStopUnionParam       `json:"stop,omitzero"`
 	StreamOptions     map[string]any                           `json:"stream_options,omitzero"`
 	SystemInstruction map[string]any                           `json:"system_instruction,omitzero"`
@@ -180,12 +182,13 @@ type DedalusModelSettingsToolChoiceUnionParam struct {
 	// !param.IsOmitted(union.OfDedalusModelSettingsToolChoiceString)
 	OfDedalusModelSettingsToolChoiceString param.Opt[string]                                 `json:",omitzero,inline"`
 	OfString                               param.Opt[string]                                 `json:",omitzero,inline"`
+	OfAnyMap                               map[string]any                                    `json:",omitzero,inline"`
 	OfMCPToolChoice                        *DedalusModelSettingsToolChoiceMCPToolChoiceParam `json:",omitzero,inline"`
 	paramUnion
 }
 
 func (u DedalusModelSettingsToolChoiceUnionParam) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion(u, u.OfDedalusModelSettingsToolChoiceString, u.OfString, u.OfMCPToolChoice)
+	return param.MarshalUnion(u, u.OfDedalusModelSettingsToolChoiceString, u.OfString, u.OfAnyMap, u.OfMCPToolChoice)
 }
 func (u *DedalusModelSettingsToolChoiceUnionParam) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
@@ -196,6 +199,8 @@ func (u *DedalusModelSettingsToolChoiceUnionParam) asAny() any {
 		return &u.OfDedalusModelSettingsToolChoiceString
 	} else if !param.IsOmitted(u.OfString) {
 		return &u.OfString.Value
+	} else if !param.IsOmitted(u.OfAnyMap) {
+		return &u.OfAnyMap
 	} else if !param.IsOmitted(u.OfMCPToolChoice) {
 		return u.OfMCPToolChoice
 	}
@@ -236,7 +241,8 @@ type Model struct {
 	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
 	// Provider that hosts this model
 	//
-	// Any of "openai", "anthropic", "google", "xai", "mistral", "groq".
+	// Any of "openai", "anthropic", "google", "xai", "mistral", "groq", "fireworks",
+	// "deepseek".
 	Provider ModelProvider `json:"provider,required"`
 	// Normalized model capabilities across all providers.
 	Capabilities ModelCapabilities `json:"capabilities,nullable"`
@@ -285,6 +291,8 @@ const (
 	ModelProviderXai       ModelProvider = "xai"
 	ModelProviderMistral   ModelProvider = "mistral"
 	ModelProviderGroq      ModelProvider = "groq"
+	ModelProviderFireworks ModelProvider = "fireworks"
+	ModelProviderDeepseek  ModelProvider = "deepseek"
 )
 
 // Normalized model capabilities across all providers.

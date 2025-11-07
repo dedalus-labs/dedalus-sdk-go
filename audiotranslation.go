@@ -5,6 +5,7 @@ package githubcomdedaluslabsdedalussdkgo
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -37,34 +38,87 @@ func NewAudioTranslationService(opts ...option.RequestOption) (r AudioTranslatio
 	return
 }
 
-// Translate audio to English text.
+// Translate audio into English.
 //
-// OpenAI Whisper models only.
-func (r *AudioTranslationService) New(ctx context.Context, body AudioTranslationNewParams, opts ...option.RequestOption) (res *AudioTranslationNewResponse, err error) {
+// Translates audio files in any supported language to English text using OpenAI's
+// Whisper model. Supports the same audio formats as transcription. Maximum file
+// size is 25 MB.
+//
+// Args: file: Audio file to translate (required) model: Model ID to use (e.g.,
+// "openai/whisper-1") prompt: Optional text to guide the model's style
+// response_format: Format of the output (json, text, srt, verbose_json, vtt)
+// temperature: Sampling temperature between 0 and 1
+//
+// Returns: Translation object with the English translation
+func (r *AudioTranslationService) New(ctx context.Context, body AudioTranslationNewParams, opts ...option.RequestOption) (res *AudioTranslationNewResponseUnion, err error) {
 	opts = slices.Concat(r.Options, opts)
 	path := "v1/audio/translations"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
 }
 
-// Response from translation endpoint.
+// AudioTranslationNewResponseUnion contains all possible properties and values
+// from [AudioTranslationNewResponseCreateTranslationResponseVerboseJson],
+// [AudioTranslationNewResponseCreateTranslationResponseJson].
 //
-// For response_format='json' or 'text', only 'text' is returned. For
-// response_format='verbose_json', additional fields are included.
-type AudioTranslationNewResponse struct {
-	// The translated text (in English)
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+type AudioTranslationNewResponseUnion struct {
+	// This field is from variant
+	// [AudioTranslationNewResponseCreateTranslationResponseVerboseJson].
+	Duration float64 `json:"duration"`
+	// This field is from variant
+	// [AudioTranslationNewResponseCreateTranslationResponseVerboseJson].
+	Language string `json:"language"`
+	Text     string `json:"text"`
+	// This field is from variant
+	// [AudioTranslationNewResponseCreateTranslationResponseVerboseJson].
+	Segments []AudioTranslationNewResponseCreateTranslationResponseVerboseJsonSegment `json:"segments"`
+	JSON     struct {
+		Duration respjson.Field
+		Language respjson.Field
+		Text     respjson.Field
+		Segments respjson.Field
+		raw      string
+	} `json:"-"`
+}
+
+func (u AudioTranslationNewResponseUnion) AsCreateTranslationResponseVerboseJson() (v AudioTranslationNewResponseCreateTranslationResponseVerboseJson) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u AudioTranslationNewResponseUnion) AsCreateTranslationResponseJson() (v AudioTranslationNewResponseCreateTranslationResponseJson) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+// Returns the unmodified JSON received from the API
+func (u AudioTranslationNewResponseUnion) RawJSON() string { return u.JSON.raw }
+
+func (r *AudioTranslationNewResponseUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Fields:
+//
+// - language (required): str
+// - duration (required): float
+// - text (required): str
+// - segments (optional): list[TranscriptionSegment]
+type AudioTranslationNewResponseCreateTranslationResponseVerboseJson struct {
+	// The duration of the input audio.
+	Duration float64 `json:"duration,required"`
+	// The language of the output translation (always `english`).
+	Language string `json:"language,required"`
+	// The translated text.
 	Text string `json:"text,required"`
-	// The duration of the input audio in seconds
-	Duration float64 `json:"duration,nullable"`
-	// The language of the output translation (always 'english')
-	Language string `json:"language,nullable"`
-	// Segments of the translated text and their corresponding details
-	Segments []AudioTranslationNewResponseSegment `json:"segments,nullable"`
+	// Segments of the translated text and their corresponding details.
+	Segments []AudioTranslationNewResponseCreateTranslationResponseVerboseJsonSegment `json:"segments"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Text        respjson.Field
 		Duration    respjson.Field
 		Language    respjson.Field
+		Text        respjson.Field
 		Segments    respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
@@ -72,34 +126,48 @@ type AudioTranslationNewResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r AudioTranslationNewResponse) RawJSON() string { return r.JSON.raw }
-func (r *AudioTranslationNewResponse) UnmarshalJSON(data []byte) error {
+func (r AudioTranslationNewResponseCreateTranslationResponseVerboseJson) RawJSON() string {
+	return r.JSON.raw
+}
+func (r *AudioTranslationNewResponseCreateTranslationResponseVerboseJson) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Segment-level details for transcription.
-type AudioTranslationNewResponseSegment struct {
-	// Unique identifier of the segment
+// Fields:
+//
+// - id (required): int
+// - seek (required): int
+// - start (required): float
+// - end (required): float
+// - text (required): str
+// - tokens (required): list[int]
+// - temperature (required): float
+// - avg_logprob (required): float
+// - compression_ratio (required): float
+// - no_speech_prob (required): float
+type AudioTranslationNewResponseCreateTranslationResponseVerboseJsonSegment struct {
+	// Unique identifier of the segment.
 	ID int64 `json:"id,required"`
-	// Average log probability of the segment
+	// Average logprob of the segment. If the value is lower than -1, consider the
+	// logprobs failed.
 	AvgLogprob float64 `json:"avg_logprob,required"`
-	// Compression ratio of the segment. If greater than 2.4, consider the compression
-	// failed
+	// Compression ratio of the segment. If the value is greater than 2.4, consider the
+	// compression failed.
 	CompressionRatio float64 `json:"compression_ratio,required"`
-	// End time of the segment in seconds
+	// End time of the segment in seconds.
 	End float64 `json:"end,required"`
-	// Probability of no speech in the segment. If higher than 1.0 and avg_logprob is
-	// below -1, consider this segment silent
+	// Probability of no speech in the segment. If the value is higher than 1.0 and the
+	// `avg_logprob` is below -1, consider this segment silent.
 	NoSpeechProb float64 `json:"no_speech_prob,required"`
-	// Seek offset of the segment
+	// Seek offset of the segment.
 	Seek int64 `json:"seek,required"`
-	// Start time of the segment in seconds
+	// Start time of the segment in seconds.
 	Start float64 `json:"start,required"`
-	// Temperature parameter used for generating this segment
+	// Temperature parameter used for generating the segment.
 	Temperature float64 `json:"temperature,required"`
-	// Text content of the segment
+	// Text content of the segment.
 	Text string `json:"text,required"`
-	// Array of token IDs for the segment
+	// Array of token IDs for the text content.
 	Tokens []int64 `json:"tokens,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -119,8 +187,29 @@ type AudioTranslationNewResponseSegment struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r AudioTranslationNewResponseSegment) RawJSON() string { return r.JSON.raw }
-func (r *AudioTranslationNewResponseSegment) UnmarshalJSON(data []byte) error {
+func (r AudioTranslationNewResponseCreateTranslationResponseVerboseJsonSegment) RawJSON() string {
+	return r.JSON.raw
+}
+func (r *AudioTranslationNewResponseCreateTranslationResponseVerboseJsonSegment) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Fields:
+//
+// - text (required): str
+type AudioTranslationNewResponseCreateTranslationResponseJson struct {
+	Text string `json:"text,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Text        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r AudioTranslationNewResponseCreateTranslationResponseJson) RawJSON() string { return r.JSON.raw }
+func (r *AudioTranslationNewResponseCreateTranslationResponseJson) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 

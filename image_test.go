@@ -30,7 +30,7 @@ func TestImageGenerateWithOptionalParams(t *testing.T) {
 		CreateImageRequest: githubcomdedaluslabsdedalussdkgo.CreateImageRequestParam{
 			Prompt:            "A white siamese cat",
 			Background:        githubcomdedaluslabsdedalussdkgo.CreateImageRequestBackgroundTransparent,
-			Model:             githubcomdedaluslabsdedalussdkgo.String("dall-e-3"),
+			Model:             githubcomdedaluslabsdedalussdkgo.String("openai/dall-e-3"),
 			Moderation:        githubcomdedaluslabsdedalussdkgo.CreateImageRequestModerationAuto,
 			N:                 githubcomdedaluslabsdedalussdkgo.Int(1),
 			OutputCompression: githubcomdedaluslabsdedalussdkgo.Int(85),
