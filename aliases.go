@@ -76,6 +76,12 @@ const ModelProviderMistral = shared.ModelProviderMistral
 // Equals "groq"
 const ModelProviderGroq = shared.ModelProviderGroq
 
+// Equals "fireworks"
+const ModelProviderFireworks = shared.ModelProviderFireworks
+
+// Equals "deepseek"
+const ModelProviderDeepseek = shared.ModelProviderDeepseek
+
 // Normalized model capabilities across all providers.
 //
 // This is an alias to an internal type.

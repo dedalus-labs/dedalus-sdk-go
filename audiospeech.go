@@ -32,10 +32,13 @@ func NewAudioSpeechService(opts ...option.RequestOption) (r AudioSpeechService) 
 	return
 }
 
-// Generate audio from text using text-to-speech.
+// Generate speech audio from text.
 //
-// OpenAI models only. Gemini TTS uses different architecture (audio modalities in
-// chat).
+// Generates audio from the input text using text-to-speech models. Supports
+// multiple voices and output formats including mp3, opus, aac, flac, wav, and pcm.
+//
+// Returns streaming audio data that can be saved to a file or streamed directly to
+// users.
 func (r *AudioSpeechService) New(ctx context.Context, body AudioSpeechNewParams, opts ...option.RequestOption) (res *http.Response, err error) {
 	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "audio/mpeg")}, opts...)
@@ -48,7 +51,7 @@ type AudioSpeechNewParams struct {
 	// The text to generate audio for. The maximum length is 4096 characters.
 	Input string `json:"input,required"`
 	// One of the available [TTS models](https://platform.openai.com/docs/models#tts):
-	// `tts-1`, `tts-1-hd` or `gpt-4o-mini-tts`.
+	// `openai/tts-1`, `openai/tts-1-hd` or `openai/gpt-4o-mini-tts`.
 	Model string `json:"model,required"`
 	// The voice to use when generating the audio. Supported voices are `alloy`, `ash`,
 	// `ballad`, `coral`, `echo`, `fable`, `onyx`, `nova`, `sage`, `shimmer`, and

@@ -54,9 +54,9 @@ type CreateImageRequestParam struct {
 	// characters for `gpt-image-1`, 1000 characters for `dall-e-2` and 4000 characters
 	// for `dall-e-3`.
 	Prompt string `json:"prompt,required"`
-	// The model to use for image generation. One of `dall-e-2`, `dall-e-3`, or
-	// `gpt-image-1`. Defaults to `dall-e-2` unless a parameter specific to
-	// `gpt-image-1` is used.
+	// The model to use for image generation. One of `openai/dall-e-2`,
+	// `openai/dall-e-3`, or `openai/gpt-image-1`. Defaults to `openai/dall-e-2` unless
+	// a parameter specific to `gpt-image-1` is used.
 	Model param.Opt[string] `json:"model,omitzero"`
 	// The number of images to generate. Must be between 1 and 10. For `dall-e-3`, only
 	// `n=1` is supported.

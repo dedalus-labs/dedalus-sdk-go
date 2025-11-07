@@ -46,6 +46,7 @@ func TestChatCompletionNewWithOptionalParams(t *testing.T) {
 			"voice":  "bar",
 		},
 		AutoExecuteTools:                githubcomdedaluslabsdedalussdkgo.Bool(true),
+		Deferred:                        githubcomdedaluslabsdedalussdkgo.Bool(true),
 		DisableAutomaticFunctionCalling: githubcomdedaluslabsdedalussdkgo.Bool(true),
 		FrequencyPenalty:                githubcomdedaluslabsdedalussdkgo.Float(-0.5),
 		FunctionCall: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsFunctionCallUnion{
@@ -78,11 +79,7 @@ func TestChatCompletionNewWithOptionalParams(t *testing.T) {
 		MaxTokens:           githubcomdedaluslabsdedalussdkgo.Int(100),
 		MaxTurns:            githubcomdedaluslabsdedalussdkgo.Int(5),
 		MCPServers: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMCPServersUnion{
-			OfMCPServers: []githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMCPServersMCPServerUnion{{
-				OfMCPServerSlug: githubcomdedaluslabsdedalussdkgo.String("dedalus-labs/brave-search"),
-			}, {
-				OfMCPServerSlug: githubcomdedaluslabsdedalussdkgo.String("dedalus-labs/github-api"),
-			}},
+			OfStringArray: []string{"dedalus-labs/brave-search", "dedalus-labs/github-api"},
 		},
 		Metadata: map[string]string{
 			"session": "abc",
@@ -122,6 +119,9 @@ func TestChatCompletionNewWithOptionalParams(t *testing.T) {
 			"category":  "bar",
 			"threshold": "bar",
 		}},
+		SearchParameters: map[string]any{
+			"foo": "bar",
+		},
 		Seed:        githubcomdedaluslabsdedalussdkgo.Int(42),
 		ServiceTier: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsServiceTierAuto,
 		Stop:        []string{"\n", "END"},

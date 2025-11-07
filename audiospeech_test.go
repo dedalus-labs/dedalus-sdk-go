@@ -28,7 +28,7 @@ func TestAudioSpeechNewWithOptionalParams(t *testing.T) {
 	)
 	resp, err := client.Audio.Speech.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.AudioSpeechNewParams{
 		Input:          "Hello, how are you today?",
-		Model:          "tts-1",
+		Model:          "openai/tts-1",
 		Voice:          githubcomdedaluslabsdedalussdkgo.AudioSpeechNewParamsVoiceAlloy,
 		Instructions:   githubcomdedaluslabsdedalussdkgo.String("instructions"),
 		ResponseFormat: githubcomdedaluslabsdedalussdkgo.AudioSpeechNewParamsResponseFormatMP3,

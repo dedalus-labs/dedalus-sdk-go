@@ -4,6 +4,7 @@ package githubcomdedaluslabsdedalussdkgo
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"slices"
 
@@ -38,81 +39,67 @@ func NewChatCompletionService(opts ...option.RequestOption) (r ChatCompletionSer
 
 // Create a chat completion.
 //
-// This endpoint provides a vendor-agnostic chat completions API that works with
-// thousands of LLMs. It supports MCP integration, multi-model routing with
-// intelligent agentic handoffs, client-side and server-side tool execution, and
-// streaming and non-streaming responses.
+// Unified chat-completions endpoint that works across many model providers.
+// Supports optional MCP integration, multi-model routing with agentic handoffs,
+// server- or client-executed tools, and both streaming and non-streaming delivery.
 //
-// Args: request: Chat completion request with messages, model, and configuration.
-// http_request: FastAPI request object for accessing headers and state.
-// background_tasks: FastAPI background tasks for async billing operations. user:
-// Authenticated user with validated API key and sufficient balance.
+// Request body:
 //
-// Returns: ChatCompletion: OpenAI-compatible completion response with usage data.
+//   - messages: ordered list of chat turns.
+//   - model: identifier or a list of identifiers for routing.
+//   - tools: optional tool declarations available to the model.
+//   - mcp_servers: optional list of MCP server slugs to enable during the run.
+//   - stream: boolean to request incremental output.
+//   - config: optional generation parameters (e.g., temperature, max_tokens,
+//     metadata).
 //
-// Raises: HTTPException: - 401 if authentication fails or insufficient balance. -
-// 400 if request validation fails. - 500 if internal processing error occurs.
+// Headers:
 //
-// Billing: - Token usage billed automatically based on model pricing - MCP tool
-// calls billed separately using credits system - Streaming responses billed after
-// completion via background task
+// - Authorization: bearer key for the calling account.
+// - Optional BYOK or provider headers if applicable.
 //
-// Example: Basic chat completion: ```python from dedalus_labs import Dedalus
+// Behavior:
 //
-//	client = Dedalus(api_key="your-api-key")
+//   - If multiple models are supplied, the router may select or hand off across
+//     them.
+//   - Tools may be invoked on the server or signaled for the client to run.
+//   - Streaming responses emit incremental deltas; non-streaming returns a single
+//     object.
+//   - Usage metrics are computed when available and returned in the response.
 //
-//	completion = client.chat.completions.create(
-//	    model="openai/gpt-5",
-//	    messages=[{"role": "user", "content": "Hello, how are you?"}],
-//	)
+// Responses:
 //
-//	print(completion.choices[0].message.content)
-//	```
+//   - 200 OK: JSON completion object with choices, message content, and usage.
+//   - 400 Bad Request: validation error.
+//   - 401 Unauthorized: authentication failed.
+//   - 402 Payment Required or 429 Too Many Requests: quota, balance, or rate limit
+//     issue.
+//   - 500 Internal Server Error: unexpected failure.
 //
-//	With tools and MCP servers:
-//	```python
-//	completion = client.chat.completions.create(
-//	    model="openai/gpt-5",
-//	    messages=[{"role": "user", "content": "Search for recent AI news"}],
-//	    tools=[
-//	        {
-//	            "type": "function",
-//	            "function": {
-//	                "name": "search_web",
-//	                "description": "Search the web for information",
-//	            },
-//	        }
-//	    ],
-//	    mcp_servers=["dedalus-labs/brave-search"],
-//	)
-//	```
+// Billing:
 //
-//	Multi-model routing:
-//	```python
-//	completion = client.chat.completions.create(
-//	    model=[
-//	        "openai/gpt-4o-mini",
-//	        "openai/gpt-5",
-//	        "anthropic/claude-sonnet-4-20250514",
-//	    ],
-//	    messages=[{"role": "user", "content": "Analyze this complex data"}],
-//	    agent_attributes={"complexity": 0.8, "accuracy": 0.9},
-//	)
-//	```
+// - Token usage metered by the selected model(s).
+// - Tool calls and MCP sessions may be billed separately.
+// - Streaming is settled after the stream ends via an async task.
 //
-//	Streaming response:
-//	```python
-//	stream = client.chat.completions.create(
-//	    model="openai/gpt-5",
-//	    messages=[{"role": "user", "content": "Tell me a story"}],
-//	    stream=True,
-//	)
+// Example (non-streaming HTTP): POST /v1/chat/completions Content-Type:
+// application/json Authorization: Bearer <key>
 //
-//	for chunk in stream:
-//	    if chunk.choices[0].delta.content:
-//	        print(chunk.choices[0].delta.content, end="")
-//	```
-func (r *ChatCompletionService) New(ctx context.Context, body ChatCompletionNewParams, opts ...option.RequestOption) (res *StreamChunk, err error) {
+// { "model": "provider/model-name", "messages": [{"role": "user", "content":
+// "Hello"}] }
+//
+// 200 OK { "id": "cmpl_123", "object": "chat.completion", "choices": [ {"index":
+// 0, "message": {"role": "assistant", "content": "Hi there!"}, "finish_reason":
+// "stop"} ], "usage": {"prompt_tokens": 3, "completion_tokens": 4, "total_tokens":
+// 7} }
+//
+// Example (streaming over SSE): POST /v1/chat/completions Accept:
+// text/event-stream
+//
+// data: {"id":"cmpl_123","choices":[{"index":0,"delta":{"content":"Hi"}}]} data:
+// {"id":"cmpl_123","choices":[{"index":0,"delta":{"content":" there!"}}]} data:
+// [DONE]
+func (r *ChatCompletionService) New(ctx context.Context, body ChatCompletionNewParams, opts ...option.RequestOption) (res *Completion, err error) {
 	opts = slices.Concat(r.Options, opts)
 	path := "v1/chat/completions"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
@@ -121,80 +108,66 @@ func (r *ChatCompletionService) New(ctx context.Context, body ChatCompletionNewP
 
 // Create a chat completion.
 //
-// This endpoint provides a vendor-agnostic chat completions API that works with
-// thousands of LLMs. It supports MCP integration, multi-model routing with
-// intelligent agentic handoffs, client-side and server-side tool execution, and
-// streaming and non-streaming responses.
+// Unified chat-completions endpoint that works across many model providers.
+// Supports optional MCP integration, multi-model routing with agentic handoffs,
+// server- or client-executed tools, and both streaming and non-streaming delivery.
 //
-// Args: request: Chat completion request with messages, model, and configuration.
-// http_request: FastAPI request object for accessing headers and state.
-// background_tasks: FastAPI background tasks for async billing operations. user:
-// Authenticated user with validated API key and sufficient balance.
+// Request body:
 //
-// Returns: ChatCompletion: OpenAI-compatible completion response with usage data.
+//   - messages: ordered list of chat turns.
+//   - model: identifier or a list of identifiers for routing.
+//   - tools: optional tool declarations available to the model.
+//   - mcp_servers: optional list of MCP server slugs to enable during the run.
+//   - stream: boolean to request incremental output.
+//   - config: optional generation parameters (e.g., temperature, max_tokens,
+//     metadata).
 //
-// Raises: HTTPException: - 401 if authentication fails or insufficient balance. -
-// 400 if request validation fails. - 500 if internal processing error occurs.
+// Headers:
 //
-// Billing: - Token usage billed automatically based on model pricing - MCP tool
-// calls billed separately using credits system - Streaming responses billed after
-// completion via background task
+// - Authorization: bearer key for the calling account.
+// - Optional BYOK or provider headers if applicable.
 //
-// Example: Basic chat completion: ```python from dedalus_labs import Dedalus
+// Behavior:
 //
-//	client = Dedalus(api_key="your-api-key")
+//   - If multiple models are supplied, the router may select or hand off across
+//     them.
+//   - Tools may be invoked on the server or signaled for the client to run.
+//   - Streaming responses emit incremental deltas; non-streaming returns a single
+//     object.
+//   - Usage metrics are computed when available and returned in the response.
 //
-//	completion = client.chat.completions.create(
-//	    model="openai/gpt-5",
-//	    messages=[{"role": "user", "content": "Hello, how are you?"}],
-//	)
+// Responses:
 //
-//	print(completion.choices[0].message.content)
-//	```
+//   - 200 OK: JSON completion object with choices, message content, and usage.
+//   - 400 Bad Request: validation error.
+//   - 401 Unauthorized: authentication failed.
+//   - 402 Payment Required or 429 Too Many Requests: quota, balance, or rate limit
+//     issue.
+//   - 500 Internal Server Error: unexpected failure.
 //
-//	With tools and MCP servers:
-//	```python
-//	completion = client.chat.completions.create(
-//	    model="openai/gpt-5",
-//	    messages=[{"role": "user", "content": "Search for recent AI news"}],
-//	    tools=[
-//	        {
-//	            "type": "function",
-//	            "function": {
-//	                "name": "search_web",
-//	                "description": "Search the web for information",
-//	            },
-//	        }
-//	    ],
-//	    mcp_servers=["dedalus-labs/brave-search"],
-//	)
-//	```
+// Billing:
 //
-//	Multi-model routing:
-//	```python
-//	completion = client.chat.completions.create(
-//	    model=[
-//	        "openai/gpt-4o-mini",
-//	        "openai/gpt-5",
-//	        "anthropic/claude-sonnet-4-20250514",
-//	    ],
-//	    messages=[{"role": "user", "content": "Analyze this complex data"}],
-//	    agent_attributes={"complexity": 0.8, "accuracy": 0.9},
-//	)
-//	```
+// - Token usage metered by the selected model(s).
+// - Tool calls and MCP sessions may be billed separately.
+// - Streaming is settled after the stream ends via an async task.
 //
-//	Streaming response:
-//	```python
-//	stream = client.chat.completions.create(
-//	    model="openai/gpt-5",
-//	    messages=[{"role": "user", "content": "Tell me a story"}],
-//	    stream=True,
-//	)
+// Example (non-streaming HTTP): POST /v1/chat/completions Content-Type:
+// application/json Authorization: Bearer <key>
 //
-//	for chunk in stream:
-//	    if chunk.choices[0].delta.content:
-//	        print(chunk.choices[0].delta.content, end="")
-//	```
+// { "model": "provider/model-name", "messages": [{"role": "user", "content":
+// "Hello"}] }
+//
+// 200 OK { "id": "cmpl_123", "object": "chat.completion", "choices": [ {"index":
+// 0, "message": {"role": "assistant", "content": "Hi there!"}, "finish_reason":
+// "stop"} ], "usage": {"prompt_tokens": 3, "completion_tokens": 4, "total_tokens":
+// 7} }
+//
+// Example (streaming over SSE): POST /v1/chat/completions Accept:
+// text/event-stream
+//
+// data: {"id":"cmpl_123","choices":[{"index":0,"delta":{"content":"Hi"}}]} data:
+// {"id":"cmpl_123","choices":[{"index":0,"delta":{"content":" there!"}}]} data:
+// [DONE]
 func (r *ChatCompletionService) NewStreaming(ctx context.Context, body ChatCompletionNewParams, opts ...option.RequestOption) (stream *ssestream.Stream[StreamChunk]) {
 	var (
 		raw *http.Response
@@ -211,18 +184,25 @@ func (r *ChatCompletionService) NewStreaming(ctx context.Context, body ChatCompl
 type ChatCompletionTokenLogprob struct {
 	// The token.
 	Token string `json:"token,required"`
-	// Log probability of this token.
+	// A list of integers representing the UTF-8 bytes representation of the token.
+	// Useful in instances where characters are represented by multiple tokens and
+	// their byte representations must be combined to generate the correct text
+	// representation. Can be `null` if there is no bytes representation for the token.
+	Bytes []int64 `json:"bytes,required"`
+	// The log probability of this token, if it is within the top 20 most likely
+	// tokens. Otherwise, the value `-9999.0` is used to signify that the token is very
+	// unlikely.
 	Logprob float64 `json:"logprob,required"`
-	// List of the most likely tokens and their log probability information.
+	// List of the most likely tokens and their log probability, at this token
+	// position. In rare cases, there may be fewer than the number of requested
+	// `top_logprobs` returned.
 	TopLogprobs []TopLogprob `json:"top_logprobs,required"`
-	// Bytes representation of the token.
-	Bytes []int64 `json:"bytes,nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Token       respjson.Field
+		Bytes       respjson.Field
 		Logprob     respjson.Field
 		TopLogprobs respjson.Field
-		Bytes       respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -231,6 +211,586 @@ type ChatCompletionTokenLogprob struct {
 // Returns the unmodified JSON received from the API
 func (r ChatCompletionTokenLogprob) RawJSON() string { return r.JSON.raw }
 func (r *ChatCompletionTokenLogprob) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Chat completion response for Dedalus API.
+//
+// OpenAI-compatible chat completion response with Dedalus extensions. Maintains
+// full compatibility with OpenAI API while providing additional features like
+// server-side tool execution tracking and MCP error reporting.
+type Completion struct {
+	// A unique identifier for the chat completion.
+	ID string `json:"id,required"`
+	// A list of chat completion choices. Can be more than one if `n` is greater
+	// than 1.
+	Choices []CompletionChoice `json:"choices,required"`
+	// The Unix timestamp (in seconds) of when the chat completion was created.
+	Created int64 `json:"created,required"`
+	// The model used for the chat completion.
+	Model string `json:"model,required"`
+	// The object type, which is always `chat.completion`.
+	Object constant.ChatCompletion `json:"object,required"`
+	// Information about MCP server failures, if any occurred during the request.
+	// Contains details about which servers failed and why, along with recommendations
+	// for the user. Only present when MCP server failures occurred.
+	MCPServerErrors map[string]any `json:"mcp_server_errors,nullable"`
+	// Specifies the processing type used for serving the request.
+	//
+	//   - If set to 'auto', then the request will be processed with the service tier
+	//     configured in the Project settings. Unless otherwise configured, the Project
+	//     will use 'default'.
+	//   - If set to 'default', then the request will be processed with the standard
+	//     pricing and performance for the selected model.
+	//   - If set to '[flex](https://platform.openai.com/docs/guides/flex-processing)' or
+	//     '[priority](https://openai.com/api-priority-processing/)', then the request
+	//     will be processed with the corresponding service tier.
+	//   - When not set, the default behavior is 'auto'.
+	//
+	// When the `service_tier` parameter is set, the response body will include the
+	// `service_tier` value based on the processing mode actually used to serve the
+	// request. This response value may be different from the value set in the
+	// parameter.
+	//
+	// Any of "auto", "default", "flex", "scale", "priority".
+	ServiceTier CompletionServiceTier `json:"service_tier,nullable"`
+	// This fingerprint represents the backend configuration that the model runs with.
+	//
+	// Can be used in conjunction with the `seed` request parameter to understand when
+	// backend changes have been made that might impact determinism.
+	SystemFingerprint string `json:"system_fingerprint"`
+	// List of tool names that were executed server-side (e.g., MCP tools). Only
+	// present when tools were executed on the server rather than returned for
+	// client-side execution.
+	ToolsExecuted []string `json:"tools_executed,nullable"`
+	// Usage statistics for the completion request.
+	Usage CompletionUsage `json:"usage"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID                respjson.Field
+		Choices           respjson.Field
+		Created           respjson.Field
+		Model             respjson.Field
+		Object            respjson.Field
+		MCPServerErrors   respjson.Field
+		ServiceTier       respjson.Field
+		SystemFingerprint respjson.Field
+		ToolsExecuted     respjson.Field
+		Usage             respjson.Field
+		ExtraFields       map[string]respjson.Field
+		raw               string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r Completion) RawJSON() string { return r.JSON.raw }
+func (r *Completion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// A chat completion choice.
+//
+// OpenAI-compatible choice object for non-streaming responses. Part of the
+// ChatCompletion response.
+type CompletionChoice struct {
+	// The index of the choice in the list of choices.
+	Index int64 `json:"index,required"`
+	// A chat completion message generated by the model.
+	Message CompletionChoiceMessage `json:"message,required"`
+	// The reason the model stopped generating tokens. This will be `stop` if the model
+	// hit a natural stop point or a provided stop sequence, `length` if the maximum
+	// number of tokens specified in the request was reached, `content_filter` if
+	// content was omitted due to a flag from our content filters, `tool_calls` if the
+	// model called a tool, or `function_call` (deprecated) if the model called a
+	// function.
+	//
+	// Any of "stop", "length", "tool_calls", "content_filter", "function_call".
+	FinishReason string `json:"finish_reason,nullable"`
+	// Log probability information for the choice.
+	Logprobs CompletionChoiceLogprobs `json:"logprobs,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Index        respjson.Field
+		Message      respjson.Field
+		FinishReason respjson.Field
+		Logprobs     respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r CompletionChoice) RawJSON() string { return r.JSON.raw }
+func (r *CompletionChoice) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// A chat completion message generated by the model.
+type CompletionChoiceMessage struct {
+	// The contents of the message.
+	Content string `json:"content,required"`
+	// The refusal message generated by the model.
+	Refusal string `json:"refusal,required"`
+	// The role of the author of this message.
+	Role constant.Assistant `json:"role,required"`
+	// Annotations for the message, when applicable, as when using the
+	// [web search tool](https://platform.openai.com/docs/guides/tools-web-search?api-mode=chat).
+	Annotations []CompletionChoiceMessageAnnotation `json:"annotations"`
+	// If the audio output modality is requested, this object contains data
+	//
+	// about the audio response from the model.
+	// [Learn more](https://platform.openai.com/docs/guides/audio).
+	//
+	// Fields:
+	//
+	// - id (required): str
+	// - expires_at (required): int
+	// - data (required): str
+	// - transcript (required): str
+	Audio CompletionChoiceMessageAudio `json:"audio,nullable"`
+	// Deprecated and replaced by `tool_calls`. The name and arguments of a function
+	// that should be called, as generated by the model.
+	FunctionCall CompletionChoiceMessageFunctionCall `json:"function_call"`
+	// The tool calls generated by the model, such as function calls.
+	ToolCalls []CompletionChoiceMessageToolCallUnion `json:"tool_calls"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Content      respjson.Field
+		Refusal      respjson.Field
+		Role         respjson.Field
+		Annotations  respjson.Field
+		Audio        respjson.Field
+		FunctionCall respjson.Field
+		ToolCalls    respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r CompletionChoiceMessage) RawJSON() string { return r.JSON.raw }
+func (r *CompletionChoiceMessage) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// A URL citation when using web search.
+//
+// Fields:
+//
+// - type (required): Literal['url_citation']
+// - url_citation (required): UrlCitation
+type CompletionChoiceMessageAnnotation struct {
+	// The type of the URL citation. Always `url_citation`.
+	Type constant.URLCitation `json:"type,required"`
+	// A URL citation when using web search.
+	URLCitation CompletionChoiceMessageAnnotationURLCitation `json:"url_citation,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Type        respjson.Field
+		URLCitation respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r CompletionChoiceMessageAnnotation) RawJSON() string { return r.JSON.raw }
+func (r *CompletionChoiceMessageAnnotation) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// A URL citation when using web search.
+type CompletionChoiceMessageAnnotationURLCitation struct {
+	// The index of the last character of the URL citation in the message.
+	EndIndex int64 `json:"end_index,required"`
+	// The index of the first character of the URL citation in the message.
+	StartIndex int64 `json:"start_index,required"`
+	// The title of the web resource.
+	Title string `json:"title,required"`
+	// The URL of the web resource.
+	URL string `json:"url,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		EndIndex    respjson.Field
+		StartIndex  respjson.Field
+		Title       respjson.Field
+		URL         respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r CompletionChoiceMessageAnnotationURLCitation) RawJSON() string { return r.JSON.raw }
+func (r *CompletionChoiceMessageAnnotationURLCitation) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// If the audio output modality is requested, this object contains data
+//
+// about the audio response from the model.
+// [Learn more](https://platform.openai.com/docs/guides/audio).
+//
+// Fields:
+//
+// - id (required): str
+// - expires_at (required): int
+// - data (required): str
+// - transcript (required): str
+type CompletionChoiceMessageAudio struct {
+	// Unique identifier for this audio response.
+	ID string `json:"id,required"`
+	// Base64 encoded audio bytes generated by the model, in the format specified in
+	// the request.
+	Data string `json:"data,required"`
+	// The Unix timestamp (in seconds) for when this audio response will no longer be
+	// accessible on the server for use in multi-turn conversations.
+	ExpiresAt int64 `json:"expires_at,required"`
+	// Transcript of the audio generated by the model.
+	Transcript string `json:"transcript,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Data        respjson.Field
+		ExpiresAt   respjson.Field
+		Transcript  respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r CompletionChoiceMessageAudio) RawJSON() string { return r.JSON.raw }
+func (r *CompletionChoiceMessageAudio) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Deprecated and replaced by `tool_calls`. The name and arguments of a function
+// that should be called, as generated by the model.
+type CompletionChoiceMessageFunctionCall struct {
+	// The arguments to call the function with, as generated by the model in JSON
+	// format. Note that the model does not always generate valid JSON, and may
+	// hallucinate parameters not defined by your function schema. Validate the
+	// arguments in your code before calling your function.
+	Arguments string `json:"arguments,required"`
+	// The name of the function to call.
+	Name string `json:"name,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Arguments   respjson.Field
+		Name        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r CompletionChoiceMessageFunctionCall) RawJSON() string { return r.JSON.raw }
+func (r *CompletionChoiceMessageFunctionCall) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// CompletionChoiceMessageToolCallUnion contains all possible properties and values
+// from [CompletionChoiceMessageToolCallFunction],
+// [CompletionChoiceMessageToolCallCustom].
+//
+// Use the [CompletionChoiceMessageToolCallUnion.AsAny] method to switch on the
+// variant.
+//
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+type CompletionChoiceMessageToolCallUnion struct {
+	ID string `json:"id"`
+	// This field is from variant [CompletionChoiceMessageToolCallFunction].
+	Function CompletionChoiceMessageToolCallFunctionFunction `json:"function"`
+	// Any of "function", "custom".
+	Type string `json:"type"`
+	// This field is from variant [CompletionChoiceMessageToolCallCustom].
+	Custom CompletionChoiceMessageToolCallCustomCustom `json:"custom"`
+	JSON   struct {
+		ID       respjson.Field
+		Function respjson.Field
+		Type     respjson.Field
+		Custom   respjson.Field
+		raw      string
+	} `json:"-"`
+}
+
+// anyCompletionChoiceMessageToolCall is implemented by each variant of
+// [CompletionChoiceMessageToolCallUnion] to add type safety for the return type of
+// [CompletionChoiceMessageToolCallUnion.AsAny]
+type anyCompletionChoiceMessageToolCall interface {
+	implCompletionChoiceMessageToolCallUnion()
+}
+
+func (CompletionChoiceMessageToolCallFunction) implCompletionChoiceMessageToolCallUnion() {}
+func (CompletionChoiceMessageToolCallCustom) implCompletionChoiceMessageToolCallUnion()   {}
+
+// Use the following switch statement to find the correct variant
+//
+//	switch variant := CompletionChoiceMessageToolCallUnion.AsAny().(type) {
+//	case githubcomdedaluslabsdedalussdkgo.CompletionChoiceMessageToolCallFunction:
+//	case githubcomdedaluslabsdedalussdkgo.CompletionChoiceMessageToolCallCustom:
+//	default:
+//	  fmt.Errorf("no variant present")
+//	}
+func (u CompletionChoiceMessageToolCallUnion) AsAny() anyCompletionChoiceMessageToolCall {
+	switch u.Type {
+	case "function":
+		return u.AsFunction()
+	case "custom":
+		return u.AsCustom()
+	}
+	return nil
+}
+
+func (u CompletionChoiceMessageToolCallUnion) AsFunction() (v CompletionChoiceMessageToolCallFunction) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u CompletionChoiceMessageToolCallUnion) AsCustom() (v CompletionChoiceMessageToolCallCustom) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+// Returns the unmodified JSON received from the API
+func (u CompletionChoiceMessageToolCallUnion) RawJSON() string { return u.JSON.raw }
+
+func (r *CompletionChoiceMessageToolCallUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// A call to a function tool created by the model.
+//
+// Fields:
+//
+// - id (required): str
+// - type (required): Literal['function']
+// - function (required): Function
+type CompletionChoiceMessageToolCallFunction struct {
+	// The ID of the tool call.
+	ID string `json:"id,required"`
+	// The function that the model called.
+	Function CompletionChoiceMessageToolCallFunctionFunction `json:"function,required"`
+	// The type of the tool. Currently, only `function` is supported.
+	Type constant.Function `json:"type,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Function    respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r CompletionChoiceMessageToolCallFunction) RawJSON() string { return r.JSON.raw }
+func (r *CompletionChoiceMessageToolCallFunction) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// The function that the model called.
+type CompletionChoiceMessageToolCallFunctionFunction struct {
+	// The arguments to call the function with, as generated by the model in JSON
+	// format. Note that the model does not always generate valid JSON, and may
+	// hallucinate parameters not defined by your function schema. Validate the
+	// arguments in your code before calling your function.
+	Arguments string `json:"arguments,required"`
+	// The name of the function to call.
+	Name string `json:"name,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Arguments   respjson.Field
+		Name        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r CompletionChoiceMessageToolCallFunctionFunction) RawJSON() string { return r.JSON.raw }
+func (r *CompletionChoiceMessageToolCallFunctionFunction) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// A call to a custom tool created by the model.
+//
+// Fields:
+//
+// - id (required): str
+// - type (required): Literal['custom']
+// - custom (required): Custom
+type CompletionChoiceMessageToolCallCustom struct {
+	// The ID of the tool call.
+	ID string `json:"id,required"`
+	// The custom tool that the model called.
+	Custom CompletionChoiceMessageToolCallCustomCustom `json:"custom,required"`
+	// The type of the tool. Always `custom`.
+	Type constant.Custom `json:"type,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Custom      respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r CompletionChoiceMessageToolCallCustom) RawJSON() string { return r.JSON.raw }
+func (r *CompletionChoiceMessageToolCallCustom) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// The custom tool that the model called.
+type CompletionChoiceMessageToolCallCustomCustom struct {
+	// The input for the custom tool call generated by the model.
+	Input string `json:"input,required"`
+	// The name of the custom tool to call.
+	Name string `json:"name,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Input       respjson.Field
+		Name        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r CompletionChoiceMessageToolCallCustomCustom) RawJSON() string { return r.JSON.raw }
+func (r *CompletionChoiceMessageToolCallCustomCustom) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Log probability information for the choice.
+type CompletionChoiceLogprobs struct {
+	// A list of message content tokens with log probability information.
+	Content []ChatCompletionTokenLogprob `json:"content,nullable"`
+	// A list of message refusal tokens with log probability information.
+	Refusal []ChatCompletionTokenLogprob `json:"refusal,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Content     respjson.Field
+		Refusal     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r CompletionChoiceLogprobs) RawJSON() string { return r.JSON.raw }
+func (r *CompletionChoiceLogprobs) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Specifies the processing type used for serving the request.
+//
+//   - If set to 'auto', then the request will be processed with the service tier
+//     configured in the Project settings. Unless otherwise configured, the Project
+//     will use 'default'.
+//   - If set to 'default', then the request will be processed with the standard
+//     pricing and performance for the selected model.
+//   - If set to '[flex](https://platform.openai.com/docs/guides/flex-processing)' or
+//     '[priority](https://openai.com/api-priority-processing/)', then the request
+//     will be processed with the corresponding service tier.
+//   - When not set, the default behavior is 'auto'.
+//
+// When the `service_tier` parameter is set, the response body will include the
+// `service_tier` value based on the processing mode actually used to serve the
+// request. This response value may be different from the value set in the
+// parameter.
+type CompletionServiceTier string
+
+const (
+	CompletionServiceTierAuto     CompletionServiceTier = "auto"
+	CompletionServiceTierDefault  CompletionServiceTier = "default"
+	CompletionServiceTierFlex     CompletionServiceTier = "flex"
+	CompletionServiceTierScale    CompletionServiceTier = "scale"
+	CompletionServiceTierPriority CompletionServiceTier = "priority"
+)
+
+// Usage statistics for the completion request.
+type CompletionUsage struct {
+	// Number of tokens in the generated completion.
+	CompletionTokens int64 `json:"completion_tokens,required"`
+	// Number of tokens in the prompt.
+	PromptTokens int64 `json:"prompt_tokens,required"`
+	// Total number of tokens used in the request (prompt + completion).
+	TotalTokens int64 `json:"total_tokens,required"`
+	// Breakdown of tokens used in a completion.
+	CompletionTokensDetails CompletionUsageCompletionTokensDetails `json:"completion_tokens_details"`
+	// Breakdown of tokens used in the prompt.
+	PromptTokensDetails CompletionUsagePromptTokensDetails `json:"prompt_tokens_details"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		CompletionTokens        respjson.Field
+		PromptTokens            respjson.Field
+		TotalTokens             respjson.Field
+		CompletionTokensDetails respjson.Field
+		PromptTokensDetails     respjson.Field
+		ExtraFields             map[string]respjson.Field
+		raw                     string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r CompletionUsage) RawJSON() string { return r.JSON.raw }
+func (r *CompletionUsage) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Breakdown of tokens used in a completion.
+type CompletionUsageCompletionTokensDetails struct {
+	// When using Predicted Outputs, the number of tokens in the prediction that
+	// appeared in the completion.
+	AcceptedPredictionTokens int64 `json:"accepted_prediction_tokens"`
+	// Audio input tokens generated by the model.
+	AudioTokens int64 `json:"audio_tokens"`
+	// Tokens generated by the model for reasoning.
+	ReasoningTokens int64 `json:"reasoning_tokens"`
+	// When using Predicted Outputs, the number of tokens in the prediction that did
+	// not appear in the completion. However, like reasoning tokens, these tokens are
+	// still counted in the total completion tokens for purposes of billing, output,
+	// and context window limits.
+	RejectedPredictionTokens int64 `json:"rejected_prediction_tokens"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AcceptedPredictionTokens respjson.Field
+		AudioTokens              respjson.Field
+		ReasoningTokens          respjson.Field
+		RejectedPredictionTokens respjson.Field
+		ExtraFields              map[string]respjson.Field
+		raw                      string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r CompletionUsageCompletionTokensDetails) RawJSON() string { return r.JSON.raw }
+func (r *CompletionUsageCompletionTokensDetails) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Breakdown of tokens used in the prompt.
+type CompletionUsagePromptTokensDetails struct {
+	// Audio input tokens present in the prompt.
+	AudioTokens int64 `json:"audio_tokens"`
+	// Cached tokens present in the prompt.
+	CachedTokens int64 `json:"cached_tokens"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AudioTokens  respjson.Field
+		CachedTokens respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r CompletionUsagePromptTokensDetails) RawJSON() string { return r.JSON.raw }
+func (r *CompletionUsagePromptTokensDetails) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -289,7 +849,15 @@ type StreamChunk struct {
 	ServiceTier StreamChunkServiceTier `json:"service_tier,nullable"`
 	// System fingerprint representing backend configuration
 	SystemFingerprint string `json:"system_fingerprint,nullable"`
-	// Usage statistics (only in final chunk with stream_options.include_usage=true)
+	// Usage statistics for the completion request.
+	//
+	// Fields:
+	//
+	// - completion_tokens (required): int
+	// - prompt_tokens (required): int
+	// - total_tokens (required): int
+	// - completion_tokens_details (optional): CompletionTokensDetails
+	// - prompt_tokens_details (optional): PromptTokensDetails
 	Usage StreamChunkUsage `json:"usage,nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -472,14 +1040,26 @@ const (
 	StreamChunkServiceTierPriority StreamChunkServiceTier = "priority"
 )
 
-// Usage statistics (only in final chunk with stream_options.include_usage=true)
+// Usage statistics for the completion request.
+//
+// Fields:
+//
+// - completion_tokens (required): int
+// - prompt_tokens (required): int
+// - total_tokens (required): int
+// - completion_tokens_details (optional): CompletionTokensDetails
+// - prompt_tokens_details (optional): PromptTokensDetails
 type StreamChunkUsage struct {
-	CompletionTokens        int64                                   `json:"completion_tokens,required"`
-	PromptTokens            int64                                   `json:"prompt_tokens,required"`
-	TotalTokens             int64                                   `json:"total_tokens,required"`
-	CompletionTokensDetails StreamChunkUsageCompletionTokensDetails `json:"completion_tokens_details,nullable"`
-	PromptTokensDetails     StreamChunkUsagePromptTokensDetails     `json:"prompt_tokens_details,nullable"`
-	ExtraFields             map[string]any                          `json:",extras"`
+	// Number of tokens in the generated completion.
+	CompletionTokens int64 `json:"completion_tokens,required"`
+	// Number of tokens in the prompt.
+	PromptTokens int64 `json:"prompt_tokens,required"`
+	// Total number of tokens used in the request (prompt + completion).
+	TotalTokens int64 `json:"total_tokens,required"`
+	// Breakdown of tokens used in a completion.
+	CompletionTokensDetails StreamChunkUsageCompletionTokensDetails `json:"completion_tokens_details"`
+	// Breakdown of tokens used in the prompt.
+	PromptTokensDetails StreamChunkUsagePromptTokensDetails `json:"prompt_tokens_details"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		CompletionTokens        respjson.Field
@@ -498,12 +1078,20 @@ func (r *StreamChunkUsage) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Breakdown of tokens used in a completion.
 type StreamChunkUsageCompletionTokensDetails struct {
-	AcceptedPredictionTokens int64          `json:"accepted_prediction_tokens,nullable"`
-	AudioTokens              int64          `json:"audio_tokens,nullable"`
-	ReasoningTokens          int64          `json:"reasoning_tokens,nullable"`
-	RejectedPredictionTokens int64          `json:"rejected_prediction_tokens,nullable"`
-	ExtraFields              map[string]any `json:",extras"`
+	// When using Predicted Outputs, the number of tokens in the prediction that
+	// appeared in the completion.
+	AcceptedPredictionTokens int64 `json:"accepted_prediction_tokens"`
+	// Audio input tokens generated by the model.
+	AudioTokens int64 `json:"audio_tokens"`
+	// Tokens generated by the model for reasoning.
+	ReasoningTokens int64 `json:"reasoning_tokens"`
+	// When using Predicted Outputs, the number of tokens in the prediction that did
+	// not appear in the completion. However, like reasoning tokens, these tokens are
+	// still counted in the total completion tokens for purposes of billing, output,
+	// and context window limits.
+	RejectedPredictionTokens int64 `json:"rejected_prediction_tokens"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		AcceptedPredictionTokens respjson.Field
@@ -521,10 +1109,12 @@ func (r *StreamChunkUsageCompletionTokensDetails) UnmarshalJSON(data []byte) err
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Breakdown of tokens used in the prompt.
 type StreamChunkUsagePromptTokensDetails struct {
-	AudioTokens  int64          `json:"audio_tokens,nullable"`
-	CachedTokens int64          `json:"cached_tokens,nullable"`
-	ExtraFields  map[string]any `json:",extras"`
+	// Audio input tokens present in the prompt.
+	AudioTokens int64 `json:"audio_tokens"`
+	// Cached tokens present in the prompt.
+	CachedTokens int64 `json:"cached_tokens"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		AudioTokens  respjson.Field
@@ -544,15 +1134,20 @@ func (r *StreamChunkUsagePromptTokensDetails) UnmarshalJSON(data []byte) error {
 type TopLogprob struct {
 	// The token.
 	Token string `json:"token,required"`
-	// Log probability of this token.
+	// A list of integers representing the UTF-8 bytes representation of the token.
+	// Useful in instances where characters are represented by multiple tokens and
+	// their byte representations must be combined to generate the correct text
+	// representation. Can be `null` if there is no bytes representation for the token.
+	Bytes []int64 `json:"bytes,required"`
+	// The log probability of this token, if it is within the top 20 most likely
+	// tokens. Otherwise, the value `-9999.0` is used to signify that the token is very
+	// unlikely.
 	Logprob float64 `json:"logprob,required"`
-	// Bytes representation of the token.
-	Bytes []int64 `json:"bytes,nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Token       respjson.Field
-		Logprob     respjson.Field
 		Bytes       respjson.Field
+		Logprob     respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -575,6 +1170,9 @@ type ChatCompletionNewParams struct {
 	// 'anthropic/claude-3-5-sonnet'] or list of DedalusModel objects - agent will
 	// choose optimal model based on task complexity.
 	Model ChatCompletionNewParamsModelUnion `json:"model,omitzero,required"`
+	// xAI-specific parameter. If set to true, the request returns a request_id for
+	// async completion retrieval via GET /v1/chat/deferred-completion/{request_id}.
+	Deferred param.Opt[bool] `json:"deferred,omitzero"`
 	// Google-only flag to disable the SDK's automatic function execution. When true,
 	// the model returns function calls for the client to execute manually.
 	DisableAutomaticFunctionCalling param.Opt[bool] `json:"disable_automatic_function_calling,omitzero"`
@@ -710,6 +1308,9 @@ type ChatCompletionNewParams struct {
 	ResponseFormat map[string]any `json:"response_format,omitzero"`
 	// Google safety settings (harm categories and thresholds).
 	SafetySettings []map[string]any `json:"safety_settings,omitzero"`
+	// xAI-specific parameter for configuring web search data acquisition. If not set,
+	// no data will be acquired by the model.
+	SearchParameters map[string]any `json:"search_parameters,omitzero"`
 	// Specifies the processing tier used for the request. 'auto' uses project
 	// defaults, while 'default' forces standard pricing and performance.
 	//
@@ -888,97 +1489,25 @@ func (u *ChatCompletionNewParamsInstructionsUnion) asAny() any {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type ChatCompletionNewParamsMCPServersUnion struct {
-	OfMCPServers    []ChatCompletionNewParamsMCPServersMCPServerUnion `json:",omitzero,inline"`
-	OfMCPServerSlug param.Opt[string]                                 `json:",omitzero,inline"`
-	OfMCPServerSpec *ChatCompletionNewParamsMCPServersMCPServerSpec   `json:",omitzero,inline"`
+	OfString      param.Opt[string] `json:",omitzero,inline"`
+	OfStringArray []string          `json:",omitzero,inline"`
 	paramUnion
 }
 
 func (u ChatCompletionNewParamsMCPServersUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion(u, u.OfMCPServers, u.OfMCPServerSlug, u.OfMCPServerSpec)
+	return param.MarshalUnion(u, u.OfString, u.OfStringArray)
 }
 func (u *ChatCompletionNewParamsMCPServersUnion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *ChatCompletionNewParamsMCPServersUnion) asAny() any {
-	if !param.IsOmitted(u.OfMCPServers) {
-		return &u.OfMCPServers
-	} else if !param.IsOmitted(u.OfMCPServerSlug) {
-		return &u.OfMCPServerSlug.Value
-	} else if !param.IsOmitted(u.OfMCPServerSpec) {
-		return u.OfMCPServerSpec
+	if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	} else if !param.IsOmitted(u.OfStringArray) {
+		return &u.OfStringArray
 	}
 	return nil
-}
-
-// Only one field can be non-zero.
-//
-// Use [param.IsOmitted] to confirm if a field is set.
-type ChatCompletionNewParamsMCPServersMCPServerUnion struct {
-	OfMCPServerSlug param.Opt[string]                                        `json:",omitzero,inline"`
-	OfMCPServerSpec *ChatCompletionNewParamsMCPServersMCPServerMCPServerSpec `json:",omitzero,inline"`
-	paramUnion
-}
-
-func (u ChatCompletionNewParamsMCPServersMCPServerUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion(u, u.OfMCPServerSlug, u.OfMCPServerSpec)
-}
-func (u *ChatCompletionNewParamsMCPServersMCPServerUnion) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, u)
-}
-
-func (u *ChatCompletionNewParamsMCPServersMCPServerUnion) asAny() any {
-	if !param.IsOmitted(u.OfMCPServerSlug) {
-		return &u.OfMCPServerSlug.Value
-	} else if !param.IsOmitted(u.OfMCPServerSpec) {
-		return u.OfMCPServerSpec
-	}
-	return nil
-}
-
-// Structured representation of an MCP server reference.
-type ChatCompletionNewParamsMCPServersMCPServerMCPServerSpec struct {
-	// Slug identifying an MCP server (e.g., 'dedalus-labs/brave-search').
-	Slug param.Opt[string] `json:"slug,omitzero"`
-	// Explicit MCP server URL.
-	URL param.Opt[string] `json:"url,omitzero" format:"uri"`
-	// Optional explicit version to target when using a slug.
-	Version param.Opt[string] `json:"version,omitzero"`
-	// Optional metadata associated with the MCP server entry.
-	Metadata    map[string]any `json:"metadata,omitzero"`
-	ExtraFields map[string]any `json:"-"`
-	paramObj
-}
-
-func (r ChatCompletionNewParamsMCPServersMCPServerMCPServerSpec) MarshalJSON() (data []byte, err error) {
-	type shadow ChatCompletionNewParamsMCPServersMCPServerMCPServerSpec
-	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
-}
-func (r *ChatCompletionNewParamsMCPServersMCPServerMCPServerSpec) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Structured representation of an MCP server reference.
-type ChatCompletionNewParamsMCPServersMCPServerSpec struct {
-	// Slug identifying an MCP server (e.g., 'dedalus-labs/brave-search').
-	Slug param.Opt[string] `json:"slug,omitzero"`
-	// Explicit MCP server URL.
-	URL param.Opt[string] `json:"url,omitzero" format:"uri"`
-	// Optional explicit version to target when using a slug.
-	Version param.Opt[string] `json:"version,omitzero"`
-	// Optional metadata associated with the MCP server entry.
-	Metadata    map[string]any `json:"metadata,omitzero"`
-	ExtraFields map[string]any `json:"-"`
-	paramObj
-}
-
-func (r ChatCompletionNewParamsMCPServersMCPServerSpec) MarshalJSON() (data []byte, err error) {
-	type shadow ChatCompletionNewParamsMCPServersMCPServerSpec
-	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
-}
-func (r *ChatCompletionNewParamsMCPServersMCPServerSpec) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
 }
 
 // Constrains effort on reasoning for supported reasoning models. Higher values use
