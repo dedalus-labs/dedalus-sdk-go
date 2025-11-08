@@ -5,6 +5,7 @@ package githubcomdedaluslabsdedalussdkgo
 import (
 	"context"
 	"net/http"
+	"slices"
 
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/apijson"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/requestconfig"
@@ -13,7 +14,7 @@ import (
 )
 
 // RootService contains methods and other services that help with interacting with
-// the dedalus API.
+// the Dedalus API.
 //
 // Note, unlike clients, this service does not read variables from the environment
 // automatically. You should not instantiate this service directly, and instead use
@@ -33,7 +34,7 @@ func NewRootService(opts ...option.RequestOption) (r RootService) {
 
 // Root
 func (r *RootService) Get(ctx context.Context, opts ...option.RequestOption) (res *RootGetResponse, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := ""
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return

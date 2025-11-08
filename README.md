@@ -1,8 +1,12 @@
 # Dedalus Go API Library
 
+<!-- x-release-please-start-version -->
+
 <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go"><img src="https://pkg.go.dev/badge/github.com/dedalus-labs/dedalus-sdk-go.svg" alt="Go Reference"></a>
 
-The Dedalus Go library provides convenient access to the [Dedalus REST API](docs.dedaluslabs.ai)
+<!-- x-release-please-end -->
+
+The Dedalus Go library provides convenient access to the [Dedalus REST API](https://docs.dedaluslabs.ai)
 from applications written in Go.
 
 It is generated with [Stainless](https://www.stainless.com/).
@@ -24,14 +28,14 @@ Or to pin the version:
 <!-- x-release-please-start-version -->
 
 ```sh
-go get -u 'github.com/dedalus-labs/dedalus-sdk-go@v0.1.0-alpha.2'
+go get -u 'github.com/dedalus-labs/dedalus-sdk-go@v0.1.0-alpha.3'
 ```
 
 <!-- x-release-please-end -->
 
 ## Requirements
 
-This library requires Go 1.18+.
+This library requires Go 1.22+.
 
 ## Usage
 
@@ -50,10 +54,19 @@ import (
 
 func main() {
 	client := githubcomdedaluslabsdedalussdkgo.NewClient(
-		option.WithAPIKey("My API Key"), // defaults to os.LookupEnv("DEDALUS_API_KEY")
+		option.WithAPIKey("My API Key"),     // defaults to os.LookupEnv("DEDALUS_API_KEY")
+		option.WithEnvironmentDevelopment(), // defaults to option.WithEnvironmentProduction()
 	)
-	completion, err := client.Chat.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatNewParams{
-		CompletionRequest: githubcomdedaluslabsdedalussdkgo.CompletionRequestParam{},
+	completion, err := client.Chat.Completions.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
+		Messages: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesUnion{
+			OfMapOfAnyMap: []map[string]any{{
+				"role":    "user",
+				"content": "Hello, how are you today?",
+			}},
+		},
+		Model: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion{
+			OfModelID: githubcomdedaluslabsdedalussdkgo.String("openai/gpt-5"),
+		},
 	})
 	if err != nil {
 		panic(err.Error())
@@ -123,7 +136,7 @@ custom := param.Override[githubcomdedaluslabsdedalussdkgo.FooParams](12)
 
 ### Request unions
 
-Unions are represented as a struct with fields prefixed by "Of" for each of it's variants,
+Unions are represented as a struct with fields prefixed by "Of" for each of its variants,
 only one field can be non-zero. The non-zero field will be serialized.
 
 Sub-properties of the union can be accessed via methods on the union struct.
@@ -339,6 +352,27 @@ file returned by `os.Open` will be sent with the file name on disk.
 
 We also provide a helper `githubcomdedaluslabsdedalussdkgo.File(reader io.Reader, filename string, contentType string)`
 which can be used to wrap any `io.Reader` with the appropriate file name and content type.
+
+```go
+// A file from the file system
+file, err := os.Open("/path/to/file")
+githubcomdedaluslabsdedalussdkgo.AudioTranscriptionNewParams{
+	File:  file,
+	Model: "model",
+}
+
+// A file from a string
+githubcomdedaluslabsdedalussdkgo.AudioTranscriptionNewParams{
+	File:  strings.NewReader("my file contents"),
+	Model: "model",
+}
+
+// With a custom filename and contentType
+githubcomdedaluslabsdedalussdkgo.AudioTranscriptionNewParams{
+	File:  githubcomdedaluslabsdedalussdkgo.File(strings.NewReader(`{"hello": "foo"}`), "file.go", "application/json"),
+	Model: "model",
+}
+```
 
 ### Retries
 

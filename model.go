@@ -7,6 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"slices"
+	"time"
 
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/apijson"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/requestconfig"
@@ -15,7 +17,7 @@ import (
 )
 
 // ModelService contains methods and other services that help with interacting with
-// the dedalus API.
+// the Dedalus API.
 //
 // Note, unlike clients, this service does not read variables from the environment
 // automatically. You should not instantiate this service directly, and instead use
@@ -33,14 +35,14 @@ func NewModelService(opts ...option.RequestOption) (r ModelService) {
 	return
 }
 
-// Get information about a specific model.
+// Retrieve a model.
 //
-// Returns detailed information about a specific model by ID. The model must be
-// available to your API key's configured providers.
+// Retrieve detailed information about a specific model, including its
+// capabilities, provider, and supported features.
 //
-// Args: model_id: The ID of the model to retrieve (e.g., 'gpt-4',
-// 'claude-3-5-sonnet-20241022') user: Authenticated user obtained from API key
-// validation
+// Args: model_id: The ID of the model to retrieve (e.g., 'openai/gpt-4',
+// 'anthropic/claude-3-5-sonnet-20241022') user: Authenticated user obtained from
+// API key validation
 //
 // Returns: Model: Information about the requested model
 //
@@ -52,7 +54,7 @@ func NewModelService(opts ...option.RequestOption) (r ModelService) {
 // Example: ```python import dedalus_labs
 //
 //	client = dedalus_labs.Client(api_key="your-api-key")
-//	model = client.models.retrieve("gpt-4")
+//	model = client.models.retrieve("openai/gpt-4")
 //
 //	print(f"Model: {model.id}")
 //	print(f"Owner: {model.owned_by}")
@@ -61,14 +63,14 @@ func NewModelService(opts ...option.RequestOption) (r ModelService) {
 //	Response:
 //	```json
 //	{
-//	    "id": "gpt-4",
+//	    "id": "openai/gpt-4",
 //	    "object": "model",
 //	    "created": 1687882411,
 //	    "owned_by": "openai"
 //	}
 //	```
 func (r *ModelService) Get(ctx context.Context, modelID string, opts ...option.RequestOption) (res *Model, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if modelID == "" {
 		err = errors.New("missing required model_id parameter")
 		return
@@ -80,119 +82,26 @@ func (r *ModelService) Get(ctx context.Context, modelID string, opts ...option.R
 
 // List available models.
 //
-// Returns a list of available models from all configured providers. Models are
-// filtered based on provider availability and API key configuration. Only models
-// from providers with valid API keys are returned.
+// Retrieve the complete list of models available to your organization, including
+// models from OpenAI, Anthropic, Google, xAI, Mistral, Fireworks, and DeepSeek.
 //
-// Args: user: Authenticated user obtained from API key validation
-//
-// Returns: ModelsResponse: Object containing list of available models
-//
-// Raises: HTTPException: - 401 if authentication fails - 500 if internal error
-// occurs during model listing
-//
-// Requires: Valid API key with 'read' scope permission
-//
-// Example: ```python import dedalus_labs
-//
-//	client = dedalus_labs.Client(api_key="your-api-key")
-//	models = client.models.list()
-//
-//	for model in models.data:
-//	    print(f"Model: {model.id} (Owner: {model.owned_by})")
-//	```
-//
-//	Response:
-//	```json
-//	{
-//	    "object": "list",
-//	    "data": [
-//	        {
-//	            "id": "gpt-4",
-//	            "object": "model",
-//	            "owned_by": "openai"
-//	        },
-//	        {
-//	            "id": "claude-3-5-sonnet-20241022",
-//	            "object": "model",
-//	            "owned_by": "anthropic"
-//	        }
-//	    ]
-//	}
-//	```
-func (r *ModelService) List(ctx context.Context, opts ...option.RequestOption) (res *ModelsResponse, err error) {
-	opts = append(r.Options[:], opts...)
+// Returns: ListModelsResponse: List of available models across all supported
+// providers
+func (r *ModelService) List(ctx context.Context, opts ...option.RequestOption) (res *ListModelsResponse, err error) {
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/models"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
 }
 
-// Model information compatible with OpenAI API.
-//
-// Represents a language model available through the Dedalus API. Models are
-// aggregated from multiple providers (OpenAI, Anthropic, etc.) and made available
-// through a unified interface.
-//
-// Attributes: id: Unique model identifier (e.g., 'gpt-4',
-// 'claude-3-5-sonnet-20241022') object: Always 'model' for compatibility with
-// OpenAI API created: Unix timestamp when model was created (may be None)
-// owned_by: Provider organization that owns the model root: Base model identifier
-// if this is a fine-tuned variant parent: Parent model identifier for hierarchical
-// relationships permission: Access permissions (reserved for future use)
-//
-// Example: { "id": "gpt-4", "object": "model", "created": 1687882411, "owned_by":
-// "openai" }
-type Model struct {
-	// Model identifier
-	ID string `json:"id,required"`
-	// Creation timestamp
-	Created int64 `json:"created,nullable"`
-	// Object type
-	Object string `json:"object"`
-	// Model owner
-	OwnedBy string `json:"owned_by"`
-	// Parent model
-	Parent string `json:"parent,nullable"`
-	// Permissions
-	Permission []map[string]any `json:"permission,nullable"`
-	// Root model
-	Root string `json:"root,nullable"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		ID          respjson.Field
-		Created     respjson.Field
-		Object      respjson.Field
-		OwnedBy     respjson.Field
-		Parent      respjson.Field
-		Permission  respjson.Field
-		Root        respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r Model) RawJSON() string { return r.JSON.raw }
-func (r *Model) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Response containing list of available models.
-//
-// Returns all models available to the authenticated user based on their API key
-// permissions and configured providers.
-//
-// Attributes: object: Always 'list' for compatibility with OpenAI API data: List
-// of Model objects representing available models
-//
-// Example: { "object": "list", "data": [ { "id": "gpt-4", "object": "model",
-// "owned_by": "openai" }, { "id": "claude-3-5-sonnet-20241022", "object": "model",
-// "owned_by": "anthropic" } ] }
-type ModelsResponse struct {
-	// List of models
+// Response for /v1/models endpoint.
+type ListModelsResponse struct {
+	// List of available models
 	Data []Model `json:"data,required"`
-	// Object type
-	Object string `json:"object"`
+	// Response object type
+	//
+	// Any of "list".
+	Object ListModelsResponseObject `json:"object"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -203,7 +112,151 @@ type ModelsResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r ModelsResponse) RawJSON() string { return r.JSON.raw }
-func (r *ModelsResponse) UnmarshalJSON(data []byte) error {
+func (r ListModelsResponse) RawJSON() string { return r.JSON.raw }
+func (r *ListModelsResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Response object type
+type ListModelsResponseObject string
+
+const (
+	ListModelsResponseObjectList ListModelsResponseObject = "list"
+)
+
+// Unified model metadata across all providers.
+//
+// Combines provider-specific schemas into a single, consistent format. Fields that
+// aren't available from a provider are set to None.
+type Model struct {
+	// Unique model identifier with provider prefix (e.g., 'openai/gpt-4')
+	ID string `json:"id,required"`
+	// When the model was released (RFC 3339)
+	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	// Provider that hosts this model
+	//
+	// Any of "openai", "anthropic", "google", "xai", "mistral", "groq", "fireworks",
+	// "deepseek".
+	Provider ModelProvider `json:"provider,required"`
+	// Normalized model capabilities across all providers.
+	Capabilities ModelCapabilities `json:"capabilities,nullable"`
+	// Provider-declared default parameters for model generation.
+	Defaults ModelDefaults `json:"defaults,nullable"`
+	// Model description
+	Description string `json:"description,nullable"`
+	// Human-readable model name
+	DisplayName string `json:"display_name,nullable"`
+	// Provider-specific generation method names (None = not declared)
+	ProviderDeclaredGenerationMethods []string `json:"provider_declared_generation_methods,nullable"`
+	// Raw provider-specific metadata
+	ProviderInfo map[string]any `json:"provider_info,nullable"`
+	// Model version identifier
+	Version string `json:"version,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID                                respjson.Field
+		CreatedAt                         respjson.Field
+		Provider                          respjson.Field
+		Capabilities                      respjson.Field
+		Defaults                          respjson.Field
+		Description                       respjson.Field
+		DisplayName                       respjson.Field
+		ProviderDeclaredGenerationMethods respjson.Field
+		ProviderInfo                      respjson.Field
+		Version                           respjson.Field
+		ExtraFields                       map[string]respjson.Field
+		raw                               string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r Model) RawJSON() string { return r.JSON.raw }
+func (r *Model) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Provider that hosts this model
+type ModelProvider string
+
+const (
+	ModelProviderOpenAI    ModelProvider = "openai"
+	ModelProviderAnthropic ModelProvider = "anthropic"
+	ModelProviderGoogle    ModelProvider = "google"
+	ModelProviderXai       ModelProvider = "xai"
+	ModelProviderMistral   ModelProvider = "mistral"
+	ModelProviderGroq      ModelProvider = "groq"
+	ModelProviderFireworks ModelProvider = "fireworks"
+	ModelProviderDeepseek  ModelProvider = "deepseek"
+)
+
+// Normalized model capabilities across all providers.
+type ModelCapabilities struct {
+	// Supports audio processing
+	Audio bool `json:"audio,nullable"`
+	// Supports image generation
+	ImageGeneration bool `json:"image_generation,nullable"`
+	// Maximum input tokens
+	InputTokenLimit int64 `json:"input_token_limit,nullable"`
+	// Maximum output tokens
+	OutputTokenLimit int64 `json:"output_token_limit,nullable"`
+	// Supports streaming responses
+	Streaming bool `json:"streaming,nullable"`
+	// Supports structured JSON output
+	StructuredOutput bool `json:"structured_output,nullable"`
+	// Supports text generation
+	Text bool `json:"text,nullable"`
+	// Supports extended thinking/reasoning
+	Thinking bool `json:"thinking,nullable"`
+	// Supports function/tool calling
+	Tools bool `json:"tools,nullable"`
+	// Supports image understanding
+	Vision bool `json:"vision,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Audio            respjson.Field
+		ImageGeneration  respjson.Field
+		InputTokenLimit  respjson.Field
+		OutputTokenLimit respjson.Field
+		Streaming        respjson.Field
+		StructuredOutput respjson.Field
+		Text             respjson.Field
+		Thinking         respjson.Field
+		Tools            respjson.Field
+		Vision           respjson.Field
+		ExtraFields      map[string]respjson.Field
+		raw              string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ModelCapabilities) RawJSON() string { return r.JSON.raw }
+func (r *ModelCapabilities) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Provider-declared default parameters for model generation.
+type ModelDefaults struct {
+	// Default maximum output tokens
+	MaxOutputTokens int64 `json:"max_output_tokens,nullable"`
+	// Default temperature setting
+	Temperature float64 `json:"temperature,nullable"`
+	// Default top_k setting
+	TopK int64 `json:"top_k,nullable"`
+	// Default top_p setting
+	TopP float64 `json:"top_p,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		MaxOutputTokens respjson.Field
+		Temperature     respjson.Field
+		TopK            respjson.Field
+		TopP            respjson.Field
+		ExtraFields     map[string]respjson.Field
+		raw             string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ModelDefaults) RawJSON() string { return r.JSON.raw }
+func (r *ModelDefaults) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }

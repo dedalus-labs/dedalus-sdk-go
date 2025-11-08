@@ -6,23 +6,21 @@ import (
 	"github.com/dedalus-labs/dedalus-sdk-go/option"
 )
 
-// ChatService contains methods and other services that help with interacting with
-// the Dedalus API.
+// PrivateService contains methods and other services that help with interacting
+// with the Dedalus API.
 //
 // Note, unlike clients, this service does not read variables from the environment
 // automatically. You should not instantiate this service directly, and instead use
-// the [NewChatService] method instead.
-type ChatService struct {
-	Options     []option.RequestOption
-	Completions ChatCompletionService
+// the [NewPrivateService] method instead.
+type PrivateService struct {
+	Options []option.RequestOption
 }
 
-// NewChatService generates a new service that applies the given options to each
+// NewPrivateService generates a new service that applies the given options to each
 // request. These options are applied after the parent client's options (if there
 // is one), and before any request-specific options.
-func NewChatService(opts ...option.RequestOption) (r ChatService) {
-	r = ChatService{}
+func NewPrivateService(opts ...option.RequestOption) (r PrivateService) {
+	r = PrivateService{}
 	r.Options = opts
-	r.Completions = NewChatCompletionService(opts...)
 	return
 }

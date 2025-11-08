@@ -15,7 +15,7 @@ import (
 	"github.com/tidwall/sjson"
 )
 
-// RequestOption is an option for the requests made by the dedalus API Client
+// RequestOption is an option for the requests made by the Dedalus API Client
 // which can be supplied to clients, services, and methods. You can read more about this functional
 // options pattern in our [README].
 //
@@ -266,10 +266,25 @@ func WithEnvironmentProduction() RequestOption {
 	return requestconfig.WithDefaultBaseURL("https://api.dedaluslabs.ai/")
 }
 
+// WithEnvironmentDevelopment returns a RequestOption that sets the current
+// environment to be the "development" environment. An environment specifies which base URL
+// to use by default.
+func WithEnvironmentDevelopment() RequestOption {
+	return requestconfig.WithDefaultBaseURL("http://localhost:8080/")
+}
+
 // WithAPIKey returns a RequestOption that sets the client setting "api_key".
 func WithAPIKey(value string) RequestOption {
 	return requestconfig.RequestOptionFunc(func(r *requestconfig.RequestConfig) error {
 		r.APIKey = value
 		return r.Apply(WithHeader("authorization", fmt.Sprintf("Bearer %s", r.APIKey)))
+	})
+}
+
+// WithOrganization returns a RequestOption that sets the client setting "organization".
+func WithOrganization(value string) RequestOption {
+	return requestconfig.RequestOptionFunc(func(r *requestconfig.RequestConfig) error {
+		r.Organization = value
+		return nil
 	})
 }

@@ -3,8 +3,10 @@
 package githubcomdedaluslabsdedalussdkgo_test
 
 import (
+	"bytes"
 	"context"
 	"errors"
+	"io"
 	"os"
 	"testing"
 
@@ -13,7 +15,7 @@ import (
 	"github.com/dedalus-labs/dedalus-sdk-go/option"
 )
 
-func TestHealthCheck(t *testing.T) {
+func TestAudioTranscriptionNewWithOptionalParams(t *testing.T) {
 	t.Skip("Prism tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -26,7 +28,14 @@ func TestHealthCheck(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Health.Check(context.TODO())
+	_, err := client.Audio.Transcriptions.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.AudioTranscriptionNewParams{
+		File:           io.Reader(bytes.NewBuffer([]byte("some file contents"))),
+		Model:          "model",
+		Language:       githubcomdedaluslabsdedalussdkgo.String("language"),
+		Prompt:         githubcomdedaluslabsdedalussdkgo.String("prompt"),
+		ResponseFormat: githubcomdedaluslabsdedalussdkgo.String("response_format"),
+		Temperature:    githubcomdedaluslabsdedalussdkgo.Float(0),
+	})
 	if err != nil {
 		var apierr *githubcomdedaluslabsdedalussdkgo.Error
 		if errors.As(err, &apierr) {

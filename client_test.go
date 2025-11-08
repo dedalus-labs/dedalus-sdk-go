@@ -271,8 +271,16 @@ func TestContextDeadlineStreaming(t *testing.T) {
 				},
 			}),
 		)
-		stream := client.Chat.NewStreaming(deadlineCtx, githubcomdedaluslabsdedalussdkgo.ChatNewParams{
-			CompletionRequest: githubcomdedaluslabsdedalussdkgo.CompletionRequestParam{},
+		stream := client.Chat.Completions.NewStreaming(deadlineCtx, githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
+			Messages: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesUnion{
+				OfMapOfAnyMap: []map[string]any{{
+					"content": "bar",
+					"role":    "bar",
+				}},
+			},
+			Model: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion{
+				OfModelID: githubcomdedaluslabsdedalussdkgo.String("openai/gpt-4"),
+			},
 		})
 		for stream.Next() {
 			_ = stream.Current()
@@ -318,10 +326,18 @@ func TestContextDeadlineStreamingWithRequestTimeout(t *testing.T) {
 				},
 			}),
 		)
-		stream := client.Chat.NewStreaming(
+		stream := client.Chat.Completions.NewStreaming(
 			context.Background(),
-			githubcomdedaluslabsdedalussdkgo.ChatNewParams{
-				CompletionRequest: githubcomdedaluslabsdedalussdkgo.CompletionRequestParam{},
+			githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
+				Messages: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesUnion{
+					OfMapOfAnyMap: []map[string]any{{
+						"content": "bar",
+						"role":    "bar",
+					}},
+				},
+				Model: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion{
+					OfModelID: githubcomdedaluslabsdedalussdkgo.String("openai/gpt-4"),
+				},
 			},
 			option.WithRequestTimeout((100 * time.Millisecond)),
 		)

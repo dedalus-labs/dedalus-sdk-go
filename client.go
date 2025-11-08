@@ -6,23 +6,28 @@ import (
 	"context"
 	"net/http"
 	"os"
+	"slices"
 
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/requestconfig"
 	"github.com/dedalus-labs/dedalus-sdk-go/option"
 )
 
 // Client creates a struct with services and top level methods that help with
-// interacting with the dedalus API. You should not instantiate this client
+// interacting with the Dedalus API. You should not instantiate this client
 // directly, and instead use the [NewClient] method instead.
 type Client struct {
-	Options []option.RequestOption
-	Root    RootService
-	Health  HealthService
-	Models  ModelService
-	Chat    ChatService
+	Options    []option.RequestOption
+	Root       RootService
+	_Private   PrivateService
+	Health     HealthService
+	Models     ModelService
+	Embeddings EmbeddingService
+	Audio      AudioService
+	Images     ImageService
+	Chat       ChatService
 }
 
-// DefaultClientOptions read from the environment (DEDALUS_API_KEY,
+// DefaultClientOptions read from the environment (DEDALUS_API_KEY, DEDALUS_ORG_ID,
 // DEDALUS_BASE_URL). This should be used to initialize new clients.
 func DefaultClientOptions() []option.RequestOption {
 	defaults := []option.RequestOption{option.WithEnvironmentProduction()}
@@ -32,21 +37,28 @@ func DefaultClientOptions() []option.RequestOption {
 	if o, ok := os.LookupEnv("DEDALUS_API_KEY"); ok {
 		defaults = append(defaults, option.WithAPIKey(o))
 	}
+	if o, ok := os.LookupEnv("DEDALUS_ORG_ID"); ok {
+		defaults = append(defaults, option.WithOrganization(o))
+	}
 	return defaults
 }
 
 // NewClient generates a new client with the default option read from the
-// environment (DEDALUS_API_KEY, DEDALUS_BASE_URL). The option passed in as
-// arguments are applied after these default arguments, and all option will be
-// passed down to the services and requests that this client makes.
+// environment (DEDALUS_API_KEY, DEDALUS_ORG_ID, DEDALUS_BASE_URL). The option
+// passed in as arguments are applied after these default arguments, and all option
+// will be passed down to the services and requests that this client makes.
 func NewClient(opts ...option.RequestOption) (r Client) {
 	opts = append(DefaultClientOptions(), opts...)
 
 	r = Client{Options: opts}
 
 	r.Root = NewRootService(opts...)
+	r._Private = NewPrivateService(opts...)
 	r.Health = NewHealthService(opts...)
 	r.Models = NewModelService(opts...)
+	r.Embeddings = NewEmbeddingService(opts...)
+	r.Audio = NewAudioService(opts...)
+	r.Images = NewImageService(opts...)
 	r.Chat = NewChatService(opts...)
 
 	return
@@ -84,7 +96,7 @@ func NewClient(opts ...option.RequestOption) (r Client) {
 // For even greater flexibility, see [option.WithResponseInto] and
 // [option.WithResponseBodyInto].
 func (r *Client) Execute(ctx context.Context, method string, path string, params any, res any, opts ...option.RequestOption) error {
-	opts = append(r.Options, opts...)
+	opts = slices.Concat(r.Options, opts)
 	return requestconfig.ExecuteNewRequest(ctx, method, path, params, res, opts...)
 }
 

@@ -22,6 +22,7 @@ import (
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/apierror"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/apiform"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/apiquery"
+	"github.com/google/uuid"
 )
 
 func getDefaultHeaders() map[string]string {
@@ -136,11 +137,13 @@ func NewRequestConfig(ctx context.Context, method string, u string, body any, ds
 	// Fallback to json serialization if none of the serialization functions that we expect
 	// to see is present.
 	if body != nil && !hasSerializationFunc {
-		content, err := json.Marshal(body)
-		if err != nil {
+		buf := new(bytes.Buffer)
+		enc := json.NewEncoder(buf)
+		enc.SetEscapeHTML(true)
+		if err := enc.Encode(body); err != nil {
 			return nil, err
 		}
-		reader = bytes.NewBuffer(content)
+		reader = buf
 	}
 
 	req, err := http.NewRequestWithContext(ctx, method, u, nil)
@@ -150,14 +153,18 @@ func NewRequestConfig(ctx context.Context, method string, u string, body any, ds
 	if reader != nil {
 		req.Header.Set("Content-Type", contentType)
 	}
-
+	if method != http.MethodGet {
+		// Note this can be overridden with `WithHeader("Idempotency-Key", myIdempotencyKey)`
+		req.Header.Set("Idempotency-Key", "stainless-go-"+uuid.New().String())
+	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("X-Stainless-Retry-Count", "0")
 	req.Header.Set("X-Stainless-Timeout", "0")
 	for k, v := range getDefaultHeaders() {
 		req.Header.Add(k, v)
 	}
-
+	req.Header.Set("User-Agent", "Dedalus-SDK")
+	req.Header.Set("X-SDK-Version", "1.0.0")
 	for k, v := range getPlatformProperties() {
 		req.Header.Add(k, v)
 	}
@@ -211,6 +218,7 @@ type RequestConfig struct {
 	HTTPClient     *http.Client
 	Middlewares    []middleware
 	APIKey         string
+	Organization   string
 	// If ResponseBodyInto not nil, then we will attempt to deserialize into
 	// ResponseBodyInto. If Destination is a []byte, then it will return the body as
 	// is.
@@ -459,6 +467,11 @@ func (cfg *RequestConfig) Execute() (err error) {
 			break
 		}
 
+		// Close the response body before retrying to prevent connection leaks
+		if res != nil && res.Body != nil {
+			res.Body.Close()
+		}
+
 		time.Sleep(retryDelay(res, retryCount))
 	}
 
@@ -578,8 +591,9 @@ func (cfg *RequestConfig) Clone(ctx context.Context) *RequestConfig {
 		HTTPClient:     cfg.HTTPClient,
 		Middlewares:    cfg.Middlewares,
 		APIKey:         cfg.APIKey,
+		Organization:   cfg.Organization,
 	}
-
+	new.Request.Header.Set("Idempotency-Key", "stainless-go-"+uuid.New().String())
 	return new
 }
 
