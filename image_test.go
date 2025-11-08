@@ -3,8 +3,10 @@
 package githubcomdedaluslabsdedalussdkgo_test
 
 import (
+	"bytes"
 	"context"
 	"errors"
+	"io"
 	"os"
 	"testing"
 
@@ -12,6 +14,68 @@ import (
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/testutil"
 	"github.com/dedalus-labs/dedalus-sdk-go/option"
 )
+
+func TestImageNewVariationWithOptionalParams(t *testing.T) {
+	t.Skip("Prism tests are disabled")
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := githubcomdedaluslabsdedalussdkgo.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+	)
+	_, err := client.Images.NewVariation(context.TODO(), githubcomdedaluslabsdedalussdkgo.ImageNewVariationParams{
+		Image:          io.Reader(bytes.NewBuffer([]byte("some file contents"))),
+		Model:          githubcomdedaluslabsdedalussdkgo.String("model"),
+		N:              githubcomdedaluslabsdedalussdkgo.Int(0),
+		ResponseFormat: githubcomdedaluslabsdedalussdkgo.String("response_format"),
+		Size:           githubcomdedaluslabsdedalussdkgo.String("size"),
+		User:           githubcomdedaluslabsdedalussdkgo.String("user"),
+	})
+	if err != nil {
+		var apierr *githubcomdedaluslabsdedalussdkgo.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
+func TestImageEditWithOptionalParams(t *testing.T) {
+	t.Skip("Prism tests are disabled")
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := githubcomdedaluslabsdedalussdkgo.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+	)
+	_, err := client.Images.Edit(context.TODO(), githubcomdedaluslabsdedalussdkgo.ImageEditParams{
+		Image:          io.Reader(bytes.NewBuffer([]byte("some file contents"))),
+		Prompt:         "prompt",
+		Mask:           io.Reader(bytes.NewBuffer([]byte("some file contents"))),
+		Model:          githubcomdedaluslabsdedalussdkgo.String("model"),
+		N:              githubcomdedaluslabsdedalussdkgo.Int(0),
+		ResponseFormat: githubcomdedaluslabsdedalussdkgo.String("response_format"),
+		Size:           githubcomdedaluslabsdedalussdkgo.String("size"),
+		User:           githubcomdedaluslabsdedalussdkgo.String("user"),
+	})
+	if err != nil {
+		var apierr *githubcomdedaluslabsdedalussdkgo.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
 
 func TestImageGenerateWithOptionalParams(t *testing.T) {
 	t.Skip("Prism tests are disabled")

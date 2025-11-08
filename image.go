@@ -3,11 +3,15 @@
 package githubcomdedaluslabsdedalussdkgo
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"io"
+	"mime/multipart"
 	"net/http"
 	"slices"
 
+	"github.com/dedalus-labs/dedalus-sdk-go/internal/apiform"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/apijson"
 	shimjson "github.com/dedalus-labs/dedalus-sdk-go/internal/encoding/json"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/requestconfig"
@@ -32,6 +36,27 @@ type ImageService struct {
 func NewImageService(opts ...option.RequestOption) (r ImageService) {
 	r = ImageService{}
 	r.Options = opts
+	return
+}
+
+// Create variations of an image.
+//
+// DALL·E 2 only. Upload an image to generate variations.
+func (r *ImageService) NewVariation(ctx context.Context, body ImageNewVariationParams, opts ...option.RequestOption) (res *ImagesResponse, err error) {
+	opts = slices.Concat(r.Options, opts)
+	path := "v1/images/variations"
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
+	return
+}
+
+// Edit images using inpainting.
+//
+// Supports dall-e-2 and gpt-image-1. Upload an image and optionally a mask to
+// indicate which areas to regenerate based on the prompt.
+func (r *ImageService) Edit(ctx context.Context, body ImageEditParams, opts ...option.RequestOption) (res *ImagesResponse, err error) {
+	opts = slices.Concat(r.Options, opts)
+	path := "v1/images/edits"
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
 }
 
@@ -277,6 +302,64 @@ type ImagesResponse struct {
 func (r ImagesResponse) RawJSON() string { return r.JSON.raw }
 func (r *ImagesResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
+}
+
+type ImageNewVariationParams struct {
+	Image          io.Reader         `json:"image,omitzero,required" format:"binary"`
+	Model          param.Opt[string] `json:"model,omitzero"`
+	N              param.Opt[int64]  `json:"n,omitzero"`
+	ResponseFormat param.Opt[string] `json:"response_format,omitzero"`
+	Size           param.Opt[string] `json:"size,omitzero"`
+	User           param.Opt[string] `json:"user,omitzero"`
+	paramObj
+}
+
+func (r ImageNewVariationParams) MarshalMultipart() (data []byte, contentType string, err error) {
+	buf := bytes.NewBuffer(nil)
+	writer := multipart.NewWriter(buf)
+	err = apiform.MarshalRoot(r, writer)
+	if err == nil {
+		err = apiform.WriteExtras(writer, r.ExtraFields())
+	}
+	if err != nil {
+		writer.Close()
+		return nil, "", err
+	}
+	err = writer.Close()
+	if err != nil {
+		return nil, "", err
+	}
+	return buf.Bytes(), writer.FormDataContentType(), nil
+}
+
+type ImageEditParams struct {
+	Image          io.Reader         `json:"image,omitzero,required" format:"binary"`
+	Prompt         string            `json:"prompt,required"`
+	Model          param.Opt[string] `json:"model,omitzero"`
+	N              param.Opt[int64]  `json:"n,omitzero"`
+	ResponseFormat param.Opt[string] `json:"response_format,omitzero"`
+	Size           param.Opt[string] `json:"size,omitzero"`
+	User           param.Opt[string] `json:"user,omitzero"`
+	Mask           io.Reader         `json:"mask,omitzero" format:"binary"`
+	paramObj
+}
+
+func (r ImageEditParams) MarshalMultipart() (data []byte, contentType string, err error) {
+	buf := bytes.NewBuffer(nil)
+	writer := multipart.NewWriter(buf)
+	err = apiform.MarshalRoot(r, writer)
+	if err == nil {
+		err = apiform.WriteExtras(writer, r.ExtraFields())
+	}
+	if err != nil {
+		writer.Close()
+		return nil, "", err
+	}
+	err = writer.Close()
+	if err != nil {
+		return nil, "", err
+	}
+	return buf.Bytes(), writer.FormDataContentType(), nil
 }
 
 type ImageGenerateParams struct {
