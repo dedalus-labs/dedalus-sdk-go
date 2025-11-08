@@ -1,3 +1,8 @@
+# Shared Params Types
+
+- <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared#DedalusModelParam">DedalusModelParam</a>
+- <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared#DedalusModelChoiceUnionParam">DedalusModelChoiceUnionParam</a>
+
 # Root
 
 Response Types:
