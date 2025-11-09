@@ -81,9 +81,10 @@ type DedalusModelSettingsParam struct {
 	Prediction                      map[string]any                     `json:"prediction,omitzero"`
 	Reasoning                       DedalusModelSettingsReasoningParam `json:"reasoning,omitzero"`
 	ResponseFormat                  map[string]any                     `json:"response_format,omitzero"`
-	// Any of "code_interpreter_call.outputs", "computer_call_output.output.image_url",
-	// "file_search_call.results", "message.input_image.image_url",
-	// "message.output_text.logprobs", "reasoning.encrypted_content".
+	// Any of "file_search_call.results", "web_search_call.results",
+	// "web_search_call.action.sources", "message.input_image.image_url",
+	// "computer_call_output.output.image_url", "code_interpreter_call.outputs",
+	// "reasoning.encrypted_content", "message.output_text.logprobs".
 	ResponseInclude   []string                                 `json:"response_include,omitzero"`
 	SafetySettings    []map[string]any                         `json:"safety_settings,omitzero"`
 	SearchParameters  map[string]any                           `json:"search_parameters,omitzero"`
