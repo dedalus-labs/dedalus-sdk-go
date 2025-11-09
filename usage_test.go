@@ -25,14 +25,14 @@ func TestUsage(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	completion, err := client.Chat.Completions.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
+		Model: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion{
+			OfModelID: githubcomdedaluslabsdedalussdkgo.String("openai/gpt-5"),
+		},
 		Messages: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesUnion{
 			OfMapOfAnyMap: []map[string]any{{
 				"role":    "user",
 				"content": "Hello, how are you today?",
 			}},
-		},
-		Model: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion{
-			OfModelID: githubcomdedaluslabsdedalussdkgo.String("openai/gpt-5"),
 		},
 	})
 	if err != nil {
