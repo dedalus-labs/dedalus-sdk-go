@@ -28,7 +28,7 @@ Or to pin the version:
 <!-- x-release-please-start-version -->
 
 ```sh
-go get -u 'github.com/dedalus-labs/dedalus-sdk-go@v0.1.0-alpha.3'
+go get -u 'github.com/dedalus-labs/dedalus-sdk-go@v0.1.0-alpha.4'
 ```
 
 <!-- x-release-please-end -->
@@ -58,14 +58,14 @@ func main() {
 		option.WithEnvironmentDevelopment(), // defaults to option.WithEnvironmentProduction()
 	)
 	completion, err := client.Chat.Completions.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
+		Model: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion{
+			OfModelID: githubcomdedaluslabsdedalussdkgo.String("openai/gpt-5-nano"),
+		},
 		Messages: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesUnion{
 			OfMapOfAnyMap: []map[string]any{{
 				"role":    "user",
 				"content": "Hello, how are you today?",
 			}},
-		},
-		Model: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion{
-			OfModelID: githubcomdedaluslabsdedalussdkgo.String("openai/gpt-5"),
 		},
 	})
 	if err != nil {

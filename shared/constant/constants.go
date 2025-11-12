@@ -25,6 +25,9 @@ type Disabled string       // Always "disabled"
 type Duration string       // Always "duration"
 type Enabled string        // Always "enabled"
 type Function string       // Always "function"
+type JSONObject string     // Always "json_object"
+type JSONSchema string     // Always "json_schema"
+type Text string           // Always "text"
 type Tokens string         // Always "tokens"
 type URLCitation string    // Always "url_citation"
 
@@ -35,6 +38,9 @@ func (c Disabled) Default() Disabled             { return "disabled" }
 func (c Duration) Default() Duration             { return "duration" }
 func (c Enabled) Default() Enabled               { return "enabled" }
 func (c Function) Default() Function             { return "function" }
+func (c JSONObject) Default() JSONObject         { return "json_object" }
+func (c JSONSchema) Default() JSONSchema         { return "json_schema" }
+func (c Text) Default() Text                     { return "text" }
 func (c Tokens) Default() Tokens                 { return "tokens" }
 func (c URLCitation) Default() URLCitation       { return "url_citation" }
 
@@ -45,6 +51,9 @@ func (c Disabled) MarshalJSON() ([]byte, error)       { return marshalString(c) 
 func (c Duration) MarshalJSON() ([]byte, error)       { return marshalString(c) }
 func (c Enabled) MarshalJSON() ([]byte, error)        { return marshalString(c) }
 func (c Function) MarshalJSON() ([]byte, error)       { return marshalString(c) }
+func (c JSONObject) MarshalJSON() ([]byte, error)     { return marshalString(c) }
+func (c JSONSchema) MarshalJSON() ([]byte, error)     { return marshalString(c) }
+func (c Text) MarshalJSON() ([]byte, error)           { return marshalString(c) }
 func (c Tokens) MarshalJSON() ([]byte, error)         { return marshalString(c) }
 func (c URLCitation) MarshalJSON() ([]byte, error)    { return marshalString(c) }
 

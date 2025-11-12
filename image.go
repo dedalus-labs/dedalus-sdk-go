@@ -228,7 +228,7 @@ type CreateImageRequestResponseFormat string
 
 const (
 	CreateImageRequestResponseFormatURL     CreateImageRequestResponseFormat = "url"
-	CreateImageRequestResponseFormatB64Json CreateImageRequestResponseFormat = "b64_json"
+	CreateImageRequestResponseFormatB64JSON CreateImageRequestResponseFormat = "b64_json"
 )
 
 // The size of the generated images. Must be one of `1024x1024`, `1536x1024`
@@ -262,14 +262,14 @@ const (
 // Single image object.
 type Image struct {
 	// Base64-encoded image data (if response_format=b64_json)
-	B64Json string `json:"b64_json,nullable"`
+	B64JSON string `json:"b64_json,nullable"`
 	// Revised prompt used for generation (dall-e-3)
 	RevisedPrompt string `json:"revised_prompt,nullable"`
 	// URL of the generated image (if response_format=url)
 	URL string `json:"url,nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		B64Json       respjson.Field
+		B64JSON       respjson.Field
 		RevisedPrompt respjson.Field
 		URL           respjson.Field
 		ExtraFields   map[string]respjson.Field

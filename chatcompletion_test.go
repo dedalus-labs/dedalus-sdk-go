@@ -11,6 +11,7 @@ import (
 	"github.com/dedalus-labs/dedalus-sdk-go"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/testutil"
 	"github.com/dedalus-labs/dedalus-sdk-go/option"
+	"github.com/dedalus-labs/dedalus-sdk-go/shared"
 )
 
 func TestChatCompletionNewWithOptionalParams(t *testing.T) {
@@ -27,12 +28,6 @@ func TestChatCompletionNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Chat.Completions.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
-		Messages: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesUnion{
-			OfMapOfAnyMap: []map[string]any{{
-				"content": "bar",
-				"role":    "bar",
-			}},
-		},
 		Model: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion{
 			OfModelID: githubcomdedaluslabsdedalussdkgo.String("openai/gpt-4"),
 		},
@@ -81,6 +76,12 @@ func TestChatCompletionNewWithOptionalParams(t *testing.T) {
 		MCPServers: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMCPServersUnion{
 			OfStringArray: []string{"dedalus-labs/brave-search", "dedalus-labs/github-api"},
 		},
+		Messages: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesUnion{
+			OfMapOfAnyMap: []map[string]any{{
+				"content": "bar",
+				"role":    "bar",
+			}},
+		},
 		Metadata: map[string]string{
 			"session": "abc",
 			"user_id": "123",
@@ -111,8 +112,8 @@ func TestChatCompletionNewWithOptionalParams(t *testing.T) {
 		PresencePenalty: githubcomdedaluslabsdedalussdkgo.Float(-0.5),
 		PromptCacheKey:  githubcomdedaluslabsdedalussdkgo.String("prompt_cache_key"),
 		ReasoningEffort: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsReasoningEffortMedium,
-		ResponseFormat: map[string]any{
-			"type": "bar",
+		ResponseFormat: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsResponseFormatUnion{
+			OfResponseFormatText: &shared.ResponseFormatTextParam{},
 		},
 		SafetyIdentifier: githubcomdedaluslabsdedalussdkgo.String("safety_identifier"),
 		SafetySettings: []map[string]any{{
