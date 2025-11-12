@@ -58,21 +58,21 @@ func (r *AudioTranslationService) New(ctx context.Context, body AudioTranslation
 }
 
 // AudioTranslationNewResponseUnion contains all possible properties and values
-// from [AudioTranslationNewResponseCreateTranslationResponseVerboseJson],
-// [AudioTranslationNewResponseCreateTranslationResponseJson].
+// from [AudioTranslationNewResponseCreateTranslationResponseVerboseJSON],
+// [AudioTranslationNewResponseCreateTranslationResponseJSON].
 //
 // Use the methods beginning with 'As' to cast the union to one of its variants.
 type AudioTranslationNewResponseUnion struct {
 	// This field is from variant
-	// [AudioTranslationNewResponseCreateTranslationResponseVerboseJson].
+	// [AudioTranslationNewResponseCreateTranslationResponseVerboseJSON].
 	Duration float64 `json:"duration"`
 	// This field is from variant
-	// [AudioTranslationNewResponseCreateTranslationResponseVerboseJson].
+	// [AudioTranslationNewResponseCreateTranslationResponseVerboseJSON].
 	Language string `json:"language"`
 	Text     string `json:"text"`
 	// This field is from variant
-	// [AudioTranslationNewResponseCreateTranslationResponseVerboseJson].
-	Segments []AudioTranslationNewResponseCreateTranslationResponseVerboseJsonSegment `json:"segments"`
+	// [AudioTranslationNewResponseCreateTranslationResponseVerboseJSON].
+	Segments []AudioTranslationNewResponseCreateTranslationResponseVerboseJSONSegment `json:"segments"`
 	JSON     struct {
 		Duration respjson.Field
 		Language respjson.Field
@@ -82,12 +82,12 @@ type AudioTranslationNewResponseUnion struct {
 	} `json:"-"`
 }
 
-func (u AudioTranslationNewResponseUnion) AsCreateTranslationResponseVerboseJson() (v AudioTranslationNewResponseCreateTranslationResponseVerboseJson) {
+func (u AudioTranslationNewResponseUnion) AsCreateTranslationResponseVerboseJSON() (v AudioTranslationNewResponseCreateTranslationResponseVerboseJSON) {
 	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
 	return
 }
 
-func (u AudioTranslationNewResponseUnion) AsCreateTranslationResponseJson() (v AudioTranslationNewResponseCreateTranslationResponseJson) {
+func (u AudioTranslationNewResponseUnion) AsCreateTranslationResponseJSON() (v AudioTranslationNewResponseCreateTranslationResponseJSON) {
 	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
 	return
 }
@@ -105,7 +105,7 @@ func (r *AudioTranslationNewResponseUnion) UnmarshalJSON(data []byte) error {
 // - duration (required): float
 // - text (required): str
 // - segments (optional): list[TranscriptionSegment]
-type AudioTranslationNewResponseCreateTranslationResponseVerboseJson struct {
+type AudioTranslationNewResponseCreateTranslationResponseVerboseJSON struct {
 	// The duration of the input audio.
 	Duration float64 `json:"duration,required"`
 	// The language of the output translation (always `english`).
@@ -113,7 +113,7 @@ type AudioTranslationNewResponseCreateTranslationResponseVerboseJson struct {
 	// The translated text.
 	Text string `json:"text,required"`
 	// Segments of the translated text and their corresponding details.
-	Segments []AudioTranslationNewResponseCreateTranslationResponseVerboseJsonSegment `json:"segments"`
+	Segments []AudioTranslationNewResponseCreateTranslationResponseVerboseJSONSegment `json:"segments"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Duration    respjson.Field
@@ -126,10 +126,10 @@ type AudioTranslationNewResponseCreateTranslationResponseVerboseJson struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r AudioTranslationNewResponseCreateTranslationResponseVerboseJson) RawJSON() string {
+func (r AudioTranslationNewResponseCreateTranslationResponseVerboseJSON) RawJSON() string {
 	return r.JSON.raw
 }
-func (r *AudioTranslationNewResponseCreateTranslationResponseVerboseJson) UnmarshalJSON(data []byte) error {
+func (r *AudioTranslationNewResponseCreateTranslationResponseVerboseJSON) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -145,7 +145,7 @@ func (r *AudioTranslationNewResponseCreateTranslationResponseVerboseJson) Unmars
 // - avg_logprob (required): float
 // - compression_ratio (required): float
 // - no_speech_prob (required): float
-type AudioTranslationNewResponseCreateTranslationResponseVerboseJsonSegment struct {
+type AudioTranslationNewResponseCreateTranslationResponseVerboseJSONSegment struct {
 	// Unique identifier of the segment.
 	ID int64 `json:"id,required"`
 	// Average logprob of the segment. If the value is lower than -1, consider the
@@ -187,17 +187,17 @@ type AudioTranslationNewResponseCreateTranslationResponseVerboseJsonSegment stru
 }
 
 // Returns the unmodified JSON received from the API
-func (r AudioTranslationNewResponseCreateTranslationResponseVerboseJsonSegment) RawJSON() string {
+func (r AudioTranslationNewResponseCreateTranslationResponseVerboseJSONSegment) RawJSON() string {
 	return r.JSON.raw
 }
-func (r *AudioTranslationNewResponseCreateTranslationResponseVerboseJsonSegment) UnmarshalJSON(data []byte) error {
+func (r *AudioTranslationNewResponseCreateTranslationResponseVerboseJSONSegment) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 // Fields:
 //
 // - text (required): str
-type AudioTranslationNewResponseCreateTranslationResponseJson struct {
+type AudioTranslationNewResponseCreateTranslationResponseJSON struct {
 	Text string `json:"text,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -208,8 +208,8 @@ type AudioTranslationNewResponseCreateTranslationResponseJson struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r AudioTranslationNewResponseCreateTranslationResponseJson) RawJSON() string { return r.JSON.raw }
-func (r *AudioTranslationNewResponseCreateTranslationResponseJson) UnmarshalJSON(data []byte) error {
+func (r AudioTranslationNewResponseCreateTranslationResponseJSON) RawJSON() string { return r.JSON.raw }
+func (r *AudioTranslationNewResponseCreateTranslationResponseJSON) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 

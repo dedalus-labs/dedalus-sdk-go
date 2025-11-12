@@ -1312,7 +1312,7 @@ type ChatCompletionNewParams struct {
 	// 'json_object'} for the legacy JSON mode. Currently only OpenAI-prefixed models
 	// honour this field; Anthropic and Google requests will return an
 	// invalid_request_error if it is supplied.
-	ResponseFormat map[string]any `json:"response_format,omitzero"`
+	ResponseFormat ChatCompletionNewParamsResponseFormatUnion `json:"response_format,omitzero"`
 	// Google safety settings (harm categories and thresholds).
 	SafetySettings []map[string]any `json:"safety_settings,omitzero"`
 	// xAI-specific parameter for configuring web search data acquisition. If not set,
@@ -1527,6 +1527,54 @@ const (
 	ChatCompletionNewParamsReasoningEffortMedium ChatCompletionNewParamsReasoningEffort = "medium"
 	ChatCompletionNewParamsReasoningEffortHigh   ChatCompletionNewParamsReasoningEffort = "high"
 )
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ChatCompletionNewParamsResponseFormatUnion struct {
+	OfResponseFormatText       *shared.ResponseFormatTextParam       `json:",omitzero,inline"`
+	OfResponseFormatJSONObject *shared.ResponseFormatJSONObjectParam `json:",omitzero,inline"`
+	OfResponseFormatJSONSchema *shared.ResponseFormatJSONSchemaParam `json:",omitzero,inline"`
+	paramUnion
+}
+
+func (u ChatCompletionNewParamsResponseFormatUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfResponseFormatText, u.OfResponseFormatJSONObject, u.OfResponseFormatJSONSchema)
+}
+func (u *ChatCompletionNewParamsResponseFormatUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
+}
+
+func (u *ChatCompletionNewParamsResponseFormatUnion) asAny() any {
+	if !param.IsOmitted(u.OfResponseFormatText) {
+		return u.OfResponseFormatText
+	} else if !param.IsOmitted(u.OfResponseFormatJSONObject) {
+		return u.OfResponseFormatJSONObject
+	} else if !param.IsOmitted(u.OfResponseFormatJSONSchema) {
+		return u.OfResponseFormatJSONSchema
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u ChatCompletionNewParamsResponseFormatUnion) GetJSONSchema() *shared.ResponseFormatJSONSchemaJSONSchemaParam {
+	if vt := u.OfResponseFormatJSONSchema; vt != nil {
+		return &vt.JSONSchema
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u ChatCompletionNewParamsResponseFormatUnion) GetType() *string {
+	if vt := u.OfResponseFormatText; vt != nil {
+		return (*string)(&vt.Type)
+	} else if vt := u.OfResponseFormatJSONObject; vt != nil {
+		return (*string)(&vt.Type)
+	} else if vt := u.OfResponseFormatJSONSchema; vt != nil {
+		return (*string)(&vt.Type)
+	}
+	return nil
+}
 
 // Specifies the processing tier used for the request. 'auto' uses project
 // defaults, while 'default' forces standard pricing and performance.
