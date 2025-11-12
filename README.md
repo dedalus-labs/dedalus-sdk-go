@@ -59,7 +59,7 @@ func main() {
 	)
 	completion, err := client.Chat.Completions.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
 		Model: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion{
-			OfModelID: githubcomdedaluslabsdedalussdkgo.String("openai/gpt-5"),
+			OfModelID: githubcomdedaluslabsdedalussdkgo.String("openai/gpt-4o-mini"),
 		},
 		Messages: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesUnion{
 			OfMapOfAnyMap: []map[string]any{{

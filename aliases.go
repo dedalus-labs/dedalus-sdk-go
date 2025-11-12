@@ -49,3 +49,43 @@ type DedalusModelSettingsToolChoiceMCPToolChoiceParam = shared.DedalusModelSetti
 //
 // This is an alias to an internal type.
 type DedalusModelChoiceUnionParam = shared.DedalusModelChoiceUnionParam
+
+// JSON object response format. An older method of generating JSON responses.
+//
+// Using `json_schema` is recommended for models that support it. Note that the
+// model will not generate JSON without a system or user message instructing it to
+// do so.
+//
+// Fields:
+//
+// - type (required): Literal['json_object']
+//
+// This is an alias to an internal type.
+type ResponseFormatJSONObjectParam = shared.ResponseFormatJSONObjectParam
+
+// JSON Schema response format. Used to generate structured JSON responses.
+//
+// Learn more about
+// [Structured Outputs](https://platform.openai.com/docs/guides/structured-outputs).
+//
+// Fields:
+//
+// - type (required): Literal['json_schema']
+// - json_schema (required): JSONSchema
+//
+// This is an alias to an internal type.
+type ResponseFormatJSONSchemaParam = shared.ResponseFormatJSONSchemaParam
+
+// Structured Outputs configuration options, including a JSON Schema.
+//
+// This is an alias to an internal type.
+type ResponseFormatJSONSchemaJSONSchemaParam = shared.ResponseFormatJSONSchemaJSONSchemaParam
+
+// Default response format. Used to generate text responses.
+//
+// Fields:
+//
+// - type (required): Literal['text']
+//
+// This is an alias to an internal type.
+type ResponseFormatTextParam = shared.ResponseFormatTextParam

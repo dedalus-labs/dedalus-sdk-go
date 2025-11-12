@@ -6,6 +6,7 @@ import (
 	"github.com/dedalus-labs/dedalus-sdk-go"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/apijson"
 	"github.com/dedalus-labs/dedalus-sdk-go/packages/param"
+	"github.com/dedalus-labs/dedalus-sdk-go/shared/constant"
 )
 
 // aliased to make [param.APIUnion] private when embedding
@@ -258,4 +259,123 @@ func (u *DedalusModelChoiceUnionParam) asAny() any {
 		return u.OfDedalusModel
 	}
 	return nil
+}
+
+func NewResponseFormatJSONObjectParam() ResponseFormatJSONObjectParam {
+	return ResponseFormatJSONObjectParam{
+		Type: "json_object",
+	}
+}
+
+// JSON object response format. An older method of generating JSON responses.
+//
+// Using `json_schema` is recommended for models that support it. Note that the
+// model will not generate JSON without a system or user message instructing it to
+// do so.
+//
+// Fields:
+//
+// - type (required): Literal['json_object']
+//
+// This struct has a constant value, construct it with
+// [NewResponseFormatJSONObjectParam].
+type ResponseFormatJSONObjectParam struct {
+	// The type of response format being defined. Always `json_object`.
+	Type constant.JSONObject `json:"type,required"`
+	paramObj
+}
+
+func (r ResponseFormatJSONObjectParam) MarshalJSON() (data []byte, err error) {
+	type shadow ResponseFormatJSONObjectParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ResponseFormatJSONObjectParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// JSON Schema response format. Used to generate structured JSON responses.
+//
+// Learn more about
+// [Structured Outputs](https://platform.openai.com/docs/guides/structured-outputs).
+//
+// Fields:
+//
+// - type (required): Literal['json_schema']
+// - json_schema (required): JSONSchema
+//
+// The properties JSONSchema, Type are required.
+type ResponseFormatJSONSchemaParam struct {
+	// Structured Outputs configuration options, including a JSON Schema.
+	JSONSchema ResponseFormatJSONSchemaJSONSchemaParam `json:"json_schema,omitzero,required"`
+	// The type of response format being defined. Always `json_schema`.
+	//
+	// This field can be elided, and will marshal its zero value as "json_schema".
+	Type constant.JSONSchema `json:"type,required"`
+	paramObj
+}
+
+func (r ResponseFormatJSONSchemaParam) MarshalJSON() (data []byte, err error) {
+	type shadow ResponseFormatJSONSchemaParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ResponseFormatJSONSchemaParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Structured Outputs configuration options, including a JSON Schema.
+//
+// The property Name is required.
+type ResponseFormatJSONSchemaJSONSchemaParam struct {
+	// The name of the response format. Must be a-z, A-Z, 0-9, or contain underscores
+	// and dashes, with a maximum length of 64.
+	Name string `json:"name,required"`
+	// Whether to enable strict schema adherence when generating the output. If set to
+	// true, the model will always follow the exact schema defined in the `schema`
+	// field. Only a subset of JSON Schema is supported when `strict` is `true`. To
+	// learn more, read the
+	// [Structured Outputs guide](https://platform.openai.com/docs/guides/structured-outputs).
+	Strict param.Opt[bool] `json:"strict,omitzero"`
+	// A description of what the response format is for, used by the model to determine
+	// how to respond in the format.
+	Description param.Opt[string] `json:"description,omitzero"`
+	// The schema for the response format, described as a JSON Schema object. Learn how
+	// to build JSON schemas [here](https://json-schema.org/).
+	Schema map[string]any `json:"schema,omitzero"`
+	paramObj
+}
+
+func (r ResponseFormatJSONSchemaJSONSchemaParam) MarshalJSON() (data []byte, err error) {
+	type shadow ResponseFormatJSONSchemaJSONSchemaParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ResponseFormatJSONSchemaJSONSchemaParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func NewResponseFormatTextParam() ResponseFormatTextParam {
+	return ResponseFormatTextParam{
+		Type: "text",
+	}
+}
+
+// Default response format. Used to generate text responses.
+//
+// Fields:
+//
+// - type (required): Literal['text']
+//
+// This struct has a constant value, construct it with
+// [NewResponseFormatTextParam].
+type ResponseFormatTextParam struct {
+	// The type of response format being defined. Always `text`.
+	Type constant.Text `json:"type,required"`
+	paramObj
+}
+
+func (r ResponseFormatTextParam) MarshalJSON() (data []byte, err error) {
+	type shadow ResponseFormatTextParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ResponseFormatTextParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }

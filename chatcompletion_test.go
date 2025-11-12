@@ -11,6 +11,7 @@ import (
 	"github.com/dedalus-labs/dedalus-sdk-go"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/testutil"
 	"github.com/dedalus-labs/dedalus-sdk-go/option"
+	"github.com/dedalus-labs/dedalus-sdk-go/shared"
 )
 
 func TestChatCompletionNewWithOptionalParams(t *testing.T) {
@@ -111,8 +112,8 @@ func TestChatCompletionNewWithOptionalParams(t *testing.T) {
 		PresencePenalty: githubcomdedaluslabsdedalussdkgo.Float(-0.5),
 		PromptCacheKey:  githubcomdedaluslabsdedalussdkgo.String("prompt_cache_key"),
 		ReasoningEffort: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsReasoningEffortMedium,
-		ResponseFormat: map[string]any{
-			"type": "bar",
+		ResponseFormat: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsResponseFormatUnion{
+			OfResponseFormatText: &shared.ResponseFormatTextParam{},
 		},
 		SafetyIdentifier: githubcomdedaluslabsdedalussdkgo.String("safety_identifier"),
 		SafetySettings: []map[string]any{{
