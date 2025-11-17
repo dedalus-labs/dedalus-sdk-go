@@ -5,18 +5,18 @@ package githubcomdedaluslabsdedalussdkgo
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"io"
 	"mime/multipart"
 	"net/http"
+	"reflect"
 	"slices"
 
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/apiform"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/apijson"
+	"github.com/dedalus-labs/dedalus-sdk-go/internal/param"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/requestconfig"
 	"github.com/dedalus-labs/dedalus-sdk-go/option"
-	"github.com/dedalus-labs/dedalus-sdk-go/packages/param"
-	"github.com/dedalus-labs/dedalus-sdk-go/packages/respjson"
+	"github.com/tidwall/gjson"
 )
 
 // AudioTranslationService contains methods and other services that help with
@@ -32,8 +32,8 @@ type AudioTranslationService struct {
 // NewAudioTranslationService generates a new service that applies the given
 // options to each request. These options are applied after the parent client's
 // options (if there is one), and before any request-specific options.
-func NewAudioTranslationService(opts ...option.RequestOption) (r AudioTranslationService) {
-	r = AudioTranslationService{}
+func NewAudioTranslationService(opts ...option.RequestOption) (r *AudioTranslationService) {
+	r = &AudioTranslationService{}
 	r.Options = opts
 	return
 }
@@ -50,53 +50,11 @@ func NewAudioTranslationService(opts ...option.RequestOption) (r AudioTranslatio
 // temperature: Sampling temperature between 0 and 1
 //
 // Returns: Translation object with the English translation
-func (r *AudioTranslationService) New(ctx context.Context, body AudioTranslationNewParams, opts ...option.RequestOption) (res *AudioTranslationNewResponseUnion, err error) {
+func (r *AudioTranslationService) New(ctx context.Context, body AudioTranslationNewParams, opts ...option.RequestOption) (res *AudioTranslationNewResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	path := "v1/audio/translations"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
-}
-
-// AudioTranslationNewResponseUnion contains all possible properties and values
-// from [AudioTranslationNewResponseCreateTranslationResponseVerboseJson],
-// [AudioTranslationNewResponseCreateTranslationResponseJson].
-//
-// Use the methods beginning with 'As' to cast the union to one of its variants.
-type AudioTranslationNewResponseUnion struct {
-	// This field is from variant
-	// [AudioTranslationNewResponseCreateTranslationResponseVerboseJson].
-	Duration float64 `json:"duration"`
-	// This field is from variant
-	// [AudioTranslationNewResponseCreateTranslationResponseVerboseJson].
-	Language string `json:"language"`
-	Text     string `json:"text"`
-	// This field is from variant
-	// [AudioTranslationNewResponseCreateTranslationResponseVerboseJson].
-	Segments []AudioTranslationNewResponseCreateTranslationResponseVerboseJsonSegment `json:"segments"`
-	JSON     struct {
-		Duration respjson.Field
-		Language respjson.Field
-		Text     respjson.Field
-		Segments respjson.Field
-		raw      string
-	} `json:"-"`
-}
-
-func (u AudioTranslationNewResponseUnion) AsCreateTranslationResponseVerboseJson() (v AudioTranslationNewResponseCreateTranslationResponseVerboseJson) {
-	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
-	return
-}
-
-func (u AudioTranslationNewResponseUnion) AsCreateTranslationResponseJson() (v AudioTranslationNewResponseCreateTranslationResponseJson) {
-	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
-	return
-}
-
-// Returns the unmodified JSON received from the API
-func (u AudioTranslationNewResponseUnion) RawJSON() string { return u.JSON.raw }
-
-func (r *AudioTranslationNewResponseUnion) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
 }
 
 // Fields:
@@ -105,7 +63,90 @@ func (r *AudioTranslationNewResponseUnion) UnmarshalJSON(data []byte) error {
 // - duration (required): float
 // - text (required): str
 // - segments (optional): list[TranscriptionSegment]
-type AudioTranslationNewResponseCreateTranslationResponseVerboseJson struct {
+type AudioTranslationNewResponse struct {
+	// The translated text.
+	Text string `json:"text,required"`
+	// The duration of the input audio.
+	Duration float64 `json:"duration"`
+	// The language of the output translation (always `english`).
+	Language string `json:"language"`
+	// This field can have the runtime type of
+	// [[]AudioTranslationNewResponseCreateTranslationResponseVerboseJSONSegment].
+	Segments interface{}                     `json:"segments"`
+	JSON     audioTranslationNewResponseJSON `json:"-"`
+	union    AudioTranslationNewResponseUnion
+}
+
+// audioTranslationNewResponseJSON contains the JSON metadata for the struct
+// [AudioTranslationNewResponse]
+type audioTranslationNewResponseJSON struct {
+	Text        apijson.Field
+	Duration    apijson.Field
+	Language    apijson.Field
+	Segments    apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r audioTranslationNewResponseJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r *AudioTranslationNewResponse) UnmarshalJSON(data []byte) (err error) {
+	*r = AudioTranslationNewResponse{}
+	err = apijson.UnmarshalRoot(data, &r.union)
+	if err != nil {
+		return err
+	}
+	return apijson.Port(r.union, &r)
+}
+
+// AsUnion returns a [AudioTranslationNewResponseUnion] interface which you can
+// cast to the specific types for more type safety.
+//
+// Possible runtime types of the union are
+// [AudioTranslationNewResponseCreateTranslationResponseVerboseJSON],
+// [AudioTranslationNewResponseCreateTranslationResponseJSON].
+func (r AudioTranslationNewResponse) AsUnion() AudioTranslationNewResponseUnion {
+	return r.union
+}
+
+// Fields:
+//
+// - language (required): str
+// - duration (required): float
+// - text (required): str
+// - segments (optional): list[TranscriptionSegment]
+//
+// Union satisfied by
+// [AudioTranslationNewResponseCreateTranslationResponseVerboseJSON] or
+// [AudioTranslationNewResponseCreateTranslationResponseJSON].
+type AudioTranslationNewResponseUnion interface {
+	implementsAudioTranslationNewResponse()
+}
+
+func init() {
+	apijson.RegisterUnion(
+		reflect.TypeOf((*AudioTranslationNewResponseUnion)(nil)).Elem(),
+		"",
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(AudioTranslationNewResponseCreateTranslationResponseVerboseJSON{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(AudioTranslationNewResponseCreateTranslationResponseJSON{}),
+		},
+	)
+}
+
+// Fields:
+//
+// - language (required): str
+// - duration (required): float
+// - text (required): str
+// - segments (optional): list[TranscriptionSegment]
+type AudioTranslationNewResponseCreateTranslationResponseVerboseJSON struct {
 	// The duration of the input audio.
 	Duration float64 `json:"duration,required"`
 	// The language of the output translation (always `english`).
@@ -113,24 +154,31 @@ type AudioTranslationNewResponseCreateTranslationResponseVerboseJson struct {
 	// The translated text.
 	Text string `json:"text,required"`
 	// Segments of the translated text and their corresponding details.
-	Segments []AudioTranslationNewResponseCreateTranslationResponseVerboseJsonSegment `json:"segments"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Duration    respjson.Field
-		Language    respjson.Field
-		Text        respjson.Field
-		Segments    respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
+	Segments []AudioTranslationNewResponseCreateTranslationResponseVerboseJSONSegment `json:"segments"`
+	JSON     audioTranslationNewResponseCreateTranslationResponseVerboseJSONJSON      `json:"-"`
 }
 
-// Returns the unmodified JSON received from the API
-func (r AudioTranslationNewResponseCreateTranslationResponseVerboseJson) RawJSON() string {
-	return r.JSON.raw
+// audioTranslationNewResponseCreateTranslationResponseVerboseJSONJSON contains the
+// JSON metadata for the struct
+// [AudioTranslationNewResponseCreateTranslationResponseVerboseJSON]
+type audioTranslationNewResponseCreateTranslationResponseVerboseJSONJSON struct {
+	Duration    apijson.Field
+	Language    apijson.Field
+	Text        apijson.Field
+	Segments    apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
 }
-func (r *AudioTranslationNewResponseCreateTranslationResponseVerboseJson) UnmarshalJSON(data []byte) error {
+
+func (r *AudioTranslationNewResponseCreateTranslationResponseVerboseJSON) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r audioTranslationNewResponseCreateTranslationResponseVerboseJSONJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r AudioTranslationNewResponseCreateTranslationResponseVerboseJSON) implementsAudioTranslationNewResponse() {
 }
 
 // Fields:
@@ -145,7 +193,7 @@ func (r *AudioTranslationNewResponseCreateTranslationResponseVerboseJson) Unmars
 // - avg_logprob (required): float
 // - compression_ratio (required): float
 // - no_speech_prob (required): float
-type AudioTranslationNewResponseCreateTranslationResponseVerboseJsonSegment struct {
+type AudioTranslationNewResponseCreateTranslationResponseVerboseJSONSegment struct {
 	// Unique identifier of the segment.
 	ID int64 `json:"id,required"`
 	// Average logprob of the segment. If the value is lower than -1, consider the
@@ -168,67 +216,76 @@ type AudioTranslationNewResponseCreateTranslationResponseVerboseJsonSegment stru
 	// Text content of the segment.
 	Text string `json:"text,required"`
 	// Array of token IDs for the text content.
-	Tokens []int64 `json:"tokens,required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		ID               respjson.Field
-		AvgLogprob       respjson.Field
-		CompressionRatio respjson.Field
-		End              respjson.Field
-		NoSpeechProb     respjson.Field
-		Seek             respjson.Field
-		Start            respjson.Field
-		Temperature      respjson.Field
-		Text             respjson.Field
-		Tokens           respjson.Field
-		ExtraFields      map[string]respjson.Field
-		raw              string
-	} `json:"-"`
+	Tokens []int64                                                                    `json:"tokens,required"`
+	JSON   audioTranslationNewResponseCreateTranslationResponseVerboseJSONSegmentJSON `json:"-"`
 }
 
-// Returns the unmodified JSON received from the API
-func (r AudioTranslationNewResponseCreateTranslationResponseVerboseJsonSegment) RawJSON() string {
-	return r.JSON.raw
+// audioTranslationNewResponseCreateTranslationResponseVerboseJSONSegmentJSON
+// contains the JSON metadata for the struct
+// [AudioTranslationNewResponseCreateTranslationResponseVerboseJSONSegment]
+type audioTranslationNewResponseCreateTranslationResponseVerboseJSONSegmentJSON struct {
+	ID               apijson.Field
+	AvgLogprob       apijson.Field
+	CompressionRatio apijson.Field
+	End              apijson.Field
+	NoSpeechProb     apijson.Field
+	Seek             apijson.Field
+	Start            apijson.Field
+	Temperature      apijson.Field
+	Text             apijson.Field
+	Tokens           apijson.Field
+	raw              string
+	ExtraFields      map[string]apijson.Field
 }
-func (r *AudioTranslationNewResponseCreateTranslationResponseVerboseJsonSegment) UnmarshalJSON(data []byte) error {
+
+func (r *AudioTranslationNewResponseCreateTranslationResponseVerboseJSONSegment) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r audioTranslationNewResponseCreateTranslationResponseVerboseJSONSegmentJSON) RawJSON() string {
+	return r.raw
 }
 
 // Fields:
 //
 // - text (required): str
-type AudioTranslationNewResponseCreateTranslationResponseJson struct {
-	Text string `json:"text,required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Text        respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
+type AudioTranslationNewResponseCreateTranslationResponseJSON struct {
+	Text string                                                       `json:"text,required"`
+	JSON audioTranslationNewResponseCreateTranslationResponseJSONJSON `json:"-"`
 }
 
-// Returns the unmodified JSON received from the API
-func (r AudioTranslationNewResponseCreateTranslationResponseJson) RawJSON() string { return r.JSON.raw }
-func (r *AudioTranslationNewResponseCreateTranslationResponseJson) UnmarshalJSON(data []byte) error {
+// audioTranslationNewResponseCreateTranslationResponseJSONJSON contains the JSON
+// metadata for the struct
+// [AudioTranslationNewResponseCreateTranslationResponseJSON]
+type audioTranslationNewResponseCreateTranslationResponseJSONJSON struct {
+	Text        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *AudioTranslationNewResponseCreateTranslationResponseJSON) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+func (r audioTranslationNewResponseCreateTranslationResponseJSONJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r AudioTranslationNewResponseCreateTranslationResponseJSON) implementsAudioTranslationNewResponse() {
+}
+
 type AudioTranslationNewParams struct {
-	File           io.Reader          `json:"file,omitzero,required" format:"binary"`
-	Model          string             `json:"model,required"`
-	Prompt         param.Opt[string]  `json:"prompt,omitzero"`
-	ResponseFormat param.Opt[string]  `json:"response_format,omitzero"`
-	Temperature    param.Opt[float64] `json:"temperature,omitzero"`
-	paramObj
+	File           param.Field[io.Reader] `json:"file,required" format:"binary"`
+	Model          param.Field[string]    `json:"model,required"`
+	Prompt         param.Field[string]    `json:"prompt"`
+	ResponseFormat param.Field[string]    `json:"response_format"`
+	Temperature    param.Field[float64]   `json:"temperature"`
 }
 
 func (r AudioTranslationNewParams) MarshalMultipart() (data []byte, contentType string, err error) {
 	buf := bytes.NewBuffer(nil)
 	writer := multipart.NewWriter(buf)
 	err = apiform.MarshalRoot(r, writer)
-	if err == nil {
-		err = apiform.WriteExtras(writer, r.ExtraFields())
-	}
 	if err != nil {
 		writer.Close()
 		return nil, "", err

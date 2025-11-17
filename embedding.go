@@ -4,16 +4,16 @@ package githubcomdedaluslabsdedalussdkgo
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
+	"reflect"
 	"slices"
 
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/apijson"
-	shimjson "github.com/dedalus-labs/dedalus-sdk-go/internal/encoding/json"
+	"github.com/dedalus-labs/dedalus-sdk-go/internal/param"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/requestconfig"
 	"github.com/dedalus-labs/dedalus-sdk-go/option"
-	"github.com/dedalus-labs/dedalus-sdk-go/packages/param"
-	"github.com/dedalus-labs/dedalus-sdk-go/packages/respjson"
+	"github.com/dedalus-labs/dedalus-sdk-go/shared"
+	"github.com/tidwall/gjson"
 )
 
 // EmbeddingService contains methods and other services that help with interacting
@@ -29,8 +29,8 @@ type EmbeddingService struct {
 // NewEmbeddingService generates a new service that applies the given options to
 // each request. These options are applied after the parent client's options (if
 // there is one), and before any request-specific options.
-func NewEmbeddingService(opts ...option.RequestOption) (r EmbeddingService) {
-	r = EmbeddingService{}
+func NewEmbeddingService(opts ...option.RequestOption) (r *EmbeddingService) {
+	r = &EmbeddingService{}
 	r.Options = opts
 	return
 }
@@ -53,8 +53,6 @@ func (r *EmbeddingService) New(ctx context.Context, body EmbeddingNewParams, opt
 //   - encoding_format (optional): Literal['float', 'base64']
 //   - dimensions (optional): int
 //   - user (optional): str
-//
-// The properties Input, Model are required.
 type CreateEmbeddingRequestParam struct {
 	// Input text to embed, encoded as a string or array of tokens. To embed multiple
 	// inputs in a single request, pass an array of strings or array of token arrays.
@@ -65,66 +63,49 @@ type CreateEmbeddingRequestParam struct {
 	// for counting tokens. In addition to the per-input token limit, all embedding
 	// models enforce a maximum of 300,000 tokens summed across all inputs in a single
 	// request.
-	Input CreateEmbeddingRequestInputUnionParam `json:"input,omitzero,required"`
+	Input param.Field[CreateEmbeddingRequestInputUnionParam] `json:"input,required"`
 	// ID of the model to use. You can use the
 	// [List models](https://platform.openai.com/docs/api-reference/models/list) API to
 	// see all of your available models, or see our
 	// [Model overview](https://platform.openai.com/docs/models) for descriptions of
 	// them.
-	Model CreateEmbeddingRequestModel `json:"model,omitzero,required"`
+	Model param.Field[CreateEmbeddingRequestModel] `json:"model,required"`
 	// The number of dimensions the resulting output embeddings should have. Only
 	// supported in `text-embedding-3` and later models.
-	Dimensions param.Opt[int64] `json:"dimensions,omitzero"`
+	Dimensions param.Field[int64] `json:"dimensions"`
+	// The format to return the embeddings in. Can be either `float` or
+	// [`base64`](https://pypi.org/project/pybase64/).
+	EncodingFormat param.Field[CreateEmbeddingRequestEncodingFormat] `json:"encoding_format"`
 	// A unique identifier representing your end-user, which can help OpenAI to monitor
 	// and detect abuse.
 	// [Learn more](https://platform.openai.com/docs/guides/safety-best-practices#end-user-ids).
-	User param.Opt[string] `json:"user,omitzero"`
-	// The format to return the embeddings in. Can be either `float` or
-	// [`base64`](https://pypi.org/project/pybase64/).
-	//
-	// Any of "float", "base64".
-	EncodingFormat CreateEmbeddingRequestEncodingFormat `json:"encoding_format,omitzero"`
-	paramObj
+	User param.Field[string] `json:"user"`
 }
 
 func (r CreateEmbeddingRequestParam) MarshalJSON() (data []byte, err error) {
-	type shadow CreateEmbeddingRequestParam
-	return param.MarshalObject(r, (*shadow)(&r))
-}
-func (r *CreateEmbeddingRequestParam) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
+	return apijson.MarshalRoot(r)
 }
 
-// Only one field can be non-zero.
+// Input text to embed, encoded as a string or array of tokens. To embed multiple
+// inputs in a single request, pass an array of strings or array of token arrays.
+// The input must not exceed the max input tokens for the model (8192 tokens for
+// all embedding models), cannot be an empty string, and any array must be 2048
+// dimensions or less.
+// [Example Python code](https://cookbook.openai.com/examples/how_to_count_tokens_with_tiktoken)
+// for counting tokens. In addition to the per-input token limit, all embedding
+// models enforce a maximum of 300,000 tokens summed across all inputs in a single
+// request.
 //
-// Use [param.IsOmitted] to confirm if a field is set.
-type CreateEmbeddingRequestInputUnionParam struct {
-	OfString          param.Opt[string] `json:",omitzero,inline"`
-	OfStringArray     []string          `json:",omitzero,inline"`
-	OfIntArray        []int64           `json:",omitzero,inline"`
-	OfArrayOfIntArray [][]int64         `json:",omitzero,inline"`
-	paramUnion
+// Satisfied by [shared.UnionString], [CreateEmbeddingRequestInputArrayParam],
+// [CreateEmbeddingRequestInputArrayParam],
+// [CreateEmbeddingRequestInputArrayParam].
+type CreateEmbeddingRequestInputUnionParam interface {
+	ImplementsCreateEmbeddingRequestInputUnionParam()
 }
 
-func (u CreateEmbeddingRequestInputUnionParam) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion(u, u.OfString, u.OfStringArray, u.OfIntArray, u.OfArrayOfIntArray)
-}
-func (u *CreateEmbeddingRequestInputUnionParam) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, u)
-}
+type CreateEmbeddingRequestInputArrayParam []string
 
-func (u *CreateEmbeddingRequestInputUnionParam) asAny() any {
-	if !param.IsOmitted(u.OfString) {
-		return &u.OfString.Value
-	} else if !param.IsOmitted(u.OfStringArray) {
-		return &u.OfStringArray
-	} else if !param.IsOmitted(u.OfIntArray) {
-		return &u.OfIntArray
-	} else if !param.IsOmitted(u.OfArrayOfIntArray) {
-		return &u.OfArrayOfIntArray
-	}
-	return nil
-}
+func (r CreateEmbeddingRequestInputArrayParam) ImplementsCreateEmbeddingRequestInputUnionParam() {}
 
 // ID of the model to use. You can use the
 // [List models](https://platform.openai.com/docs/api-reference/models/list) API to
@@ -139,6 +120,14 @@ const (
 	CreateEmbeddingRequestModelTextEmbedding3Large CreateEmbeddingRequestModel = "text-embedding-3-large"
 )
 
+func (r CreateEmbeddingRequestModel) IsKnown() bool {
+	switch r {
+	case CreateEmbeddingRequestModelTextEmbeddingAda002, CreateEmbeddingRequestModelTextEmbedding3Small, CreateEmbeddingRequestModelTextEmbedding3Large:
+		return true
+	}
+	return false
+}
+
 // The format to return the embeddings in. Can be either `float` or
 // [`base64`](https://pypi.org/project/pybase64/).
 type CreateEmbeddingRequestEncodingFormat string
@@ -147,6 +136,14 @@ const (
 	CreateEmbeddingRequestEncodingFormatFloat  CreateEmbeddingRequestEncodingFormat = "float"
 	CreateEmbeddingRequestEncodingFormatBase64 CreateEmbeddingRequestEncodingFormat = "base64"
 )
+
+func (r CreateEmbeddingRequestEncodingFormat) IsKnown() bool {
+	switch r {
+	case CreateEmbeddingRequestEncodingFormatFloat, CreateEmbeddingRequestEncodingFormatBase64:
+		return true
+	}
+	return false
+}
 
 // Response from embeddings endpoint.
 type CreateEmbeddingResponse struct {
@@ -157,24 +154,27 @@ type CreateEmbeddingResponse struct {
 	// Usage statistics (prompt_tokens, total_tokens)
 	Usage map[string]int64 `json:"usage,required"`
 	// Object type, always 'list'
-	//
-	// Any of "list".
 	Object CreateEmbeddingResponseObject `json:"object"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Data        respjson.Field
-		Model       respjson.Field
-		Usage       respjson.Field
-		Object      respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
+	JSON   createEmbeddingResponseJSON   `json:"-"`
 }
 
-// Returns the unmodified JSON received from the API
-func (r CreateEmbeddingResponse) RawJSON() string { return r.JSON.raw }
-func (r *CreateEmbeddingResponse) UnmarshalJSON(data []byte) error {
+// createEmbeddingResponseJSON contains the JSON metadata for the struct
+// [CreateEmbeddingResponse]
+type createEmbeddingResponseJSON struct {
+	Data        apijson.Field
+	Model       apijson.Field
+	Usage       apijson.Field
+	Object      apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *CreateEmbeddingResponse) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r createEmbeddingResponseJSON) RawJSON() string {
+	return r.raw
 }
 
 // Single embedding object.
@@ -184,59 +184,69 @@ type CreateEmbeddingResponseData struct {
 	// Index of the embedding in the list
 	Index int64 `json:"index,required"`
 	// Object type, always 'embedding'
-	//
-	// Any of "embedding".
-	Object string `json:"object"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Embedding   respjson.Field
-		Index       respjson.Field
-		Object      respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
+	Object CreateEmbeddingResponseDataObject `json:"object"`
+	JSON   createEmbeddingResponseDataJSON   `json:"-"`
 }
 
-// Returns the unmodified JSON received from the API
-func (r CreateEmbeddingResponseData) RawJSON() string { return r.JSON.raw }
-func (r *CreateEmbeddingResponseData) UnmarshalJSON(data []byte) error {
+// createEmbeddingResponseDataJSON contains the JSON metadata for the struct
+// [CreateEmbeddingResponseData]
+type createEmbeddingResponseDataJSON struct {
+	Embedding   apijson.Field
+	Index       apijson.Field
+	Object      apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *CreateEmbeddingResponseData) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// CreateEmbeddingResponseDataEmbeddingUnion contains all possible properties and
-// values from [[]float64], [string].
+func (r createEmbeddingResponseDataJSON) RawJSON() string {
+	return r.raw
+}
+
+// The embedding vector (float array or base64 string)
 //
-// Use the methods beginning with 'As' to cast the union to one of its variants.
-//
-// If the underlying value is not a json object, one of the following properties
-// will be valid: OfFloatArray OfString]
-type CreateEmbeddingResponseDataEmbeddingUnion struct {
-	// This field will be present if the value is a [[]float64] instead of an object.
-	OfFloatArray []float64 `json:",inline"`
-	// This field will be present if the value is a [string] instead of an object.
-	OfString string `json:",inline"`
-	JSON     struct {
-		OfFloatArray respjson.Field
-		OfString     respjson.Field
-		raw          string
-	} `json:"-"`
+// Union satisfied by [CreateEmbeddingResponseDataEmbeddingArray] or
+// [shared.UnionString].
+type CreateEmbeddingResponseDataEmbeddingUnion interface {
+	ImplementsCreateEmbeddingResponseDataEmbeddingUnion()
 }
 
-func (u CreateEmbeddingResponseDataEmbeddingUnion) AsFloatArray() (v []float64) {
-	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
-	return
+func init() {
+	apijson.RegisterUnion(
+		reflect.TypeOf((*CreateEmbeddingResponseDataEmbeddingUnion)(nil)).Elem(),
+		"",
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(CreateEmbeddingResponseDataEmbeddingArray{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.String,
+			Type:       reflect.TypeOf(shared.UnionString("")),
+		},
+	)
 }
 
-func (u CreateEmbeddingResponseDataEmbeddingUnion) AsString() (v string) {
-	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
-	return
+type CreateEmbeddingResponseDataEmbeddingArray []float64
+
+func (r CreateEmbeddingResponseDataEmbeddingArray) ImplementsCreateEmbeddingResponseDataEmbeddingUnion() {
 }
 
-// Returns the unmodified JSON received from the API
-func (u CreateEmbeddingResponseDataEmbeddingUnion) RawJSON() string { return u.JSON.raw }
+// Object type, always 'embedding'
+type CreateEmbeddingResponseDataObject string
 
-func (r *CreateEmbeddingResponseDataEmbeddingUnion) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
+const (
+	CreateEmbeddingResponseDataObjectEmbedding CreateEmbeddingResponseDataObject = "embedding"
+)
+
+func (r CreateEmbeddingResponseDataObject) IsKnown() bool {
+	switch r {
+	case CreateEmbeddingResponseDataObjectEmbedding:
+		return true
+	}
+	return false
 }
 
 // Object type, always 'list'
@@ -245,6 +255,14 @@ type CreateEmbeddingResponseObject string
 const (
 	CreateEmbeddingResponseObjectList CreateEmbeddingResponseObject = "list"
 )
+
+func (r CreateEmbeddingResponseObject) IsKnown() bool {
+	switch r {
+	case CreateEmbeddingResponseObjectList:
+		return true
+	}
+	return false
+}
 
 type EmbeddingNewParams struct {
 	// Fields:
@@ -257,13 +275,9 @@ type EmbeddingNewParams struct {
 	//   - encoding_format (optional): Literal['float', 'base64']
 	//   - dimensions (optional): int
 	//   - user (optional): str
-	CreateEmbeddingRequest CreateEmbeddingRequestParam
-	paramObj
+	CreateEmbeddingRequest CreateEmbeddingRequestParam `json:"create_embedding_request,required"`
 }
 
 func (r EmbeddingNewParams) MarshalJSON() (data []byte, err error) {
-	return shimjson.Marshal(r.CreateEmbeddingRequest)
-}
-func (r *EmbeddingNewParams) UnmarshalJSON(data []byte) error {
-	return json.Unmarshal(data, &r.CreateEmbeddingRequest)
+	return apijson.MarshalRoot(r.CreateEmbeddingRequest)
 }
