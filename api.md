@@ -6,15 +6,15 @@
 - <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared#ResponseFormatJSONSchemaParam">ResponseFormatJSONSchemaParam</a>
 - <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared#ResponseFormatTextParam">ResponseFormatTextParam</a>
 
-# Root
+# githubcomdedaluslabsdedalussdkgo
 
 Response Types:
 
-- <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#RootGetResponse">RootGetResponse</a>
+- <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#GetResponse">GetResponse</a>
 
 Methods:
 
-- <code title="get /">client.Root.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#RootService.Get">Get</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>) (<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#RootGetResponse">RootGetResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="get /">client.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#GithubcomdedaluslabsdedalussdkgoService.Get">Get</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>) (<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#GetResponse">GetResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
 # \_Private
 
@@ -66,21 +66,21 @@ Methods:
 
 Response Types:
 
-- <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#AudioTranscriptionNewResponseUnion">AudioTranscriptionNewResponseUnion</a>
+- <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#AudioTranscriptionNewResponse">AudioTranscriptionNewResponse</a>
 
 Methods:
 
-- <code title="post /v1/audio/transcriptions">client.Audio.Transcriptions.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#AudioTranscriptionService.New">New</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#AudioTranscriptionNewParams">AudioTranscriptionNewParams</a>) (<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#AudioTranscriptionNewResponseUnion">AudioTranscriptionNewResponseUnion</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="post /v1/audio/transcriptions">client.Audio.Transcriptions.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#AudioTranscriptionService.New">New</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#AudioTranscriptionNewParams">AudioTranscriptionNewParams</a>) (<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#AudioTranscriptionNewResponse">AudioTranscriptionNewResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
 ## Translations
 
 Response Types:
 
-- <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#AudioTranslationNewResponseUnion">AudioTranslationNewResponseUnion</a>
+- <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#AudioTranslationNewResponse">AudioTranslationNewResponse</a>
 
 Methods:
 
-- <code title="post /v1/audio/translations">client.Audio.Translations.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#AudioTranslationService.New">New</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#AudioTranslationNewParams">AudioTranslationNewParams</a>) (<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#AudioTranslationNewResponseUnion">AudioTranslationNewResponseUnion</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="post /v1/audio/translations">client.Audio.Translations.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#AudioTranslationService.New">New</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#AudioTranslationNewParams">AudioTranslationNewParams</a>) (<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#AudioTranslationNewResponse">AudioTranslationNewResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
 # Images
 
@@ -102,11 +102,6 @@ Methods:
 # Chat
 
 ## Completions
-
-Params Types:
-
-- <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#ModelID">ModelID</a>
-- <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go">githubcomdedaluslabsdedalussdkgo</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go#ModelsParam">ModelsParam</a>
 
 Response Types:
 

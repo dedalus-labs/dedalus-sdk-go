@@ -28,135 +28,118 @@ func TestChatCompletionNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Chat.Completions.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
-		Model: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion{
-			OfModelID: githubcomdedaluslabsdedalussdkgo.String("openai/gpt-4"),
-		},
-		AgentAttributes: map[string]float64{
-			"accuracy":   0.9,
-			"complexity": 0.8,
-			"efficiency": 0.7,
-		},
-		Audio: map[string]any{
+		Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-4")),
+		AgentAttributes: githubcomdedaluslabsdedalussdkgo.F(map[string]float64{
+			"accuracy":   0.900000,
+			"complexity": 0.800000,
+			"efficiency": 0.700000,
+		}),
+		Audio: githubcomdedaluslabsdedalussdkgo.F(map[string]interface{}{
 			"format": "bar",
 			"voice":  "bar",
-		},
-		AutoExecuteTools:                githubcomdedaluslabsdedalussdkgo.Bool(true),
-		Deferred:                        githubcomdedaluslabsdedalussdkgo.Bool(true),
-		DisableAutomaticFunctionCalling: githubcomdedaluslabsdedalussdkgo.Bool(true),
-		FrequencyPenalty:                githubcomdedaluslabsdedalussdkgo.Float(-0.5),
-		FunctionCall: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsFunctionCallUnion{
-			OfString: githubcomdedaluslabsdedalussdkgo.String("string"),
-		},
-		Functions: []map[string]any{{
+		}),
+		AutoExecuteTools:                githubcomdedaluslabsdedalussdkgo.F(true),
+		Deferred:                        githubcomdedaluslabsdedalussdkgo.F(true),
+		DisableAutomaticFunctionCalling: githubcomdedaluslabsdedalussdkgo.F(true),
+		FrequencyPenalty:                githubcomdedaluslabsdedalussdkgo.F(-0.500000),
+		FunctionCall:                    githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsFunctionCallUnion](shared.UnionString("string")),
+		Functions: githubcomdedaluslabsdedalussdkgo.F([]map[string]interface{}{{
 			"foo": "bar",
-		}},
-		GenerationConfig: map[string]any{
+		}}),
+		GenerationConfig: githubcomdedaluslabsdedalussdkgo.F(map[string]interface{}{
 			"candidateCount":   "bar",
 			"responseMimeType": "bar",
-		},
-		Guardrails: []map[string]any{{
+		}),
+		Guardrails: githubcomdedaluslabsdedalussdkgo.F([]map[string]interface{}{{
 			"foo": "bar",
-		}},
-		HandoffConfig: map[string]any{
+		}}),
+		HandoffConfig: githubcomdedaluslabsdedalussdkgo.F(map[string]interface{}{
 			"foo": "bar",
-		},
-		Input: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsInputUnion{
-			OfString: githubcomdedaluslabsdedalussdkgo.String("Translate this paragraph into French."),
-		},
-		Instructions: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsInstructionsUnion{
-			OfString: githubcomdedaluslabsdedalussdkgo.String("You are a concise assistant."),
-		},
-		LogitBias: map[string]int64{
-			"50256": -100,
-		},
-		Logprobs:            githubcomdedaluslabsdedalussdkgo.Bool(true),
-		MaxCompletionTokens: githubcomdedaluslabsdedalussdkgo.Int(1000),
-		MaxTokens:           githubcomdedaluslabsdedalussdkgo.Int(100),
-		MaxTurns:            githubcomdedaluslabsdedalussdkgo.Int(5),
-		MCPServers: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMCPServersUnion{
-			OfStringArray: []string{"dedalus-labs/brave-search", "dedalus-labs/github-api"},
-		},
-		Messages: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesUnion{
-			OfMapOfAnyMap: []map[string]any{{
-				"content": "bar",
-				"role":    "bar",
-			}},
-		},
-		Metadata: map[string]string{
+		}),
+		Input:        githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsInputUnion](shared.UnionString("Translate this paragraph into French.")),
+		Instructions: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsInstructionsUnion](shared.UnionString("You are a concise assistant.")),
+		LogitBias: githubcomdedaluslabsdedalussdkgo.F(map[string]int64{
+			"50256": int64(-100),
+		}),
+		Logprobs:            githubcomdedaluslabsdedalussdkgo.F(true),
+		MaxCompletionTokens: githubcomdedaluslabsdedalussdkgo.F(int64(1000)),
+		MaxTokens:           githubcomdedaluslabsdedalussdkgo.F(int64(100)),
+		MaxTurns:            githubcomdedaluslabsdedalussdkgo.F(int64(5)),
+		MCPServers:          githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMCPServersUnion](githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMCPServersArray([]string{"dedalus-labs/brave-search", "dedalus-labs/github-api"})),
+		Messages: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesUnion](githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesArray([]map[string]interface{}{{
+			"content": "bar",
+			"role":    "bar",
+		}})),
+		Metadata: githubcomdedaluslabsdedalussdkgo.F(map[string]string{
 			"session": "abc",
 			"user_id": "123",
-		},
-		Modalities: []string{"text"},
-		ModelAttributes: map[string]map[string]float64{
+		}),
+		Modalities: githubcomdedaluslabsdedalussdkgo.F([]string{"text"}),
+		ModelAttributes: githubcomdedaluslabsdedalussdkgo.F(map[string]map[string]float64{
 			"anthropic/claude-3-5-sonnet": {
-				"cost":         0.7,
-				"creativity":   0.8,
-				"intelligence": 0.95,
+				"cost":         0.700000,
+				"creativity":   0.800000,
+				"intelligence": 0.950000,
 			},
 			"openai/gpt-4": {
-				"cost":         0.8,
-				"intelligence": 0.9,
-				"speed":        0.6,
+				"cost":         0.800000,
+				"intelligence": 0.900000,
+				"speed":        0.600000,
 			},
 			"openai/gpt-4o-mini": {
-				"cost":         0.2,
-				"intelligence": 0.7,
-				"speed":        0.9,
+				"cost":         0.200000,
+				"intelligence": 0.700000,
+				"speed":        0.900000,
 			},
-		},
-		N:                 githubcomdedaluslabsdedalussdkgo.Int(1),
-		ParallelToolCalls: githubcomdedaluslabsdedalussdkgo.Bool(true),
-		Prediction: map[string]any{
+		}),
+		N:                 githubcomdedaluslabsdedalussdkgo.F(int64(1)),
+		ParallelToolCalls: githubcomdedaluslabsdedalussdkgo.F(true),
+		Prediction: githubcomdedaluslabsdedalussdkgo.F(map[string]interface{}{
 			"foo": "bar",
-		},
-		PresencePenalty: githubcomdedaluslabsdedalussdkgo.Float(-0.5),
-		PromptCacheKey:  githubcomdedaluslabsdedalussdkgo.String("prompt_cache_key"),
-		ReasoningEffort: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsReasoningEffortMedium,
-		ResponseFormat: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsResponseFormatUnion{
-			OfResponseFormatText: &shared.ResponseFormatTextParam{},
-		},
-		SafetyIdentifier: githubcomdedaluslabsdedalussdkgo.String("safety_identifier"),
-		SafetySettings: []map[string]any{{
+		}),
+		PresencePenalty: githubcomdedaluslabsdedalussdkgo.F(-0.500000),
+		PromptCacheKey:  githubcomdedaluslabsdedalussdkgo.F("prompt_cache_key"),
+		ReasoningEffort: githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsReasoningEffortMedium),
+		ResponseFormat: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsResponseFormatUnion](shared.ResponseFormatTextParam{
+			Type: githubcomdedaluslabsdedalussdkgo.F(shared.ResponseFormatTextTypeText),
+		}),
+		SafetyIdentifier: githubcomdedaluslabsdedalussdkgo.F("safety_identifier"),
+		SafetySettings: githubcomdedaluslabsdedalussdkgo.F([]map[string]interface{}{{
 			"category":  "bar",
 			"threshold": "bar",
-		}},
-		SearchParameters: map[string]any{
+		}}),
+		SearchParameters: githubcomdedaluslabsdedalussdkgo.F(map[string]interface{}{
 			"foo": "bar",
-		},
-		Seed:        githubcomdedaluslabsdedalussdkgo.Int(42),
-		ServiceTier: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsServiceTierAuto,
-		Stop:        []string{"\n", "END"},
-		Store:       githubcomdedaluslabsdedalussdkgo.Bool(true),
-		StreamOptions: map[string]any{
+		}),
+		Seed:        githubcomdedaluslabsdedalussdkgo.F(int64(42)),
+		ServiceTier: githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsServiceTierAuto),
+		Stop:        githubcomdedaluslabsdedalussdkgo.F([]string{"\n", "END"}),
+		Store:       githubcomdedaluslabsdedalussdkgo.F(true),
+		StreamOptions: githubcomdedaluslabsdedalussdkgo.F(map[string]interface{}{
 			"include_usage": "bar",
-		},
-		System: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsSystemUnion{
-			OfString: githubcomdedaluslabsdedalussdkgo.String("You are a helpful assistant."),
-		},
-		Temperature: githubcomdedaluslabsdedalussdkgo.Float(0),
-		Thinking: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsThinkingUnion{
-			OfEnabled: &githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsThinkingEnabled{
-				BudgetTokens: 2048,
-			},
-		},
-		ToolChoice: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsToolChoiceUnion{
-			OfString: githubcomdedaluslabsdedalussdkgo.String("auto"),
-		},
-		ToolConfig: map[string]any{
+		}),
+		System:      githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsSystemUnion](shared.UnionString("You are a helpful assistant.")),
+		Temperature: githubcomdedaluslabsdedalussdkgo.F(0.000000),
+		Thinking: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsThinkingUnion](githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsThinkingThinkingConfigEnabled{
+			BudgetTokens: githubcomdedaluslabsdedalussdkgo.F(int64(2048)),
+			Type:         githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsThinkingThinkingConfigEnabledTypeEnabled),
+		}),
+		ToolChoice: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsToolChoiceUnion](shared.UnionString("auto")),
+		ToolConfig: githubcomdedaluslabsdedalussdkgo.F(map[string]interface{}{
 			"function_calling_config": "bar",
-		},
-		Tools: []map[string]any{{
+		}),
+		Tools: githubcomdedaluslabsdedalussdkgo.F([]map[string]interface{}{{
 			"function": "bar",
 			"type":     "bar",
-		}},
-		TopK:        githubcomdedaluslabsdedalussdkgo.Int(40),
-		TopLogprobs: githubcomdedaluslabsdedalussdkgo.Int(5),
-		TopP:        githubcomdedaluslabsdedalussdkgo.Float(0.1),
-		User:        githubcomdedaluslabsdedalussdkgo.String("user-123"),
-		Verbosity:   githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsVerbosityLow,
-		WebSearchOptions: map[string]any{
+		}}),
+		TopK:        githubcomdedaluslabsdedalussdkgo.F(int64(40)),
+		TopLogprobs: githubcomdedaluslabsdedalussdkgo.F(int64(5)),
+		TopP:        githubcomdedaluslabsdedalussdkgo.F(0.100000),
+		User:        githubcomdedaluslabsdedalussdkgo.F("user-123"),
+		Verbosity:   githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsVerbosityLow),
+		WebSearchOptions: githubcomdedaluslabsdedalussdkgo.F(map[string]interface{}{
 			"foo": "bar",
-		},
+		}),
 	})
 	if err != nil {
 		var apierr *githubcomdedaluslabsdedalussdkgo.Error

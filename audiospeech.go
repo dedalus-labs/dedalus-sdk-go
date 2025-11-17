@@ -8,9 +8,9 @@ import (
 	"slices"
 
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/apijson"
+	"github.com/dedalus-labs/dedalus-sdk-go/internal/param"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/requestconfig"
 	"github.com/dedalus-labs/dedalus-sdk-go/option"
-	"github.com/dedalus-labs/dedalus-sdk-go/packages/param"
 )
 
 // AudioSpeechService contains methods and other services that help with
@@ -26,8 +26,8 @@ type AudioSpeechService struct {
 // NewAudioSpeechService generates a new service that applies the given options to
 // each request. These options are applied after the parent client's options (if
 // there is one), and before any request-specific options.
-func NewAudioSpeechService(opts ...option.RequestOption) (r AudioSpeechService) {
-	r = AudioSpeechService{}
+func NewAudioSpeechService(opts ...option.RequestOption) (r *AudioSpeechService) {
+	r = &AudioSpeechService{}
 	r.Options = opts
 	return
 }
@@ -49,43 +49,31 @@ func (r *AudioSpeechService) New(ctx context.Context, body AudioSpeechNewParams,
 
 type AudioSpeechNewParams struct {
 	// The text to generate audio for. The maximum length is 4096 characters.
-	Input string `json:"input,required"`
+	Input param.Field[string] `json:"input,required"`
 	// One of the available [TTS models](https://platform.openai.com/docs/models#tts):
 	// `openai/tts-1`, `openai/tts-1-hd` or `openai/gpt-4o-mini-tts`.
-	Model string `json:"model,required"`
+	Model param.Field[string] `json:"model,required"`
 	// The voice to use when generating the audio. Supported voices are `alloy`, `ash`,
 	// `ballad`, `coral`, `echo`, `fable`, `onyx`, `nova`, `sage`, `shimmer`, and
 	// `verse`. Previews of the voices are available in the
 	// [Text to speech guide](https://platform.openai.com/docs/guides/text-to-speech#voice-options).
-	//
-	// Any of "alloy", "ash", "ballad", "coral", "echo", "fable", "onyx", "nova",
-	// "sage", "shimmer", "verse".
-	Voice AudioSpeechNewParamsVoice `json:"voice,omitzero,required"`
+	Voice param.Field[AudioSpeechNewParamsVoice] `json:"voice,required"`
 	// Control the voice of your generated audio with additional instructions. Does not
 	// work with `tts-1` or `tts-1-hd`.
-	Instructions param.Opt[string] `json:"instructions,omitzero"`
-	// The speed of the generated audio. Select a value from `0.25` to `4.0`. `1.0` is
-	// the default.
-	Speed param.Opt[float64] `json:"speed,omitzero"`
+	Instructions param.Field[string] `json:"instructions"`
 	// The format to audio in. Supported formats are `mp3`, `opus`, `aac`, `flac`,
 	// `wav`, and `pcm`.
-	//
-	// Any of "mp3", "opus", "aac", "flac", "wav", "pcm".
-	ResponseFormat AudioSpeechNewParamsResponseFormat `json:"response_format,omitzero"`
+	ResponseFormat param.Field[AudioSpeechNewParamsResponseFormat] `json:"response_format"`
+	// The speed of the generated audio. Select a value from `0.25` to `4.0`. `1.0` is
+	// the default.
+	Speed param.Field[float64] `json:"speed"`
 	// The format to stream the audio in. Supported formats are `sse` and `audio`.
 	// `sse` is not supported for `tts-1` or `tts-1-hd`.
-	//
-	// Any of "sse", "audio".
-	StreamFormat AudioSpeechNewParamsStreamFormat `json:"stream_format,omitzero"`
-	paramObj
+	StreamFormat param.Field[AudioSpeechNewParamsStreamFormat] `json:"stream_format"`
 }
 
 func (r AudioSpeechNewParams) MarshalJSON() (data []byte, err error) {
-	type shadow AudioSpeechNewParams
-	return param.MarshalObject(r, (*shadow)(&r))
-}
-func (r *AudioSpeechNewParams) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
+	return apijson.MarshalRoot(r)
 }
 
 // The voice to use when generating the audio. Supported voices are `alloy`, `ash`,
@@ -108,6 +96,14 @@ const (
 	AudioSpeechNewParamsVoiceVerse   AudioSpeechNewParamsVoice = "verse"
 )
 
+func (r AudioSpeechNewParamsVoice) IsKnown() bool {
+	switch r {
+	case AudioSpeechNewParamsVoiceAlloy, AudioSpeechNewParamsVoiceAsh, AudioSpeechNewParamsVoiceBallad, AudioSpeechNewParamsVoiceCoral, AudioSpeechNewParamsVoiceEcho, AudioSpeechNewParamsVoiceFable, AudioSpeechNewParamsVoiceOnyx, AudioSpeechNewParamsVoiceNova, AudioSpeechNewParamsVoiceSage, AudioSpeechNewParamsVoiceShimmer, AudioSpeechNewParamsVoiceVerse:
+		return true
+	}
+	return false
+}
+
 // The format to audio in. Supported formats are `mp3`, `opus`, `aac`, `flac`,
 // `wav`, and `pcm`.
 type AudioSpeechNewParamsResponseFormat string
@@ -121,6 +117,14 @@ const (
 	AudioSpeechNewParamsResponseFormatPcm  AudioSpeechNewParamsResponseFormat = "pcm"
 )
 
+func (r AudioSpeechNewParamsResponseFormat) IsKnown() bool {
+	switch r {
+	case AudioSpeechNewParamsResponseFormatMP3, AudioSpeechNewParamsResponseFormatOpus, AudioSpeechNewParamsResponseFormatAac, AudioSpeechNewParamsResponseFormatFlac, AudioSpeechNewParamsResponseFormatWav, AudioSpeechNewParamsResponseFormatPcm:
+		return true
+	}
+	return false
+}
+
 // The format to stream the audio in. Supported formats are `sse` and `audio`.
 // `sse` is not supported for `tts-1` or `tts-1-hd`.
 type AudioSpeechNewParamsStreamFormat string
@@ -129,3 +133,11 @@ const (
 	AudioSpeechNewParamsStreamFormatSse   AudioSpeechNewParamsStreamFormat = "sse"
 	AudioSpeechNewParamsStreamFormatAudio AudioSpeechNewParamsStreamFormat = "audio"
 )
+
+func (r AudioSpeechNewParamsStreamFormat) IsKnown() bool {
+	switch r {
+	case AudioSpeechNewParamsStreamFormatSse, AudioSpeechNewParamsStreamFormatAudio:
+		return true
+	}
+	return false
+}

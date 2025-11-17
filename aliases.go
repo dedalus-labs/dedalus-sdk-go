@@ -4,15 +4,8 @@ package githubcomdedaluslabsdedalussdkgo
 
 import (
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/apierror"
-	"github.com/dedalus-labs/dedalus-sdk-go/packages/param"
 	"github.com/dedalus-labs/dedalus-sdk-go/shared"
 )
-
-// aliased to make [param.APIUnion] private when embedding
-type paramUnion = param.APIUnion
-
-// aliased to make [param.APIObject] private when embedding
-type paramObj = param.APIObject
 
 type Error = apierror.Error
 
@@ -34,7 +27,76 @@ type DedalusModelSettingsParam = shared.DedalusModelSettingsParam
 type DedalusModelSettingsReasoningParam = shared.DedalusModelSettingsReasoningParam
 
 // This is an alias to an internal type.
+type DedalusModelSettingsReasoningEffort = shared.DedalusModelSettingsReasoningEffort
+
+// This is an alias to an internal value.
+const DedalusModelSettingsReasoningEffortMinimal = shared.DedalusModelSettingsReasoningEffortMinimal
+
+// This is an alias to an internal value.
+const DedalusModelSettingsReasoningEffortLow = shared.DedalusModelSettingsReasoningEffortLow
+
+// This is an alias to an internal value.
+const DedalusModelSettingsReasoningEffortMedium = shared.DedalusModelSettingsReasoningEffortMedium
+
+// This is an alias to an internal value.
+const DedalusModelSettingsReasoningEffortHigh = shared.DedalusModelSettingsReasoningEffortHigh
+
+// This is an alias to an internal type.
+type DedalusModelSettingsReasoningGenerateSummary = shared.DedalusModelSettingsReasoningGenerateSummary
+
+// This is an alias to an internal value.
+const DedalusModelSettingsReasoningGenerateSummaryAuto = shared.DedalusModelSettingsReasoningGenerateSummaryAuto
+
+// This is an alias to an internal value.
+const DedalusModelSettingsReasoningGenerateSummaryConcise = shared.DedalusModelSettingsReasoningGenerateSummaryConcise
+
+// This is an alias to an internal value.
+const DedalusModelSettingsReasoningGenerateSummaryDetailed = shared.DedalusModelSettingsReasoningGenerateSummaryDetailed
+
+// This is an alias to an internal type.
+type DedalusModelSettingsReasoningSummary = shared.DedalusModelSettingsReasoningSummary
+
+// This is an alias to an internal value.
+const DedalusModelSettingsReasoningSummaryAuto = shared.DedalusModelSettingsReasoningSummaryAuto
+
+// This is an alias to an internal value.
+const DedalusModelSettingsReasoningSummaryConcise = shared.DedalusModelSettingsReasoningSummaryConcise
+
+// This is an alias to an internal value.
+const DedalusModelSettingsReasoningSummaryDetailed = shared.DedalusModelSettingsReasoningSummaryDetailed
+
+// This is an alias to an internal type.
+type DedalusModelSettingsResponseInclude = shared.DedalusModelSettingsResponseInclude
+
+// This is an alias to an internal value.
+const DedalusModelSettingsResponseIncludeFileSearchCallResults = shared.DedalusModelSettingsResponseIncludeFileSearchCallResults
+
+// This is an alias to an internal value.
+const DedalusModelSettingsResponseIncludeWebSearchCallResults = shared.DedalusModelSettingsResponseIncludeWebSearchCallResults
+
+// This is an alias to an internal value.
+const DedalusModelSettingsResponseIncludeWebSearchCallActionSources = shared.DedalusModelSettingsResponseIncludeWebSearchCallActionSources
+
+// This is an alias to an internal value.
+const DedalusModelSettingsResponseIncludeMessageInputImageImageURL = shared.DedalusModelSettingsResponseIncludeMessageInputImageImageURL
+
+// This is an alias to an internal value.
+const DedalusModelSettingsResponseIncludeComputerCallOutputOutputImageURL = shared.DedalusModelSettingsResponseIncludeComputerCallOutputOutputImageURL
+
+// This is an alias to an internal value.
+const DedalusModelSettingsResponseIncludeCodeInterpreterCallOutputs = shared.DedalusModelSettingsResponseIncludeCodeInterpreterCallOutputs
+
+// This is an alias to an internal value.
+const DedalusModelSettingsResponseIncludeReasoningEncryptedContent = shared.DedalusModelSettingsResponseIncludeReasoningEncryptedContent
+
+// This is an alias to an internal value.
+const DedalusModelSettingsResponseIncludeMessageOutputTextLogprobs = shared.DedalusModelSettingsResponseIncludeMessageOutputTextLogprobs
+
+// This is an alias to an internal type.
 type DedalusModelSettingsStopUnionParam = shared.DedalusModelSettingsStopUnionParam
+
+// This is an alias to an internal type.
+type DedalusModelSettingsStopArrayParam = shared.DedalusModelSettingsStopArrayParam
 
 // This is an alias to an internal type.
 type DedalusModelSettingsToolChoiceUnionParam = shared.DedalusModelSettingsToolChoiceUnionParam
@@ -42,8 +104,29 @@ type DedalusModelSettingsToolChoiceUnionParam = shared.DedalusModelSettingsToolC
 // This is an alias to an internal type.
 type DedalusModelSettingsToolChoiceString = shared.DedalusModelSettingsToolChoiceString
 
+// This is an alias to an internal value.
+const DedalusModelSettingsToolChoiceStringAuto = shared.DedalusModelSettingsToolChoiceStringAuto
+
+// This is an alias to an internal value.
+const DedalusModelSettingsToolChoiceStringRequired = shared.DedalusModelSettingsToolChoiceStringRequired
+
+// This is an alias to an internal value.
+const DedalusModelSettingsToolChoiceStringNone = shared.DedalusModelSettingsToolChoiceStringNone
+
+// This is an alias to an internal type.
+type DedalusModelSettingsToolChoiceMapParam = shared.DedalusModelSettingsToolChoiceMapParam
+
 // This is an alias to an internal type.
 type DedalusModelSettingsToolChoiceMCPToolChoiceParam = shared.DedalusModelSettingsToolChoiceMCPToolChoiceParam
+
+// This is an alias to an internal type.
+type DedalusModelSettingsTruncation = shared.DedalusModelSettingsTruncation
+
+// This is an alias to an internal value.
+const DedalusModelSettingsTruncationAuto = shared.DedalusModelSettingsTruncationAuto
+
+// This is an alias to an internal value.
+const DedalusModelSettingsTruncationDisabled = shared.DedalusModelSettingsTruncationDisabled
 
 // Dedalus model choice - either a string ID or DedalusModel configuration object.
 //
@@ -63,6 +146,14 @@ type DedalusModelChoiceUnionParam = shared.DedalusModelChoiceUnionParam
 // This is an alias to an internal type.
 type ResponseFormatJSONObjectParam = shared.ResponseFormatJSONObjectParam
 
+// The type of response format being defined. Always `json_object`.
+//
+// This is an alias to an internal type.
+type ResponseFormatJSONObjectType = shared.ResponseFormatJSONObjectType
+
+// This is an alias to an internal value.
+const ResponseFormatJSONObjectTypeJSONObject = shared.ResponseFormatJSONObjectTypeJSONObject
+
 // JSON Schema response format. Used to generate structured JSON responses.
 //
 // Learn more about
@@ -81,6 +172,14 @@ type ResponseFormatJSONSchemaParam = shared.ResponseFormatJSONSchemaParam
 // This is an alias to an internal type.
 type ResponseFormatJSONSchemaJSONSchemaParam = shared.ResponseFormatJSONSchemaJSONSchemaParam
 
+// The type of response format being defined. Always `json_schema`.
+//
+// This is an alias to an internal type.
+type ResponseFormatJSONSchemaType = shared.ResponseFormatJSONSchemaType
+
+// This is an alias to an internal value.
+const ResponseFormatJSONSchemaTypeJSONSchema = shared.ResponseFormatJSONSchemaTypeJSONSchema
+
 // Default response format. Used to generate text responses.
 //
 // Fields:
@@ -89,3 +188,11 @@ type ResponseFormatJSONSchemaJSONSchemaParam = shared.ResponseFormatJSONSchemaJS
 //
 // This is an alias to an internal type.
 type ResponseFormatTextParam = shared.ResponseFormatTextParam
+
+// The type of response format being defined. Always `text`.
+//
+// This is an alias to an internal type.
+type ResponseFormatTextType = shared.ResponseFormatTextType
+
+// This is an alias to an internal value.
+const ResponseFormatTextTypeText = shared.ResponseFormatTextTypeText
