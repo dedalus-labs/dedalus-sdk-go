@@ -14,6 +14,7 @@ import (
 	"github.com/dedalus-labs/dedalus-sdk-go"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal"
 	"github.com/dedalus-labs/dedalus-sdk-go/option"
+	"github.com/dedalus-labs/dedalus-sdk-go/shared"
 )
 
 type closureTransport struct {
@@ -272,9 +273,7 @@ func TestContextDeadlineStreaming(t *testing.T) {
 			}),
 		)
 		stream := client.Chat.Completions.NewStreaming(deadlineCtx, githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
-			Model: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion{
-				OfModelID: githubcomdedaluslabsdedalussdkgo.String("openai/gpt-4"),
-			},
+			Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-4")),
 		})
 		for stream.Next() {
 			_ = stream.Current()
@@ -323,9 +322,7 @@ func TestContextDeadlineStreamingWithRequestTimeout(t *testing.T) {
 		stream := client.Chat.Completions.NewStreaming(
 			context.Background(),
 			githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
-				Model: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion{
-					OfModelID: githubcomdedaluslabsdedalussdkgo.String("openai/gpt-4"),
-				},
+				Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-4")),
 			},
 			option.WithRequestTimeout((100 * time.Millisecond)),
 		)

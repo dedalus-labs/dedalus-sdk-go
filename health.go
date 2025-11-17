@@ -10,7 +10,6 @@ import (
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/apijson"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/requestconfig"
 	"github.com/dedalus-labs/dedalus-sdk-go/option"
-	"github.com/dedalus-labs/dedalus-sdk-go/packages/respjson"
 )
 
 // HealthService contains methods and other services that help with interacting
@@ -26,8 +25,8 @@ type HealthService struct {
 // NewHealthService generates a new service that applies the given options to each
 // request. These options are applied after the parent client's options (if there
 // is one), and before any request-specific options.
-func NewHealthService(opts ...option.RequestOption) (r HealthService) {
-	r = HealthService{}
+func NewHealthService(opts ...option.RequestOption) (r *HealthService) {
+	r = &HealthService{}
 	r.Options = opts
 	return
 }
@@ -42,17 +41,22 @@ func (r *HealthService) Check(ctx context.Context, opts ...option.RequestOption)
 
 // Health check response model.
 type HealthCheckResponse struct {
-	Status string `json:"status,required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Status      respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
+	Status string                  `json:"status,required"`
+	JSON   healthCheckResponseJSON `json:"-"`
 }
 
-// Returns the unmodified JSON received from the API
-func (r HealthCheckResponse) RawJSON() string { return r.JSON.raw }
-func (r *HealthCheckResponse) UnmarshalJSON(data []byte) error {
+// healthCheckResponseJSON contains the JSON metadata for the struct
+// [HealthCheckResponse]
+type healthCheckResponseJSON struct {
+	Status      apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *HealthCheckResponse) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r healthCheckResponseJSON) RawJSON() string {
+	return r.raw
 }

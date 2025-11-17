@@ -13,7 +13,7 @@ import (
 	"github.com/dedalus-labs/dedalus-sdk-go/option"
 )
 
-func TestRootGet(t *testing.T) {
+func TestGithubcomdedaluslabsdedalussdkgoGet(t *testing.T) {
 	t.Skip("Prism tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -26,7 +26,7 @@ func TestRootGet(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Root.Get(context.TODO())
+	_, err := client.Get(context.TODO())
 	if err != nil {
 		var apierr *githubcomdedaluslabsdedalussdkgo.Error
 		if errors.As(err, &apierr) {

@@ -29,12 +29,12 @@ func TestImageNewVariationWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Images.NewVariation(context.TODO(), githubcomdedaluslabsdedalussdkgo.ImageNewVariationParams{
-		Image:          io.Reader(bytes.NewBuffer([]byte("some file contents"))),
-		Model:          githubcomdedaluslabsdedalussdkgo.String("model"),
-		N:              githubcomdedaluslabsdedalussdkgo.Int(0),
-		ResponseFormat: githubcomdedaluslabsdedalussdkgo.String("response_format"),
-		Size:           githubcomdedaluslabsdedalussdkgo.String("size"),
-		User:           githubcomdedaluslabsdedalussdkgo.String("user"),
+		Image:          githubcomdedaluslabsdedalussdkgo.F(io.Reader(bytes.NewBuffer([]byte("some file contents")))),
+		Model:          githubcomdedaluslabsdedalussdkgo.F("model"),
+		N:              githubcomdedaluslabsdedalussdkgo.F(int64(0)),
+		ResponseFormat: githubcomdedaluslabsdedalussdkgo.F("response_format"),
+		Size:           githubcomdedaluslabsdedalussdkgo.F("size"),
+		User:           githubcomdedaluslabsdedalussdkgo.F("user"),
 	})
 	if err != nil {
 		var apierr *githubcomdedaluslabsdedalussdkgo.Error
@@ -59,14 +59,14 @@ func TestImageEditWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Images.Edit(context.TODO(), githubcomdedaluslabsdedalussdkgo.ImageEditParams{
-		Image:          io.Reader(bytes.NewBuffer([]byte("some file contents"))),
-		Prompt:         "prompt",
-		Mask:           io.Reader(bytes.NewBuffer([]byte("some file contents"))),
-		Model:          githubcomdedaluslabsdedalussdkgo.String("model"),
-		N:              githubcomdedaluslabsdedalussdkgo.Int(0),
-		ResponseFormat: githubcomdedaluslabsdedalussdkgo.String("response_format"),
-		Size:           githubcomdedaluslabsdedalussdkgo.String("size"),
-		User:           githubcomdedaluslabsdedalussdkgo.String("user"),
+		Image:          githubcomdedaluslabsdedalussdkgo.F(io.Reader(bytes.NewBuffer([]byte("some file contents")))),
+		Prompt:         githubcomdedaluslabsdedalussdkgo.F("prompt"),
+		Mask:           githubcomdedaluslabsdedalussdkgo.F(io.Reader(bytes.NewBuffer([]byte("some file contents")))),
+		Model:          githubcomdedaluslabsdedalussdkgo.F("model"),
+		N:              githubcomdedaluslabsdedalussdkgo.F(int64(0)),
+		ResponseFormat: githubcomdedaluslabsdedalussdkgo.F("response_format"),
+		Size:           githubcomdedaluslabsdedalussdkgo.F("size"),
+		User:           githubcomdedaluslabsdedalussdkgo.F("user"),
 	})
 	if err != nil {
 		var apierr *githubcomdedaluslabsdedalussdkgo.Error
@@ -92,20 +92,20 @@ func TestImageGenerateWithOptionalParams(t *testing.T) {
 	)
 	_, err := client.Images.Generate(context.TODO(), githubcomdedaluslabsdedalussdkgo.ImageGenerateParams{
 		CreateImageRequest: githubcomdedaluslabsdedalussdkgo.CreateImageRequestParam{
-			Prompt:            "A white siamese cat",
-			Background:        githubcomdedaluslabsdedalussdkgo.CreateImageRequestBackgroundTransparent,
-			Model:             githubcomdedaluslabsdedalussdkgo.String("openai/dall-e-3"),
-			Moderation:        githubcomdedaluslabsdedalussdkgo.CreateImageRequestModerationAuto,
-			N:                 githubcomdedaluslabsdedalussdkgo.Int(1),
-			OutputCompression: githubcomdedaluslabsdedalussdkgo.Int(85),
-			OutputFormat:      githubcomdedaluslabsdedalussdkgo.CreateImageRequestOutputFormatPng,
-			PartialImages:     githubcomdedaluslabsdedalussdkgo.Int(0),
-			Quality:           githubcomdedaluslabsdedalussdkgo.CreateImageRequestQualityStandard,
-			ResponseFormat:    githubcomdedaluslabsdedalussdkgo.CreateImageRequestResponseFormatURL,
-			Size:              githubcomdedaluslabsdedalussdkgo.CreateImageRequestSize1024x1024,
-			Stream:            githubcomdedaluslabsdedalussdkgo.Bool(true),
-			Style:             githubcomdedaluslabsdedalussdkgo.CreateImageRequestStyleVivid,
-			User:              githubcomdedaluslabsdedalussdkgo.String("user"),
+			Prompt:            githubcomdedaluslabsdedalussdkgo.F("A white siamese cat"),
+			Background:        githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.CreateImageRequestBackgroundTransparent),
+			Model:             githubcomdedaluslabsdedalussdkgo.F("openai/dall-e-3"),
+			Moderation:        githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.CreateImageRequestModerationAuto),
+			N:                 githubcomdedaluslabsdedalussdkgo.F(int64(1)),
+			OutputCompression: githubcomdedaluslabsdedalussdkgo.F(int64(85)),
+			OutputFormat:      githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.CreateImageRequestOutputFormatPng),
+			PartialImages:     githubcomdedaluslabsdedalussdkgo.F(int64(0)),
+			Quality:           githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.CreateImageRequestQualityStandard),
+			ResponseFormat:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.CreateImageRequestResponseFormatURL),
+			Size:              githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.CreateImageRequestSize1024x1024),
+			Stream:            githubcomdedaluslabsdedalussdkgo.F(true),
+			Style:             githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.CreateImageRequestStyleVivid),
+			User:              githubcomdedaluslabsdedalussdkgo.F("user"),
 		},
 	})
 	if err != nil {
