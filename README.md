@@ -56,9 +56,9 @@ func main() {
 	)
 	completion, err := client.Chat.Completions.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
 		Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-5-nano")),
-		Messages: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesUnion](githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesArray([]map[string]interface{}{{
-			"role":    "user",
-			"content": "Hello, how are you today?",
+		Messages: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesUnion](githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesMessages([]githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesMessageUnion{githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesMessagesChatCompletionRequestUserMessage{
+			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesMessagesChatCompletionRequestUserMessageRoleUser),
+			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesMessagesChatCompletionRequestUserMessageContentUnion](shared.UnionString("Hello, how are you today?")),
 		}})),
 	})
 	if err != nil {

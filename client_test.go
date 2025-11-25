@@ -273,7 +273,7 @@ func TestContextDeadlineStreaming(t *testing.T) {
 			}),
 		)
 		stream := client.Chat.Completions.NewStreaming(deadlineCtx, githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
-			Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-4")),
+			Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-5")),
 		})
 		for stream.Next() {
 			_ = stream.Current()
@@ -322,7 +322,7 @@ func TestContextDeadlineStreamingWithRequestTimeout(t *testing.T) {
 		stream := client.Chat.Completions.NewStreaming(
 			context.Background(),
 			githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
-				Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-4")),
+				Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-5")),
 			},
 			option.WithRequestTimeout((100 * time.Millisecond)),
 		)

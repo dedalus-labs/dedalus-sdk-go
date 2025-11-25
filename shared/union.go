@@ -9,12 +9,18 @@ func (UnionString) ImplementsDedalusModelSettingsToolChoiceUnionParam()  {}
 func (UnionString) ImplementsDedalusModelChoiceUnionParam()              {}
 func (UnionString) ImplementsCreateEmbeddingRequestInputUnionParam()     {}
 func (UnionString) ImplementsCreateEmbeddingResponseDataEmbeddingUnion() {}
-func (UnionString) ImplementsCompletionChoicesMessageContentUnion()      {}
 func (UnionString) ImplementsChatCompletionNewParamsModelUnion()         {}
-func (UnionString) ImplementsChatCompletionNewParamsFunctionCallUnion()  {}
-func (UnionString) ImplementsChatCompletionNewParamsInputUnion()         {}
-func (UnionString) ImplementsChatCompletionNewParamsInstructionsUnion()  {}
 func (UnionString) ImplementsChatCompletionNewParamsMCPServersUnion()    {}
 func (UnionString) ImplementsChatCompletionNewParamsMessagesUnion()      {}
-func (UnionString) ImplementsChatCompletionNewParamsSystemUnion()        {}
-func (UnionString) ImplementsChatCompletionNewParamsToolChoiceUnion()    {}
+func (UnionString) ImplementsChatCompletionNewParamsMessagesMessagesChatCompletionRequestDeveloperMessageContentUnion() {
+}
+func (UnionString) ImplementsChatCompletionNewParamsMessagesMessagesChatCompletionRequestSystemMessageContentUnion() {
+}
+func (UnionString) ImplementsChatCompletionNewParamsMessagesMessagesChatCompletionRequestUserMessageContentUnion() {
+}
+func (UnionString) ImplementsChatCompletionNewParamsMessagesMessagesChatCompletionRequestAssistantMessageContentUnion() {
+}
+func (UnionString) ImplementsChatCompletionNewParamsMessagesMessagesChatCompletionRequestToolMessageContentUnion() {
+}
+func (UnionString) ImplementsChatCompletionNewParamsStopUnion()              {}
+func (UnionString) ImplementsChatCompletionNewParamsSystemInstructionUnion() {}
