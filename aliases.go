@@ -133,36 +133,22 @@ const DedalusModelSettingsTruncationDisabled = shared.DedalusModelSettingsTrunca
 // This is an alias to an internal type.
 type DedalusModelChoiceUnionParam = shared.DedalusModelChoiceUnionParam
 
-// JSON object response format. An older method of generating JSON responses.
-//
-// Using `json_schema` is recommended for models that support it. Note that the
-// model will not generate JSON without a system or user message instructing it to
-// do so.
-//
-// Fields:
-//
-// - type (required): Literal['json_object']
+// JSON object response format. An older method of generating JSON responses. Using
+// `json_schema` is recommended for models that support it. Note that the model
+// will not generate JSON without a system or user message instructing it to do so.
 //
 // This is an alias to an internal type.
 type ResponseFormatJSONObjectParam = shared.ResponseFormatJSONObjectParam
 
-// The type of response format being defined. Always `json_object`.
-//
 // This is an alias to an internal type.
 type ResponseFormatJSONObjectType = shared.ResponseFormatJSONObjectType
 
 // This is an alias to an internal value.
 const ResponseFormatJSONObjectTypeJSONObject = shared.ResponseFormatJSONObjectTypeJSONObject
 
-// JSON Schema response format. Used to generate structured JSON responses.
-//
-// Learn more about
+// JSON Schema response format. Used to generate structured JSON responses. Learn
+// more about
 // [Structured Outputs](https://platform.openai.com/docs/guides/structured-outputs).
-//
-// Fields:
-//
-// - type (required): Literal['json_schema']
-// - json_schema (required): JSONSchema
 //
 // This is an alias to an internal type.
 type ResponseFormatJSONSchemaParam = shared.ResponseFormatJSONSchemaParam
@@ -172,8 +158,6 @@ type ResponseFormatJSONSchemaParam = shared.ResponseFormatJSONSchemaParam
 // This is an alias to an internal type.
 type ResponseFormatJSONSchemaJSONSchemaParam = shared.ResponseFormatJSONSchemaJSONSchemaParam
 
-// The type of response format being defined. Always `json_schema`.
-//
 // This is an alias to an internal type.
 type ResponseFormatJSONSchemaType = shared.ResponseFormatJSONSchemaType
 
@@ -182,15 +166,9 @@ const ResponseFormatJSONSchemaTypeJSONSchema = shared.ResponseFormatJSONSchemaTy
 
 // Default response format. Used to generate text responses.
 //
-// Fields:
-//
-// - type (required): Literal['text']
-//
 // This is an alias to an internal type.
 type ResponseFormatTextParam = shared.ResponseFormatTextParam
 
-// The type of response format being defined. Always `text`.
-//
 // This is an alias to an internal type.
 type ResponseFormatTextType = shared.ResponseFormatTextType
 

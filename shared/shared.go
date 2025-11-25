@@ -245,18 +245,11 @@ type DedalusModelChoiceUnionParam interface {
 	ImplementsDedalusModelChoiceUnionParam()
 }
 
-// JSON object response format. An older method of generating JSON responses.
-//
-// Using `json_schema` is recommended for models that support it. Note that the
-// model will not generate JSON without a system or user message instructing it to
-// do so.
-//
-// Fields:
-//
-// - type (required): Literal['json_object']
+// JSON object response format. An older method of generating JSON responses. Using
+// `json_schema` is recommended for models that support it. Note that the model
+// will not generate JSON without a system or user message instructing it to do so.
 type ResponseFormatJSONObjectParam struct {
-	// The type of response format being defined. Always `json_object`.
-	Type param.Field[ResponseFormatJSONObjectType] `json:"type,required"`
+	Type param.Field[ResponseFormatJSONObjectType] `json:"type"`
 }
 
 func (r ResponseFormatJSONObjectParam) MarshalJSON() (data []byte, err error) {
@@ -265,7 +258,6 @@ func (r ResponseFormatJSONObjectParam) MarshalJSON() (data []byte, err error) {
 
 func (r ResponseFormatJSONObjectParam) ImplementsChatCompletionNewParamsResponseFormatUnion() {}
 
-// The type of response format being defined. Always `json_object`.
 type ResponseFormatJSONObjectType string
 
 const (
@@ -280,20 +272,13 @@ func (r ResponseFormatJSONObjectType) IsKnown() bool {
 	return false
 }
 
-// JSON Schema response format. Used to generate structured JSON responses.
-//
-// Learn more about
+// JSON Schema response format. Used to generate structured JSON responses. Learn
+// more about
 // [Structured Outputs](https://platform.openai.com/docs/guides/structured-outputs).
-//
-// Fields:
-//
-// - type (required): Literal['json_schema']
-// - json_schema (required): JSONSchema
 type ResponseFormatJSONSchemaParam struct {
 	// Structured Outputs configuration options, including a JSON Schema.
 	JSONSchema param.Field[ResponseFormatJSONSchemaJSONSchemaParam] `json:"json_schema,required"`
-	// The type of response format being defined. Always `json_schema`.
-	Type param.Field[ResponseFormatJSONSchemaType] `json:"type,required"`
+	Type       param.Field[ResponseFormatJSONSchemaType]            `json:"type"`
 }
 
 func (r ResponseFormatJSONSchemaParam) MarshalJSON() (data []byte, err error) {
@@ -304,28 +289,18 @@ func (r ResponseFormatJSONSchemaParam) ImplementsChatCompletionNewParamsResponse
 
 // Structured Outputs configuration options, including a JSON Schema.
 type ResponseFormatJSONSchemaJSONSchemaParam struct {
-	// The name of the response format. Must be a-z, A-Z, 0-9, or contain underscores
-	// and dashes, with a maximum length of 64.
-	Name param.Field[string] `json:"name,required"`
-	// A description of what the response format is for, used by the model to determine
-	// how to respond in the format.
+	Name        param.Field[string] `json:"name,required"`
 	Description param.Field[string] `json:"description"`
 	// The schema for the response format, described as a JSON Schema object. Learn how
 	// to build JSON schemas [here](https://json-schema.org/).
 	Schema param.Field[map[string]interface{}] `json:"schema"`
-	// Whether to enable strict schema adherence when generating the output. If set to
-	// true, the model will always follow the exact schema defined in the `schema`
-	// field. Only a subset of JSON Schema is supported when `strict` is `true`. To
-	// learn more, read the
-	// [Structured Outputs guide](https://platform.openai.com/docs/guides/structured-outputs).
-	Strict param.Field[bool] `json:"strict"`
+	Strict param.Field[map[string]interface{}] `json:"strict"`
 }
 
 func (r ResponseFormatJSONSchemaJSONSchemaParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-// The type of response format being defined. Always `json_schema`.
 type ResponseFormatJSONSchemaType string
 
 const (
@@ -341,13 +316,8 @@ func (r ResponseFormatJSONSchemaType) IsKnown() bool {
 }
 
 // Default response format. Used to generate text responses.
-//
-// Fields:
-//
-// - type (required): Literal['text']
 type ResponseFormatTextParam struct {
-	// The type of response format being defined. Always `text`.
-	Type param.Field[ResponseFormatTextType] `json:"type,required"`
+	Type param.Field[ResponseFormatTextType] `json:"type"`
 }
 
 func (r ResponseFormatTextParam) MarshalJSON() (data []byte, err error) {
@@ -356,7 +326,6 @@ func (r ResponseFormatTextParam) MarshalJSON() (data []byte, err error) {
 
 func (r ResponseFormatTextParam) ImplementsChatCompletionNewParamsResponseFormatUnion() {}
 
-// The type of response format being defined. Always `text`.
 type ResponseFormatTextType string
 
 const (
