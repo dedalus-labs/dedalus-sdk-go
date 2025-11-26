@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.1.0-alpha.4 (2025-11-26)
+
+Full Changelog: [v0.1.0-alpha.3...v0.1.0-alpha.4](https://github.com/dedalus-labs/dedalus-sdk-go/compare/v0.1.0-alpha.3...v0.1.0-alpha.4)
+
+### Features
+
+* **api:** config update for dedalus-ai/dev ([d240153](https://github.com/dedalus-labs/dedalus-sdk-go/commit/d240153d2233d17c0cd9a1407e4a15b8e2816528))
+* **api:** improve types ([981e302](https://github.com/dedalus-labs/dedalus-sdk-go/commit/981e302628d2adcf5448289b7834746f142c1b26))
+* **api:** messages param nullable ([4408331](https://github.com/dedalus-labs/dedalus-sdk-go/commit/4408331c403387ad0b0e944dcc4141e1d5c3eafa))
+* **api:** response format ([87661ed](https://github.com/dedalus-labs/dedalus-sdk-go/commit/87661ede914cd98aeeacb141a533292623beedc6))
+* **api:** schema compiler landed ([77a9162](https://github.com/dedalus-labs/dedalus-sdk-go/commit/77a9162eacfa2f4aedfd3cc9a144c0a85fcac482))
+* **api:** standardize name casing with stainless initialism ([4291ed2](https://github.com/dedalus-labs/dedalus-sdk-go/commit/4291ed2e093ed660295f87992eec81bf5479012f))
+
+
+### Chores
+
+* **api:** migrate pkg manager to uv ([a3152f2](https://github.com/dedalus-labs/dedalus-sdk-go/commit/a3152f2f36b47e8ddf3a219e67a8516fe34ee384))
+* bump gjson version ([aef2b2d](https://github.com/dedalus-labs/dedalus-sdk-go/commit/aef2b2de5b5d9c540c15313b88dc98a6118a2ed0))
+
 ## 0.1.0-alpha.3 (2025-11-08)
 
 Full Changelog: [v0.1.0-alpha.2...v0.1.0-alpha.3](https://github.com/dedalus-labs/dedalus-sdk-go/compare/v0.1.0-alpha.2...v0.1.0-alpha.3)
