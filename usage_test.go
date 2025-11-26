@@ -27,10 +27,13 @@ func TestUsage(t *testing.T) {
 	)
 	completion, err := client.Chat.Completions.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
 		Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-5-nano")),
-		Messages: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesUnion](githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesMessages([]githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesMessageUnion{githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesMessagesChatCompletionRequestUserMessage{
-			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesMessagesChatCompletionRequestUserMessageRoleUser),
-			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesMessagesChatCompletionRequestUserMessageContentUnion](shared.UnionString("Hello, how are you today?")),
-		}})),
+		Messages: githubcomdedaluslabsdedalussdkgo.F([]githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessageUnion{githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParam{
+			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamRoleSystem),
+			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamContentUnion](shared.UnionString("You are Stephen Dedalus. Respond in morose Joycean malaise.")),
+		}, githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParam{
+			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamRoleUser),
+			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamContentUnion](shared.UnionString("Hello, how are you today?")),
+		}}),
 	})
 	if err != nil {
 		t.Error(err)

@@ -437,9 +437,8 @@ func (r audioTranscriptionNewResponseCreateTranscriptionResponseJSONLogprobJSON)
 type AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsage struct {
 	// The type of the usage object. Always `tokens` for this variant.
 	Type AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageType `json:"type,required"`
-	// This field can have the runtime type of
-	// [AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokensInputTokenDetails].
-	InputTokenDetails interface{} `json:"input_token_details"`
+	// Details about the input tokens billed for this request.
+	InputTokenDetails InputTokenDetails `json:"input_token_details"`
 	// Number of input tokens billed for this request.
 	InputTokens int64 `json:"input_tokens"`
 	// Number of output tokens generated.
@@ -536,8 +535,8 @@ type AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscript
 	// The type of the usage object. Always `tokens` for this variant.
 	Type AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokensType `json:"type,required"`
 	// Details about the input tokens billed for this request.
-	InputTokenDetails AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokensInputTokenDetails `json:"input_token_details"`
-	JSON              audioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokensJSON              `json:"-"`
+	InputTokenDetails InputTokenDetails                                                                              `json:"input_token_details"`
+	JSON              audioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokensJSON `json:"-"`
 }
 
 // audioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokensJSON
@@ -577,33 +576,6 @@ func (r AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscr
 		return true
 	}
 	return false
-}
-
-// Details about the input tokens billed for this request.
-type AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokensInputTokenDetails struct {
-	// Number of audio tokens billed for this request.
-	AudioTokens int64 `json:"audio_tokens"`
-	// Number of text tokens billed for this request.
-	TextTokens int64                                                                                                           `json:"text_tokens"`
-	JSON       audioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokensInputTokenDetailsJSON `json:"-"`
-}
-
-// audioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokensInputTokenDetailsJSON
-// contains the JSON metadata for the struct
-// [AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokensInputTokenDetails]
-type audioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokensInputTokenDetailsJSON struct {
-	AudioTokens apijson.Field
-	TextTokens  apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokensInputTokenDetails) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r audioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokensInputTokenDetailsJSON) RawJSON() string {
-	return r.raw
 }
 
 // Usage statistics for models billed by audio input duration.

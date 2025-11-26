@@ -3,6 +3,7 @@
 package shared
 
 import (
+	"github.com/dedalus-labs/dedalus-sdk-go"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/apijson"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/param"
 )
@@ -31,124 +32,63 @@ func (r DedalusModelParam) ImplementsChatCompletionNewParamsModelUnion() {}
 // Optional default generation settings (e.g., temperature, max_tokens) applied
 // when this model is selected.
 type DedalusModelSettingsParam struct {
-	Attributes                      param.Field[map[string]interface{}]                   `json:"attributes"`
-	Audio                           param.Field[map[string]interface{}]                   `json:"audio"`
-	Deferred                        param.Field[bool]                                     `json:"deferred"`
-	DisableAutomaticFunctionCalling param.Field[bool]                                     `json:"disable_automatic_function_calling"`
-	ExtraArgs                       param.Field[map[string]interface{}]                   `json:"extra_args"`
-	ExtraHeaders                    param.Field[map[string]string]                        `json:"extra_headers"`
-	ExtraQuery                      param.Field[map[string]interface{}]                   `json:"extra_query"`
-	FrequencyPenalty                param.Field[float64]                                  `json:"frequency_penalty"`
-	GenerationConfig                param.Field[map[string]interface{}]                   `json:"generation_config"`
-	IncludeUsage                    param.Field[bool]                                     `json:"include_usage"`
-	InputAudioFormat                param.Field[string]                                   `json:"input_audio_format"`
-	InputAudioTranscription         param.Field[map[string]interface{}]                   `json:"input_audio_transcription"`
-	LogitBias                       param.Field[map[string]int64]                         `json:"logit_bias"`
-	Logprobs                        param.Field[bool]                                     `json:"logprobs"`
-	MaxCompletionTokens             param.Field[int64]                                    `json:"max_completion_tokens"`
-	MaxTokens                       param.Field[int64]                                    `json:"max_tokens"`
-	Metadata                        param.Field[map[string]string]                        `json:"metadata"`
-	Modalities                      param.Field[[]string]                                 `json:"modalities"`
-	N                               param.Field[int64]                                    `json:"n"`
-	OutputAudioFormat               param.Field[string]                                   `json:"output_audio_format"`
-	ParallelToolCalls               param.Field[bool]                                     `json:"parallel_tool_calls"`
-	Prediction                      param.Field[map[string]interface{}]                   `json:"prediction"`
-	PresencePenalty                 param.Field[float64]                                  `json:"presence_penalty"`
-	PromptCacheKey                  param.Field[string]                                   `json:"prompt_cache_key"`
-	Reasoning                       param.Field[DedalusModelSettingsReasoningParam]       `json:"reasoning"`
-	ReasoningEffort                 param.Field[string]                                   `json:"reasoning_effort"`
-	ResponseFormat                  param.Field[map[string]interface{}]                   `json:"response_format"`
-	ResponseInclude                 param.Field[[]DedalusModelSettingsResponseInclude]    `json:"response_include"`
-	SafetyIdentifier                param.Field[string]                                   `json:"safety_identifier"`
-	SafetySettings                  param.Field[[]map[string]interface{}]                 `json:"safety_settings"`
-	SearchParameters                param.Field[map[string]interface{}]                   `json:"search_parameters"`
-	Seed                            param.Field[int64]                                    `json:"seed"`
-	ServiceTier                     param.Field[string]                                   `json:"service_tier"`
-	Stop                            param.Field[DedalusModelSettingsStopUnionParam]       `json:"stop"`
-	Store                           param.Field[bool]                                     `json:"store"`
-	Stream                          param.Field[bool]                                     `json:"stream"`
-	StreamOptions                   param.Field[map[string]interface{}]                   `json:"stream_options"`
-	StructuredOutput                param.Field[interface{}]                              `json:"structured_output"`
-	SystemInstruction               param.Field[map[string]interface{}]                   `json:"system_instruction"`
-	Temperature                     param.Field[float64]                                  `json:"temperature"`
-	Thinking                        param.Field[map[string]interface{}]                   `json:"thinking"`
-	Timeout                         param.Field[float64]                                  `json:"timeout"`
-	ToolChoice                      param.Field[DedalusModelSettingsToolChoiceUnionParam] `json:"tool_choice"`
-	ToolConfig                      param.Field[map[string]interface{}]                   `json:"tool_config"`
-	TopK                            param.Field[int64]                                    `json:"top_k"`
-	TopLogprobs                     param.Field[int64]                                    `json:"top_logprobs"`
-	TopP                            param.Field[float64]                                  `json:"top_p"`
-	Truncation                      param.Field[DedalusModelSettingsTruncation]           `json:"truncation"`
-	TurnDetection                   param.Field[map[string]interface{}]                   `json:"turn_detection"`
-	UseResponses                    param.Field[bool]                                     `json:"use_responses"`
-	User                            param.Field[string]                                   `json:"user"`
-	Verbosity                       param.Field[string]                                   `json:"verbosity"`
-	Voice                           param.Field[string]                                   `json:"voice"`
-	WebSearchOptions                param.Field[map[string]interface{}]                   `json:"web_search_options"`
+	Attributes              param.Field[map[string]interface{}]                                `json:"attributes"`
+	Audio                   param.Field[map[string]interface{}]                                `json:"audio"`
+	Deferred                param.Field[bool]                                                  `json:"deferred"`
+	ExtraArgs               param.Field[map[string]interface{}]                                `json:"extra_args"`
+	ExtraHeaders            param.Field[map[string]string]                                     `json:"extra_headers"`
+	ExtraQuery              param.Field[map[string]interface{}]                                `json:"extra_query"`
+	FrequencyPenalty        param.Field[float64]                                               `json:"frequency_penalty"`
+	GenerationConfig        param.Field[map[string]interface{}]                                `json:"generation_config"`
+	IncludeUsage            param.Field[bool]                                                  `json:"include_usage"`
+	InputAudioFormat        param.Field[string]                                                `json:"input_audio_format"`
+	InputAudioTranscription param.Field[map[string]interface{}]                                `json:"input_audio_transcription"`
+	LogitBias               param.Field[map[string]int64]                                      `json:"logit_bias"`
+	Logprobs                param.Field[bool]                                                  `json:"logprobs"`
+	MaxCompletionTokens     param.Field[int64]                                                 `json:"max_completion_tokens"`
+	MaxTokens               param.Field[int64]                                                 `json:"max_tokens"`
+	Metadata                param.Field[map[string]string]                                     `json:"metadata"`
+	Modalities              param.Field[[]string]                                              `json:"modalities"`
+	N                       param.Field[int64]                                                 `json:"n"`
+	OutputAudioFormat       param.Field[string]                                                `json:"output_audio_format"`
+	ParallelToolCalls       param.Field[bool]                                                  `json:"parallel_tool_calls"`
+	Prediction              param.Field[map[string]interface{}]                                `json:"prediction"`
+	PresencePenalty         param.Field[float64]                                               `json:"presence_penalty"`
+	PromptCacheKey          param.Field[string]                                                `json:"prompt_cache_key"`
+	Reasoning               param.Field[githubcomdedaluslabsdedalussdkgo.ReasoningParam]       `json:"reasoning"`
+	ReasoningEffort         param.Field[string]                                                `json:"reasoning_effort"`
+	ResponseFormat          param.Field[map[string]interface{}]                                `json:"response_format"`
+	ResponseInclude         param.Field[[]DedalusModelSettingsResponseInclude]                 `json:"response_include"`
+	SafetyIdentifier        param.Field[string]                                                `json:"safety_identifier"`
+	SafetySettings          param.Field[[]map[string]interface{}]                              `json:"safety_settings"`
+	SearchParameters        param.Field[map[string]interface{}]                                `json:"search_parameters"`
+	Seed                    param.Field[int64]                                                 `json:"seed"`
+	ServiceTier             param.Field[string]                                                `json:"service_tier"`
+	Stop                    param.Field[DedalusModelSettingsStopUnionParam]                    `json:"stop"`
+	Store                   param.Field[bool]                                                  `json:"store"`
+	Stream                  param.Field[bool]                                                  `json:"stream"`
+	StreamOptions           param.Field[map[string]interface{}]                                `json:"stream_options"`
+	StructuredOutput        param.Field[interface{}]                                           `json:"structured_output"`
+	SystemInstruction       param.Field[map[string]interface{}]                                `json:"system_instruction"`
+	Temperature             param.Field[float64]                                               `json:"temperature"`
+	Thinking                param.Field[map[string]interface{}]                                `json:"thinking"`
+	Timeout                 param.Field[float64]                                               `json:"timeout"`
+	ToolChoice              param.Field[githubcomdedaluslabsdedalussdkgo.ToolChoiceUnionParam] `json:"tool_choice"`
+	ToolConfig              param.Field[map[string]interface{}]                                `json:"tool_config"`
+	TopK                    param.Field[int64]                                                 `json:"top_k"`
+	TopLogprobs             param.Field[int64]                                                 `json:"top_logprobs"`
+	TopP                    param.Field[float64]                                               `json:"top_p"`
+	Truncation              param.Field[DedalusModelSettingsTruncation]                        `json:"truncation"`
+	TurnDetection           param.Field[map[string]interface{}]                                `json:"turn_detection"`
+	UseResponses            param.Field[bool]                                                  `json:"use_responses"`
+	User                    param.Field[string]                                                `json:"user"`
+	Verbosity               param.Field[string]                                                `json:"verbosity"`
+	Voice                   param.Field[string]                                                `json:"voice"`
+	WebSearchOptions        param.Field[map[string]interface{}]                                `json:"web_search_options"`
 }
 
 func (r DedalusModelSettingsParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
-}
-
-type DedalusModelSettingsReasoningParam struct {
-	Effort          param.Field[DedalusModelSettingsReasoningEffort]          `json:"effort"`
-	GenerateSummary param.Field[DedalusModelSettingsReasoningGenerateSummary] `json:"generate_summary"`
-	Summary         param.Field[DedalusModelSettingsReasoningSummary]         `json:"summary"`
-	ExtraFields     map[string]interface{}                                    `json:"-,extras"`
-}
-
-func (r DedalusModelSettingsReasoningParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type DedalusModelSettingsReasoningEffort string
-
-const (
-	DedalusModelSettingsReasoningEffortMinimal DedalusModelSettingsReasoningEffort = "minimal"
-	DedalusModelSettingsReasoningEffortLow     DedalusModelSettingsReasoningEffort = "low"
-	DedalusModelSettingsReasoningEffortMedium  DedalusModelSettingsReasoningEffort = "medium"
-	DedalusModelSettingsReasoningEffortHigh    DedalusModelSettingsReasoningEffort = "high"
-)
-
-func (r DedalusModelSettingsReasoningEffort) IsKnown() bool {
-	switch r {
-	case DedalusModelSettingsReasoningEffortMinimal, DedalusModelSettingsReasoningEffortLow, DedalusModelSettingsReasoningEffortMedium, DedalusModelSettingsReasoningEffortHigh:
-		return true
-	}
-	return false
-}
-
-type DedalusModelSettingsReasoningGenerateSummary string
-
-const (
-	DedalusModelSettingsReasoningGenerateSummaryAuto     DedalusModelSettingsReasoningGenerateSummary = "auto"
-	DedalusModelSettingsReasoningGenerateSummaryConcise  DedalusModelSettingsReasoningGenerateSummary = "concise"
-	DedalusModelSettingsReasoningGenerateSummaryDetailed DedalusModelSettingsReasoningGenerateSummary = "detailed"
-)
-
-func (r DedalusModelSettingsReasoningGenerateSummary) IsKnown() bool {
-	switch r {
-	case DedalusModelSettingsReasoningGenerateSummaryAuto, DedalusModelSettingsReasoningGenerateSummaryConcise, DedalusModelSettingsReasoningGenerateSummaryDetailed:
-		return true
-	}
-	return false
-}
-
-type DedalusModelSettingsReasoningSummary string
-
-const (
-	DedalusModelSettingsReasoningSummaryAuto     DedalusModelSettingsReasoningSummary = "auto"
-	DedalusModelSettingsReasoningSummaryConcise  DedalusModelSettingsReasoningSummary = "concise"
-	DedalusModelSettingsReasoningSummaryDetailed DedalusModelSettingsReasoningSummary = "detailed"
-)
-
-func (r DedalusModelSettingsReasoningSummary) IsKnown() bool {
-	switch r {
-	case DedalusModelSettingsReasoningSummaryAuto, DedalusModelSettingsReasoningSummaryConcise, DedalusModelSettingsReasoningSummaryDetailed:
-		return true
-	}
-	return false
 }
 
 type DedalusModelSettingsResponseInclude string
@@ -181,48 +121,6 @@ type DedalusModelSettingsStopArrayParam []string
 
 func (r DedalusModelSettingsStopArrayParam) ImplementsDedalusModelSettingsStopUnionParam() {}
 
-// Satisfied by [shared.DedalusModelSettingsToolChoiceString],
-// [shared.UnionString], [shared.DedalusModelSettingsToolChoiceMapParam],
-// [shared.DedalusModelSettingsToolChoiceMCPToolChoiceParam].
-type DedalusModelSettingsToolChoiceUnionParam interface {
-	ImplementsDedalusModelSettingsToolChoiceUnionParam()
-}
-
-type DedalusModelSettingsToolChoiceString string
-
-const (
-	DedalusModelSettingsToolChoiceStringAuto     DedalusModelSettingsToolChoiceString = "auto"
-	DedalusModelSettingsToolChoiceStringRequired DedalusModelSettingsToolChoiceString = "required"
-	DedalusModelSettingsToolChoiceStringNone     DedalusModelSettingsToolChoiceString = "none"
-)
-
-func (r DedalusModelSettingsToolChoiceString) IsKnown() bool {
-	switch r {
-	case DedalusModelSettingsToolChoiceStringAuto, DedalusModelSettingsToolChoiceStringRequired, DedalusModelSettingsToolChoiceStringNone:
-		return true
-	}
-	return false
-}
-
-func (r DedalusModelSettingsToolChoiceString) ImplementsDedalusModelSettingsToolChoiceUnionParam() {}
-
-type DedalusModelSettingsToolChoiceMapParam map[string]interface{}
-
-func (r DedalusModelSettingsToolChoiceMapParam) ImplementsDedalusModelSettingsToolChoiceUnionParam() {
-}
-
-type DedalusModelSettingsToolChoiceMCPToolChoiceParam struct {
-	Name        param.Field[string] `json:"name,required"`
-	ServerLabel param.Field[string] `json:"server_label,required"`
-}
-
-func (r DedalusModelSettingsToolChoiceMCPToolChoiceParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r DedalusModelSettingsToolChoiceMCPToolChoiceParam) ImplementsDedalusModelSettingsToolChoiceUnionParam() {
-}
-
 type DedalusModelSettingsTruncation string
 
 const (
@@ -245,11 +143,53 @@ type DedalusModelChoiceUnionParam interface {
 	ImplementsDedalusModelChoiceUnionParam()
 }
 
+// Schema for FunctionObject.
+//
+// Fields:
+//
+// - description (optional): str
+// - name (required): str
+// - parameters (optional): FunctionParameters
+// - strict (optional): bool | None
+type FunctionDefinitionParam struct {
+	// The name of the function to be called. Must be a-z, A-Z, 0-9, or contain
+	// underscores and dashes, with a maximum length of 64.
+	Name param.Field[string] `json:"name,required"`
+	// A description of what the function does, used by the model to choose when and
+	// how to call the function.
+	Description param.Field[string] `json:"description"`
+	// The parameters the functions accepts, described as a JSON Schema object. See the
+	// [guide](https://platform.openai.com/docs/guides/function-calling) for examples,
+	// and the
+	// [JSON Schema reference](https://json-schema.org/understanding-json-schema/) for
+	// documentation about the format.
+	//
+	// Omitting `parameters` defines a function with an empty parameter list.
+	Parameters param.Field[FunctionParameters] `json:"parameters"`
+	// Whether to enable strict schema adherence when generating the function call. If
+	// set to true, the model will follow the exact schema defined in the `parameters`
+	// field. Only a subset of JSON Schema is supported when `strict` is `true`. Learn
+	// more about Structured Outputs in the
+	// [function calling guide](https://platform.openai.com/docs/guides/function-calling).
+	Strict param.Field[bool] `json:"strict"`
+}
+
+func (r FunctionDefinitionParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+type FunctionParameters map[string]interface{}
+
 // JSON object response format. An older method of generating JSON responses. Using
 // `json_schema` is recommended for models that support it. Note that the model
 // will not generate JSON without a system or user message instructing it to do so.
+//
+// Fields:
+//
+// - type (required): Literal["json_object"]
 type ResponseFormatJSONObjectParam struct {
-	Type param.Field[ResponseFormatJSONObjectType] `json:"type"`
+	// The type of response format being defined. Always `json_object`.
+	Type param.Field[ResponseFormatJSONObjectType] `json:"type,required"`
 }
 
 func (r ResponseFormatJSONObjectParam) MarshalJSON() (data []byte, err error) {
@@ -258,6 +198,7 @@ func (r ResponseFormatJSONObjectParam) MarshalJSON() (data []byte, err error) {
 
 func (r ResponseFormatJSONObjectParam) ImplementsChatCompletionNewParamsResponseFormatUnion() {}
 
+// The type of response format being defined. Always `json_object`.
 type ResponseFormatJSONObjectType string
 
 const (
@@ -275,10 +216,16 @@ func (r ResponseFormatJSONObjectType) IsKnown() bool {
 // JSON Schema response format. Used to generate structured JSON responses. Learn
 // more about
 // [Structured Outputs](https://platform.openai.com/docs/guides/structured-outputs).
+//
+// Fields:
+//
+// - type (required): Literal["json_schema"]
+// - json_schema (required): JSONSchema
 type ResponseFormatJSONSchemaParam struct {
 	// Structured Outputs configuration options, including a JSON Schema.
 	JSONSchema param.Field[ResponseFormatJSONSchemaJSONSchemaParam] `json:"json_schema,required"`
-	Type       param.Field[ResponseFormatJSONSchemaType]            `json:"type"`
+	// The type of response format being defined. Always `json_schema`.
+	Type param.Field[ResponseFormatJSONSchemaType] `json:"type,required"`
 }
 
 func (r ResponseFormatJSONSchemaParam) MarshalJSON() (data []byte, err error) {
@@ -289,18 +236,28 @@ func (r ResponseFormatJSONSchemaParam) ImplementsChatCompletionNewParamsResponse
 
 // Structured Outputs configuration options, including a JSON Schema.
 type ResponseFormatJSONSchemaJSONSchemaParam struct {
-	Name        param.Field[string] `json:"name,required"`
+	// The name of the response format. Must be a-z, A-Z, 0-9, or contain underscores
+	// and dashes, with a maximum length of 64.
+	Name param.Field[string] `json:"name,required"`
+	// A description of what the response format is for, used by the model to determine
+	// how to respond in the format.
 	Description param.Field[string] `json:"description"`
 	// The schema for the response format, described as a JSON Schema object. Learn how
 	// to build JSON schemas [here](https://json-schema.org/).
 	Schema param.Field[map[string]interface{}] `json:"schema"`
-	Strict param.Field[map[string]interface{}] `json:"strict"`
+	// Whether to enable strict schema adherence when generating the output. If set to
+	// true, the model will always follow the exact schema defined in the `schema`
+	// field. Only a subset of JSON Schema is supported when `strict` is `true`. To
+	// learn more, read the
+	// [Structured Outputs guide](https://platform.openai.com/docs/guides/structured-outputs).
+	Strict param.Field[bool] `json:"strict"`
 }
 
 func (r ResponseFormatJSONSchemaJSONSchemaParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
+// The type of response format being defined. Always `json_schema`.
 type ResponseFormatJSONSchemaType string
 
 const (
@@ -316,8 +273,13 @@ func (r ResponseFormatJSONSchemaType) IsKnown() bool {
 }
 
 // Default response format. Used to generate text responses.
+//
+// Fields:
+//
+// - type (required): Literal["text"]
 type ResponseFormatTextParam struct {
-	Type param.Field[ResponseFormatTextType] `json:"type"`
+	// The type of response format being defined. Always `text`.
+	Type param.Field[ResponseFormatTextType] `json:"type,required"`
 }
 
 func (r ResponseFormatTextParam) MarshalJSON() (data []byte, err error) {
@@ -326,6 +288,7 @@ func (r ResponseFormatTextParam) MarshalJSON() (data []byte, err error) {
 
 func (r ResponseFormatTextParam) ImplementsChatCompletionNewParamsResponseFormatUnion() {}
 
+// The type of response format being defined. Always `text`.
 type ResponseFormatTextType string
 
 const (
