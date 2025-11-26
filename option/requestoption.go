@@ -168,7 +168,7 @@ func WithQueryDel(key string) RequestOption {
 // The key accepts a string as defined by the [sjson format].
 //
 // [sjson format]: https://github.com/tidwall/sjson
-func WithJSONSet(key string, value any) RequestOption {
+func WithJSONSet(key string, value interface{}) RequestOption {
 	return requestconfig.RequestOptionFunc(func(r *requestconfig.RequestConfig) (err error) {
 		var b []byte
 
@@ -266,13 +266,6 @@ func WithEnvironmentProduction() RequestOption {
 	return requestconfig.WithDefaultBaseURL("https://api.dedaluslabs.ai/")
 }
 
-// WithEnvironmentDevelopment returns a RequestOption that sets the current
-// environment to be the "development" environment. An environment specifies which base URL
-// to use by default.
-func WithEnvironmentDevelopment() RequestOption {
-	return requestconfig.WithDefaultBaseURL("http://localhost:8080/")
-}
-
 // WithAPIKey returns a RequestOption that sets the client setting "api_key".
 func WithAPIKey(value string) RequestOption {
 	return requestconfig.RequestOptionFunc(func(r *requestconfig.RequestConfig) error {
@@ -281,10 +274,42 @@ func WithAPIKey(value string) RequestOption {
 	})
 }
 
+// WithXAPIKey returns a RequestOption that sets the client setting "x_api_key".
+func WithXAPIKey(value string) RequestOption {
+	return requestconfig.RequestOptionFunc(func(r *requestconfig.RequestConfig) error {
+		r.XAPIKey = value
+		return r.Apply(WithHeader("x-api-key", r.XAPIKey))
+	})
+}
+
 // WithOrganization returns a RequestOption that sets the client setting "organization".
 func WithOrganization(value string) RequestOption {
 	return requestconfig.RequestOptionFunc(func(r *requestconfig.RequestConfig) error {
 		r.Organization = value
+		return nil
+	})
+}
+
+// WithProvider returns a RequestOption that sets the client setting "provider".
+func WithProvider(value string) RequestOption {
+	return requestconfig.RequestOptionFunc(func(r *requestconfig.RequestConfig) error {
+		r.Provider = value
+		return r.Apply(WithHeader("X-Provider", value))
+	})
+}
+
+// WithProviderKey returns a RequestOption that sets the client setting "provider_key".
+func WithProviderKey(value string) RequestOption {
+	return requestconfig.RequestOptionFunc(func(r *requestconfig.RequestConfig) error {
+		r.ProviderKey = value
+		return r.Apply(WithHeader("X-Provider-Key", value))
+	})
+}
+
+// WithProviderModel returns a RequestOption that sets the client setting "provider_model".
+func WithProviderModel(value string) RequestOption {
+	return requestconfig.RequestOptionFunc(func(r *requestconfig.RequestConfig) error {
+		r.ProviderModel = value
 		return nil
 	})
 }
