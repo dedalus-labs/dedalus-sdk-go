@@ -24,33 +24,6 @@ type DedalusModelParam = shared.DedalusModelParam
 type DedalusModelSettingsParam = shared.DedalusModelSettingsParam
 
 // This is an alias to an internal type.
-type DedalusModelSettingsResponseInclude = shared.DedalusModelSettingsResponseInclude
-
-// This is an alias to an internal value.
-const DedalusModelSettingsResponseIncludeFileSearchCallResults = shared.DedalusModelSettingsResponseIncludeFileSearchCallResults
-
-// This is an alias to an internal value.
-const DedalusModelSettingsResponseIncludeWebSearchCallResults = shared.DedalusModelSettingsResponseIncludeWebSearchCallResults
-
-// This is an alias to an internal value.
-const DedalusModelSettingsResponseIncludeWebSearchCallActionSources = shared.DedalusModelSettingsResponseIncludeWebSearchCallActionSources
-
-// This is an alias to an internal value.
-const DedalusModelSettingsResponseIncludeMessageInputImageImageURL = shared.DedalusModelSettingsResponseIncludeMessageInputImageImageURL
-
-// This is an alias to an internal value.
-const DedalusModelSettingsResponseIncludeComputerCallOutputOutputImageURL = shared.DedalusModelSettingsResponseIncludeComputerCallOutputOutputImageURL
-
-// This is an alias to an internal value.
-const DedalusModelSettingsResponseIncludeCodeInterpreterCallOutputs = shared.DedalusModelSettingsResponseIncludeCodeInterpreterCallOutputs
-
-// This is an alias to an internal value.
-const DedalusModelSettingsResponseIncludeReasoningEncryptedContent = shared.DedalusModelSettingsResponseIncludeReasoningEncryptedContent
-
-// This is an alias to an internal value.
-const DedalusModelSettingsResponseIncludeMessageOutputTextLogprobs = shared.DedalusModelSettingsResponseIncludeMessageOutputTextLogprobs
-
-// This is an alias to an internal type.
 type DedalusModelSettingsStopUnionParam = shared.DedalusModelSettingsStopUnionParam
 
 // This is an alias to an internal type.

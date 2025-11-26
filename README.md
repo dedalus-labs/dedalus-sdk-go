@@ -51,8 +51,7 @@ import (
 
 func main() {
 	client := githubcomdedaluslabsdedalussdkgo.NewClient(
-		option.WithAPIKey("My API Key"),     // defaults to os.LookupEnv("DEDALUS_API_KEY")
-		option.WithEnvironmentDevelopment(), // defaults to option.WithEnvironmentProduction()
+		option.WithAPIKey("My API Key"), // defaults to os.LookupEnv("DEDALUS_API_KEY")
 	)
 	completion, err := client.Chat.Completions.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
 		Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-5-nano")),
