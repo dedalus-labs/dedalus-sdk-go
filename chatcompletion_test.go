@@ -37,7 +37,7 @@ func TestChatCompletionNewWithOptionalParams(t *testing.T) {
 			"foo": "bar",
 		}),
 		AutomaticToolExecution: githubcomdedaluslabsdedalussdkgo.F(true),
-		CachedContent:          githubcomdedaluslabsdedalussdkgo.F("cachedContent"),
+		CachedContent:          githubcomdedaluslabsdedalussdkgo.F("cached_content"),
 		Deferred:               githubcomdedaluslabsdedalussdkgo.F(true),
 		FrequencyPenalty:       githubcomdedaluslabsdedalussdkgo.F(-2.000000),
 		FunctionCall:           githubcomdedaluslabsdedalussdkgo.F("function_call"),
@@ -89,10 +89,8 @@ func TestChatCompletionNewWithOptionalParams(t *testing.T) {
 		PresencePenalty:      githubcomdedaluslabsdedalussdkgo.F(-2.000000),
 		PromptCacheKey:       githubcomdedaluslabsdedalussdkgo.F("prompt_cache_key"),
 		PromptCacheRetention: githubcomdedaluslabsdedalussdkgo.F("prompt_cache_retention"),
-		PromptMode: githubcomdedaluslabsdedalussdkgo.F(map[string]interface{}{
-			"foo": "bar",
-		}),
-		ReasoningEffort: githubcomdedaluslabsdedalussdkgo.F("reasoning_effort"),
+		PromptMode:           githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsPromptModeReasoning),
+		ReasoningEffort:      githubcomdedaluslabsdedalussdkgo.F("reasoning_effort"),
 		ResponseFormat: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsResponseFormatUnion](shared.ResponseFormatTextParam{
 			Type: githubcomdedaluslabsdedalussdkgo.F(shared.ResponseFormatTextTypeText),
 		}),

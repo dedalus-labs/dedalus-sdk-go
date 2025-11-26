@@ -58,7 +58,6 @@ type DedalusModelSettingsParam struct {
 	Reasoning               param.Field[githubcomdedaluslabsdedalussdkgo.ReasoningParam]       `json:"reasoning"`
 	ReasoningEffort         param.Field[string]                                                `json:"reasoning_effort"`
 	ResponseFormat          param.Field[map[string]interface{}]                                `json:"response_format"`
-	ResponseInclude         param.Field[[]DedalusModelSettingsResponseInclude]                 `json:"response_include"`
 	SafetyIdentifier        param.Field[string]                                                `json:"safety_identifier"`
 	SafetySettings          param.Field[[]map[string]interface{}]                              `json:"safety_settings"`
 	SearchParameters        param.Field[map[string]interface{}]                                `json:"search_parameters"`
@@ -80,7 +79,6 @@ type DedalusModelSettingsParam struct {
 	TopP                    param.Field[float64]                                               `json:"top_p"`
 	Truncation              param.Field[DedalusModelSettingsTruncation]                        `json:"truncation"`
 	TurnDetection           param.Field[map[string]interface{}]                                `json:"turn_detection"`
-	UseResponses            param.Field[bool]                                                  `json:"use_responses"`
 	User                    param.Field[string]                                                `json:"user"`
 	Verbosity               param.Field[string]                                                `json:"verbosity"`
 	Voice                   param.Field[string]                                                `json:"voice"`
@@ -89,27 +87,6 @@ type DedalusModelSettingsParam struct {
 
 func (r DedalusModelSettingsParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
-}
-
-type DedalusModelSettingsResponseInclude string
-
-const (
-	DedalusModelSettingsResponseIncludeFileSearchCallResults            DedalusModelSettingsResponseInclude = "file_search_call.results"
-	DedalusModelSettingsResponseIncludeWebSearchCallResults             DedalusModelSettingsResponseInclude = "web_search_call.results"
-	DedalusModelSettingsResponseIncludeWebSearchCallActionSources       DedalusModelSettingsResponseInclude = "web_search_call.action.sources"
-	DedalusModelSettingsResponseIncludeMessageInputImageImageURL        DedalusModelSettingsResponseInclude = "message.input_image.image_url"
-	DedalusModelSettingsResponseIncludeComputerCallOutputOutputImageURL DedalusModelSettingsResponseInclude = "computer_call_output.output.image_url"
-	DedalusModelSettingsResponseIncludeCodeInterpreterCallOutputs       DedalusModelSettingsResponseInclude = "code_interpreter_call.outputs"
-	DedalusModelSettingsResponseIncludeReasoningEncryptedContent        DedalusModelSettingsResponseInclude = "reasoning.encrypted_content"
-	DedalusModelSettingsResponseIncludeMessageOutputTextLogprobs        DedalusModelSettingsResponseInclude = "message.output_text.logprobs"
-)
-
-func (r DedalusModelSettingsResponseInclude) IsKnown() bool {
-	switch r {
-	case DedalusModelSettingsResponseIncludeFileSearchCallResults, DedalusModelSettingsResponseIncludeWebSearchCallResults, DedalusModelSettingsResponseIncludeWebSearchCallActionSources, DedalusModelSettingsResponseIncludeMessageInputImageImageURL, DedalusModelSettingsResponseIncludeComputerCallOutputOutputImageURL, DedalusModelSettingsResponseIncludeCodeInterpreterCallOutputs, DedalusModelSettingsResponseIncludeReasoningEncryptedContent, DedalusModelSettingsResponseIncludeMessageOutputTextLogprobs:
-		return true
-	}
-	return false
 }
 
 // Satisfied by [shared.UnionString], [shared.DedalusModelSettingsStopArrayParam].
