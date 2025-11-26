@@ -17,8 +17,6 @@ import (
 // directly, and instead use the [NewClient] method instead.
 type Client struct {
 	Options    []option.RequestOption
-	_Private   *PrivateService
-	Health     *HealthService
 	Models     *ModelService
 	Embeddings *EmbeddingService
 	Audio      *AudioService
@@ -66,8 +64,6 @@ func NewClient(opts ...option.RequestOption) (r *Client) {
 
 	r = &Client{Options: opts}
 
-	r._Private = NewPrivateService(opts...)
-	r.Health = NewHealthService(opts...)
 	r.Models = NewModelService(opts...)
 	r.Embeddings = NewEmbeddingService(opts...)
 	r.Audio = NewAudioService(opts...)
@@ -144,12 +140,4 @@ func (r *Client) Patch(ctx context.Context, path string, params interface{}, res
 // response.
 func (r *Client) Delete(ctx context.Context, path string, params interface{}, res interface{}, opts ...option.RequestOption) error {
 	return r.Execute(ctx, http.MethodDelete, path, params, res, opts...)
-}
-
-// Root
-func (r *Client) Get(ctx context.Context, opts ...option.RequestOption) (res *GetResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
-	path := ""
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
 }

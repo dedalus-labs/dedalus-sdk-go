@@ -4,23 +4,18 @@ package shared
 
 type UnionString string
 
-func (UnionString) ImplementsDedalusModelSettingsStopUnionParam()        {}
-func (UnionString) ImplementsDedalusModelSettingsToolChoiceUnionParam()  {}
-func (UnionString) ImplementsDedalusModelChoiceUnionParam()              {}
-func (UnionString) ImplementsCreateEmbeddingRequestInputUnionParam()     {}
-func (UnionString) ImplementsCreateEmbeddingResponseDataEmbeddingUnion() {}
-func (UnionString) ImplementsChatCompletionNewParamsModelUnion()         {}
-func (UnionString) ImplementsChatCompletionNewParamsMCPServersUnion()    {}
-func (UnionString) ImplementsChatCompletionNewParamsMessagesUnion()      {}
-func (UnionString) ImplementsChatCompletionNewParamsMessagesMessagesChatCompletionRequestDeveloperMessageContentUnion() {
-}
-func (UnionString) ImplementsChatCompletionNewParamsMessagesMessagesChatCompletionRequestSystemMessageContentUnion() {
-}
-func (UnionString) ImplementsChatCompletionNewParamsMessagesMessagesChatCompletionRequestUserMessageContentUnion() {
-}
-func (UnionString) ImplementsChatCompletionNewParamsMessagesMessagesChatCompletionRequestAssistantMessageContentUnion() {
-}
-func (UnionString) ImplementsChatCompletionNewParamsMessagesMessagesChatCompletionRequestToolMessageContentUnion() {
-}
-func (UnionString) ImplementsChatCompletionNewParamsStopUnion()              {}
-func (UnionString) ImplementsChatCompletionNewParamsSystemInstructionUnion() {}
+func (UnionString) ImplementsDedalusModelSettingsStopUnionParam()              {}
+func (UnionString) ImplementsDedalusModelChoiceUnionParam()                    {}
+func (UnionString) ImplementsCreateEmbeddingRequestInputUnionParam()           {}
+func (UnionString) ImplementsCreateEmbeddingResponseDataEmbeddingUnion()       {}
+func (UnionString) ImplementsChatCompletionAssistantMessageParamContentUnion() {}
+func (UnionString) ImplementsChatCompletionDeveloperMessageParamContentUnion() {}
+func (UnionString) ImplementsChatCompletionSystemMessageParamContentUnion()    {}
+func (UnionString) ImplementsChatCompletionToolMessageParamContentUnion()      {}
+func (UnionString) ImplementsChatCompletionUserMessageParamContentUnion()      {}
+func (UnionString) ImplementsPredictionContentContentUnionParam()              {}
+func (UnionString) ImplementsToolChoiceUnionParam()                            {}
+func (UnionString) ImplementsChatCompletionNewParamsModelUnion()               {}
+func (UnionString) ImplementsChatCompletionNewParamsMCPServersUnion()          {}
+func (UnionString) ImplementsChatCompletionNewParamsStopUnion()                {}
+func (UnionString) ImplementsChatCompletionNewParamsSystemInstructionUnion()   {}

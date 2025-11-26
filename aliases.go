@@ -24,48 +24,6 @@ type DedalusModelParam = shared.DedalusModelParam
 type DedalusModelSettingsParam = shared.DedalusModelSettingsParam
 
 // This is an alias to an internal type.
-type DedalusModelSettingsReasoningParam = shared.DedalusModelSettingsReasoningParam
-
-// This is an alias to an internal type.
-type DedalusModelSettingsReasoningEffort = shared.DedalusModelSettingsReasoningEffort
-
-// This is an alias to an internal value.
-const DedalusModelSettingsReasoningEffortMinimal = shared.DedalusModelSettingsReasoningEffortMinimal
-
-// This is an alias to an internal value.
-const DedalusModelSettingsReasoningEffortLow = shared.DedalusModelSettingsReasoningEffortLow
-
-// This is an alias to an internal value.
-const DedalusModelSettingsReasoningEffortMedium = shared.DedalusModelSettingsReasoningEffortMedium
-
-// This is an alias to an internal value.
-const DedalusModelSettingsReasoningEffortHigh = shared.DedalusModelSettingsReasoningEffortHigh
-
-// This is an alias to an internal type.
-type DedalusModelSettingsReasoningGenerateSummary = shared.DedalusModelSettingsReasoningGenerateSummary
-
-// This is an alias to an internal value.
-const DedalusModelSettingsReasoningGenerateSummaryAuto = shared.DedalusModelSettingsReasoningGenerateSummaryAuto
-
-// This is an alias to an internal value.
-const DedalusModelSettingsReasoningGenerateSummaryConcise = shared.DedalusModelSettingsReasoningGenerateSummaryConcise
-
-// This is an alias to an internal value.
-const DedalusModelSettingsReasoningGenerateSummaryDetailed = shared.DedalusModelSettingsReasoningGenerateSummaryDetailed
-
-// This is an alias to an internal type.
-type DedalusModelSettingsReasoningSummary = shared.DedalusModelSettingsReasoningSummary
-
-// This is an alias to an internal value.
-const DedalusModelSettingsReasoningSummaryAuto = shared.DedalusModelSettingsReasoningSummaryAuto
-
-// This is an alias to an internal value.
-const DedalusModelSettingsReasoningSummaryConcise = shared.DedalusModelSettingsReasoningSummaryConcise
-
-// This is an alias to an internal value.
-const DedalusModelSettingsReasoningSummaryDetailed = shared.DedalusModelSettingsReasoningSummaryDetailed
-
-// This is an alias to an internal type.
 type DedalusModelSettingsResponseInclude = shared.DedalusModelSettingsResponseInclude
 
 // This is an alias to an internal value.
@@ -99,27 +57,6 @@ type DedalusModelSettingsStopUnionParam = shared.DedalusModelSettingsStopUnionPa
 type DedalusModelSettingsStopArrayParam = shared.DedalusModelSettingsStopArrayParam
 
 // This is an alias to an internal type.
-type DedalusModelSettingsToolChoiceUnionParam = shared.DedalusModelSettingsToolChoiceUnionParam
-
-// This is an alias to an internal type.
-type DedalusModelSettingsToolChoiceString = shared.DedalusModelSettingsToolChoiceString
-
-// This is an alias to an internal value.
-const DedalusModelSettingsToolChoiceStringAuto = shared.DedalusModelSettingsToolChoiceStringAuto
-
-// This is an alias to an internal value.
-const DedalusModelSettingsToolChoiceStringRequired = shared.DedalusModelSettingsToolChoiceStringRequired
-
-// This is an alias to an internal value.
-const DedalusModelSettingsToolChoiceStringNone = shared.DedalusModelSettingsToolChoiceStringNone
-
-// This is an alias to an internal type.
-type DedalusModelSettingsToolChoiceMapParam = shared.DedalusModelSettingsToolChoiceMapParam
-
-// This is an alias to an internal type.
-type DedalusModelSettingsToolChoiceMCPToolChoiceParam = shared.DedalusModelSettingsToolChoiceMCPToolChoiceParam
-
-// This is an alias to an internal type.
 type DedalusModelSettingsTruncation = shared.DedalusModelSettingsTruncation
 
 // This is an alias to an internal value.
@@ -133,13 +70,42 @@ const DedalusModelSettingsTruncationDisabled = shared.DedalusModelSettingsTrunca
 // This is an alias to an internal type.
 type DedalusModelChoiceUnionParam = shared.DedalusModelChoiceUnionParam
 
+// Schema for FunctionObject.
+//
+// Fields:
+//
+// - description (optional): str
+// - name (required): str
+// - parameters (optional): FunctionParameters
+// - strict (optional): bool | None
+//
+// This is an alias to an internal type.
+type FunctionDefinitionParam = shared.FunctionDefinitionParam
+
+// The parameters the functions accepts, described as a JSON Schema object. See the
+// [guide](https://platform.openai.com/docs/guides/function-calling) for examples,
+// and the
+// [JSON Schema reference](https://json-schema.org/understanding-json-schema/) for
+// documentation about the format.
+//
+// Omitting `parameters` defines a function with an empty parameter list.
+//
+// This is an alias to an internal type.
+type FunctionParameters = shared.FunctionParameters
+
 // JSON object response format. An older method of generating JSON responses. Using
 // `json_schema` is recommended for models that support it. Note that the model
 // will not generate JSON without a system or user message instructing it to do so.
 //
+// Fields:
+//
+// - type (required): Literal["json_object"]
+//
 // This is an alias to an internal type.
 type ResponseFormatJSONObjectParam = shared.ResponseFormatJSONObjectParam
 
+// The type of response format being defined. Always `json_object`.
+//
 // This is an alias to an internal type.
 type ResponseFormatJSONObjectType = shared.ResponseFormatJSONObjectType
 
@@ -150,6 +116,11 @@ const ResponseFormatJSONObjectTypeJSONObject = shared.ResponseFormatJSONObjectTy
 // more about
 // [Structured Outputs](https://platform.openai.com/docs/guides/structured-outputs).
 //
+// Fields:
+//
+// - type (required): Literal["json_schema"]
+// - json_schema (required): JSONSchema
+//
 // This is an alias to an internal type.
 type ResponseFormatJSONSchemaParam = shared.ResponseFormatJSONSchemaParam
 
@@ -158,6 +129,8 @@ type ResponseFormatJSONSchemaParam = shared.ResponseFormatJSONSchemaParam
 // This is an alias to an internal type.
 type ResponseFormatJSONSchemaJSONSchemaParam = shared.ResponseFormatJSONSchemaJSONSchemaParam
 
+// The type of response format being defined. Always `json_schema`.
+//
 // This is an alias to an internal type.
 type ResponseFormatJSONSchemaType = shared.ResponseFormatJSONSchemaType
 
@@ -166,9 +139,15 @@ const ResponseFormatJSONSchemaTypeJSONSchema = shared.ResponseFormatJSONSchemaTy
 
 // Default response format. Used to generate text responses.
 //
+// Fields:
+//
+// - type (required): Literal["text"]
+//
 // This is an alias to an internal type.
 type ResponseFormatTextParam = shared.ResponseFormatTextParam
 
+// The type of response format being defined. Always `text`.
+//
 // This is an alias to an internal type.
 type ResponseFormatTextType = shared.ResponseFormatTextType
 

@@ -43,14 +43,16 @@ func (r *EmbeddingService) New(ctx context.Context, body EmbeddingNewParams, opt
 	return
 }
 
+// Schema for CreateEmbeddingRequest.
+//
 // Fields:
 //
 //   - input (required): str | Annotated[list[str], MinLen(1), MaxLen(2048)] |
 //     Annotated[list[int], MinLen(1), MaxLen(2048)] |
 //     Annotated[list[Annotated[list[int], MinLen(1)]], MinLen(1), MaxLen(2048)]
-//   - model (required): str | Literal['text-embedding-ada-002',
-//     'text-embedding-3-small', 'text-embedding-3-large']
-//   - encoding_format (optional): Literal['float', 'base64']
+//   - model (required): str | Literal["text-embedding-ada-002",
+//     "text-embedding-3-small", "text-embedding-3-large"]
+//   - encoding_format (optional): Literal["float", "base64"]
 //   - dimensions (optional): int
 //   - user (optional): str
 type CreateEmbeddingRequestParam struct {
@@ -265,14 +267,16 @@ func (r CreateEmbeddingResponseObject) IsKnown() bool {
 }
 
 type EmbeddingNewParams struct {
+	// Schema for CreateEmbeddingRequest.
+	//
 	// Fields:
 	//
 	//   - input (required): str | Annotated[list[str], MinLen(1), MaxLen(2048)] |
 	//     Annotated[list[int], MinLen(1), MaxLen(2048)] |
 	//     Annotated[list[Annotated[list[int], MinLen(1)]], MinLen(1), MaxLen(2048)]
-	//   - model (required): str | Literal['text-embedding-ada-002',
-	//     'text-embedding-3-small', 'text-embedding-3-large']
-	//   - encoding_format (optional): Literal['float', 'base64']
+	//   - model (required): str | Literal["text-embedding-ada-002",
+	//     "text-embedding-3-small", "text-embedding-3-large"]
+	//   - encoding_format (optional): Literal["float", "base64"]
 	//   - dimensions (optional): int
 	//   - user (optional): str
 	CreateEmbeddingRequest CreateEmbeddingRequestParam `json:"create_embedding_request,required"`
