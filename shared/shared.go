@@ -157,6 +157,38 @@ func (r FunctionDefinitionParam) MarshalJSON() (data []byte, err error) {
 
 type FunctionParameters map[string]interface{}
 
+// Single MCP server input: slug string or structured MCPServerParam.
+//
+// Satisfied by [shared.UnionString], [shared.MCPServerParam].
+type MCPServerInputUnionParam interface {
+	ImplementsMCPServerInputUnionParam()
+}
+
+// Structured MCP server parameter.
+//
+// Slug-based: {"slug": "dedalus-labs/brave-search", "version": "v1.0.0"}
+// URL-based: {"url": "https://mcp.dedaluslabs.ai/acme/my-server/mcp"}
+type MCPServerParam struct {
+	// Marketplace slug.
+	Slug param.Field[string] `json:"slug"`
+	// Direct URL to MCP server endpoint.
+	URL param.Field[string] `json:"url"`
+	// Version constraint for slug-based servers.
+	Version param.Field[string] `json:"version"`
+}
+
+func (r MCPServerParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r MCPServerParam) ImplementsMCPServerInputUnionParam() {}
+
+func (r MCPServerParam) ImplementsChatCompletionNewParamsMCPServersUnion() {}
+
+type MCPServersParam []MCPServerInputUnionParam
+
+func (r MCPServersParam) ImplementsChatCompletionNewParamsMCPServersUnion() {}
+
 // JSON object response format. An older method of generating JSON responses. Using
 // `json_schema` is recommended for models that support it. Note that the model
 // will not generate JSON without a system or user message instructing it to do so.

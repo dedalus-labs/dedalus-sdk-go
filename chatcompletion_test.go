@@ -64,7 +64,7 @@ func TestChatCompletionNewWithOptionalParams(t *testing.T) {
 		MaxCompletionTokens: githubcomdedaluslabsdedalussdkgo.F(int64(0)),
 		MaxTokens:           githubcomdedaluslabsdedalussdkgo.F(int64(1)),
 		MaxTurns:            githubcomdedaluslabsdedalussdkgo.F(int64(5)),
-		MCPServers:          githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMCPServersUnion](githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMCPServersArray([]string{"dedalus-labs/brave-search"})),
+		MCPServers:          githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMCPServersUnion](shared.UnionString("dedalus-labs/example-server")),
 		Messages: githubcomdedaluslabsdedalussdkgo.F([]githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessageUnion{githubcomdedaluslabsdedalussdkgo.ChatCompletionDeveloperMessageParam{
 			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionDeveloperMessageParamContentUnion](shared.UnionString("string")),
 			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionDeveloperMessageParamRoleDeveloper),

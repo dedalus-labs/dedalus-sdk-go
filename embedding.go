@@ -47,9 +47,12 @@ func (r *EmbeddingService) New(ctx context.Context, body EmbeddingNewParams, opt
 //
 // Fields:
 //
-//   - input (required): str | Annotated[list[str], MinLen(1), MaxLen(2048)] |
-//     Annotated[list[int], MinLen(1), MaxLen(2048)] |
-//     Annotated[list[Annotated[list[int], MinLen(1)]], MinLen(1), MaxLen(2048)]
+//   - input (required): str | Annotated[list[str], MinLen(1), MaxLen(2048),
+//     ArrayTitle("CreateEmbeddingRequestInputArray")] | Annotated[list[int],
+//     MinLen(1), MaxLen(2048), ArrayTitle("CreateEmbeddingRequestInputArray")] |
+//     Annotated[list[Annotated[list[int], MinLen(1),
+//     ArrayTitle("CreateEmbeddingRequestInputItemArray")]], MinLen(1), MaxLen(2048),
+//     ArrayTitle("CreateEmbeddingRequestInputArray")]
 //   - model (required): str | Literal["text-embedding-ada-002",
 //     "text-embedding-3-small", "text-embedding-3-large"]
 //   - encoding_format (optional): Literal["float", "base64"]
@@ -98,16 +101,18 @@ func (r CreateEmbeddingRequestParam) MarshalJSON() (data []byte, err error) {
 // models enforce a maximum of 300,000 tokens summed across all inputs in a single
 // request.
 //
-// Satisfied by [shared.UnionString], [CreateEmbeddingRequestInputArrayParam],
-// [CreateEmbeddingRequestInputArrayParam],
-// [CreateEmbeddingRequestInputArrayParam].
+// Satisfied by [shared.UnionString],
+// [CreateEmbeddingRequestInputCreateEmbeddingRequestInputArrayParam],
+// [CreateEmbeddingRequestInputCreateEmbeddingRequestInputArrayParam],
+// [CreateEmbeddingRequestInputCreateEmbeddingRequestInputArrayParam].
 type CreateEmbeddingRequestInputUnionParam interface {
 	ImplementsCreateEmbeddingRequestInputUnionParam()
 }
 
-type CreateEmbeddingRequestInputArrayParam []string
+type CreateEmbeddingRequestInputCreateEmbeddingRequestInputArrayParam []string
 
-func (r CreateEmbeddingRequestInputArrayParam) ImplementsCreateEmbeddingRequestInputUnionParam() {}
+func (r CreateEmbeddingRequestInputCreateEmbeddingRequestInputArrayParam) ImplementsCreateEmbeddingRequestInputUnionParam() {
+}
 
 // ID of the model to use. You can use the
 // [List models](https://platform.openai.com/docs/api-reference/models/list) API to
@@ -271,9 +276,12 @@ type EmbeddingNewParams struct {
 	//
 	// Fields:
 	//
-	//   - input (required): str | Annotated[list[str], MinLen(1), MaxLen(2048)] |
-	//     Annotated[list[int], MinLen(1), MaxLen(2048)] |
-	//     Annotated[list[Annotated[list[int], MinLen(1)]], MinLen(1), MaxLen(2048)]
+	//   - input (required): str | Annotated[list[str], MinLen(1), MaxLen(2048),
+	//     ArrayTitle("CreateEmbeddingRequestInputArray")] | Annotated[list[int],
+	//     MinLen(1), MaxLen(2048), ArrayTitle("CreateEmbeddingRequestInputArray")] |
+	//     Annotated[list[Annotated[list[int], MinLen(1),
+	//     ArrayTitle("CreateEmbeddingRequestInputItemArray")]], MinLen(1), MaxLen(2048),
+	//     ArrayTitle("CreateEmbeddingRequestInputArray")]
 	//   - model (required): str | Literal["text-embedding-ada-002",
 	//     "text-embedding-3-small", "text-embedding-3-large"]
 	//   - encoding_format (optional): Literal["float", "base64"]
