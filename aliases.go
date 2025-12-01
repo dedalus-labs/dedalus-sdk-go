@@ -66,6 +66,24 @@ type FunctionDefinitionParam = shared.FunctionDefinitionParam
 // This is an alias to an internal type.
 type FunctionParameters = shared.FunctionParameters
 
+// Single MCP server input: slug string or structured MCPServerParam.
+//
+// This is an alias to an internal type.
+type MCPServerInputUnionParam = shared.MCPServerInputUnionParam
+
+// Structured MCP server parameter.
+//
+// Slug-based: {"slug": "dedalus-labs/brave-search", "version": "v1.0.0"}
+// URL-based: {"url": "https://mcp.dedaluslabs.ai/acme/my-server/mcp"}
+//
+// This is an alias to an internal type.
+type MCPServerParam = shared.MCPServerParam
+
+// List of MCP server inputs.
+//
+// This is an alias to an internal type.
+type MCPServersParam = shared.MCPServersParam
+
 // JSON object response format. An older method of generating JSON responses. Using
 // `json_schema` is recommended for models that support it. Note that the model
 // will not generate JSON without a system or user message instructing it to do so.

@@ -6,6 +6,7 @@ type UnionString string
 
 func (UnionString) ImplementsDedalusModelSettingsStopUnionParam()              {}
 func (UnionString) ImplementsDedalusModelChoiceUnionParam()                    {}
+func (UnionString) ImplementsMCPServerInputUnionParam()                        {}
 func (UnionString) ImplementsCreateEmbeddingRequestInputUnionParam()           {}
 func (UnionString) ImplementsCreateEmbeddingResponseDataEmbeddingUnion()       {}
 func (UnionString) ImplementsChatCompletionAssistantMessageParamContentUnion() {}
