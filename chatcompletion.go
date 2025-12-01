@@ -87,7 +87,7 @@ func NewChatCompletionService(opts ...option.RequestOption) (r *ChatCompletionSe
 // data: {"id":"cmpl_123","choices":[{"index":0,"delta":{"content":"Hi"}}]} data:
 // {"id":"cmpl_123","choices":[{"index":0,"delta":{"content":" there!"}}]} data:
 // [DONE]
-func (r *ChatCompletionService) New(ctx context.Context, body ChatCompletionNewParams, opts ...option.RequestOption) (res *Completion, err error) {
+func (r *ChatCompletionService) New(ctx context.Context, body ChatCompletionNewParams, opts ...option.RequestOption) (res *ChatCompletion, err error) {
 	opts = slices.Concat(r.Options, opts)
 	path := "v1/chat/completions"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
@@ -145,7 +145,7 @@ func (r *ChatCompletionService) New(ctx context.Context, body ChatCompletionNewP
 // data: {"id":"cmpl_123","choices":[{"index":0,"delta":{"content":"Hi"}}]} data:
 // {"id":"cmpl_123","choices":[{"index":0,"delta":{"content":" there!"}}]} data:
 // [DONE]
-func (r *ChatCompletionService) NewStreaming(ctx context.Context, body ChatCompletionNewParams, opts ...option.RequestOption) (stream *ssestream.Stream[StreamChunk]) {
+func (r *ChatCompletionService) NewStreaming(ctx context.Context, body ChatCompletionNewParams, opts ...option.RequestOption) (stream *ssestream.Stream[ChatCompletionChunk]) {
 	var (
 		raw *http.Response
 		err error
@@ -154,7 +154,7 @@ func (r *ChatCompletionService) NewStreaming(ctx context.Context, body ChatCompl
 	opts = append([]option.RequestOption{option.WithJSONSet("stream", true)}, opts...)
 	path := "v1/chat/completions"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &raw, opts...)
-	return ssestream.NewStream[StreamChunk](ssestream.NewDecoder(raw), err)
+	return ssestream.NewStream[ChatCompletionChunk](ssestream.NewDecoder(raw), err)
 }
 
 // A URL citation when using web search.
@@ -197,6 +197,131 @@ const (
 func (r AnnotationType) IsKnown() bool {
 	switch r {
 	case AnnotationTypeURLCitation:
+		return true
+	}
+	return false
+}
+
+// Chat completion response for Dedalus API.
+//
+// OpenAI-compatible chat completion response with Dedalus extensions. Maintains
+// full compatibility with OpenAI API while providing additional features like
+// server-side tool execution tracking and MCP error reporting.
+type ChatCompletion struct {
+	// A unique identifier for the chat completion.
+	ID string `json:"id,required"`
+	// A list of chat completion choices. Can be more than one if `n` is greater
+	// than 1.
+	Choices []Choice `json:"choices,required"`
+	// The Unix timestamp (in seconds) of when the chat completion was created.
+	Created int64 `json:"created,required"`
+	// The model used for the chat completion.
+	Model string `json:"model,required"`
+	// The object type, which is always `chat.completion`.
+	Object ChatCompletionObject `json:"object,required"`
+	// Information about MCP server failures, if any occurred during the request.
+	// Contains details about which servers failed and why, along with recommendations
+	// for the user. Only present when MCP server failures occurred.
+	MCPServerErrors map[string]interface{} `json:"mcp_server_errors,nullable"`
+	// Specifies the processing type used for serving the request.
+	//
+	//   - If set to 'auto', then the request will be processed with the service tier
+	//     configured in the Project settings. Unless otherwise configured, the Project
+	//     will use 'default'.
+	//   - If set to 'default', then the request will be processed with the standard
+	//     pricing and performance for the selected model.
+	//   - If set to '[flex](https://platform.openai.com/docs/guides/flex-processing)' or
+	//     '[priority](https://openai.com/api-priority-processing/)', then the request
+	//     will be processed with the corresponding service tier.
+	//   - When not set, the default behavior is 'auto'.
+	//
+	// When the `service_tier` parameter is set, the response body will include the
+	// `service_tier` value based on the processing mode actually used to serve the
+	// request. This response value may be different from the value set in the
+	// parameter.
+	ServiceTier ChatCompletionServiceTier `json:"service_tier,nullable"`
+	// This fingerprint represents the backend configuration that the model runs with.
+	//
+	// Can be used in conjunction with the `seed` request parameter to understand when
+	// backend changes have been made that might impact determinism.
+	SystemFingerprint string `json:"system_fingerprint"`
+	// List of tool names that were executed server-side (e.g., MCP tools). Only
+	// present when tools were executed on the server rather than returned for
+	// client-side execution.
+	ToolsExecuted []string `json:"tools_executed,nullable"`
+	// Usage statistics for the completion request.
+	Usage CompletionUsage    `json:"usage"`
+	JSON  chatCompletionJSON `json:"-"`
+}
+
+// chatCompletionJSON contains the JSON metadata for the struct [ChatCompletion]
+type chatCompletionJSON struct {
+	ID                apijson.Field
+	Choices           apijson.Field
+	Created           apijson.Field
+	Model             apijson.Field
+	Object            apijson.Field
+	MCPServerErrors   apijson.Field
+	ServiceTier       apijson.Field
+	SystemFingerprint apijson.Field
+	ToolsExecuted     apijson.Field
+	Usage             apijson.Field
+	raw               string
+	ExtraFields       map[string]apijson.Field
+}
+
+func (r *ChatCompletion) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r chatCompletionJSON) RawJSON() string {
+	return r.raw
+}
+
+// The object type, which is always `chat.completion`.
+type ChatCompletionObject string
+
+const (
+	ChatCompletionObjectChatCompletion ChatCompletionObject = "chat.completion"
+)
+
+func (r ChatCompletionObject) IsKnown() bool {
+	switch r {
+	case ChatCompletionObjectChatCompletion:
+		return true
+	}
+	return false
+}
+
+// Specifies the processing type used for serving the request.
+//
+//   - If set to 'auto', then the request will be processed with the service tier
+//     configured in the Project settings. Unless otherwise configured, the Project
+//     will use 'default'.
+//   - If set to 'default', then the request will be processed with the standard
+//     pricing and performance for the selected model.
+//   - If set to '[flex](https://platform.openai.com/docs/guides/flex-processing)' or
+//     '[priority](https://openai.com/api-priority-processing/)', then the request
+//     will be processed with the corresponding service tier.
+//   - When not set, the default behavior is 'auto'.
+//
+// When the `service_tier` parameter is set, the response body will include the
+// `service_tier` value based on the processing mode actually used to serve the
+// request. This response value may be different from the value set in the
+// parameter.
+type ChatCompletionServiceTier string
+
+const (
+	ChatCompletionServiceTierAuto     ChatCompletionServiceTier = "auto"
+	ChatCompletionServiceTierDefault  ChatCompletionServiceTier = "default"
+	ChatCompletionServiceTierFlex     ChatCompletionServiceTier = "flex"
+	ChatCompletionServiceTierScale    ChatCompletionServiceTier = "scale"
+	ChatCompletionServiceTierPriority ChatCompletionServiceTier = "priority"
+)
+
+func (r ChatCompletionServiceTier) IsKnown() bool {
+	switch r {
+	case ChatCompletionServiceTierAuto, ChatCompletionServiceTierDefault, ChatCompletionServiceTierFlex, ChatCompletionServiceTierScale, ChatCompletionServiceTierPriority:
 		return true
 	}
 	return false
@@ -367,9 +492,10 @@ type ChatCompletionAssistantMessageParamToolCall struct {
 	// The ID of the tool call.
 	ID param.Field[string] `json:"id,required"`
 	// The type of the tool. Currently, only `function` is supported.
-	Type     param.Field[ChatCompletionAssistantMessageParamToolCallsType] `json:"type,required"`
-	Custom   param.Field[interface{}]                                      `json:"custom"`
-	Function param.Field[interface{}]                                      `json:"function"`
+	Type   param.Field[ChatCompletionAssistantMessageParamToolCallsType] `json:"type,required"`
+	Custom param.Field[interface{}]                                      `json:"custom"`
+	// The function that the model called.
+	Function param.Field[ChoiceDeltaToolCallFunctionParam] `json:"function"`
 }
 
 func (r ChatCompletionAssistantMessageParamToolCall) MarshalJSON() (data []byte, err error) {
@@ -406,7 +532,7 @@ type ChatCompletionAssistantMessageParamToolCallsChatCompletionMessageToolCallIn
 	// The ID of the tool call.
 	ID param.Field[string] `json:"id,required"`
 	// The function that the model called.
-	Function param.Field[ChatCompletionAssistantMessageParamToolCallsChatCompletionMessageToolCallInputFunction] `json:"function,required"`
+	Function param.Field[ChoiceDeltaToolCallFunctionParam] `json:"function,required"`
 	// The type of the tool. Currently, only `function` is supported.
 	Type param.Field[ChatCompletionAssistantMessageParamToolCallsChatCompletionMessageToolCallInputType] `json:"type,required"`
 }
@@ -416,21 +542,6 @@ func (r ChatCompletionAssistantMessageParamToolCallsChatCompletionMessageToolCal
 }
 
 func (r ChatCompletionAssistantMessageParamToolCallsChatCompletionMessageToolCallInput) implementsChatCompletionAssistantMessageParamToolCallsUnion() {
-}
-
-// The function that the model called.
-type ChatCompletionAssistantMessageParamToolCallsChatCompletionMessageToolCallInputFunction struct {
-	// The arguments to call the function with, as generated by the model in JSON
-	// format. Note that the model does not always generate valid JSON, and may
-	// hallucinate parameters not defined by your function schema. Validate the
-	// arguments in your code before calling your function.
-	Arguments param.Field[string] `json:"arguments,required"`
-	// The name of the function to call.
-	Name param.Field[string] `json:"name,required"`
-}
-
-func (r ChatCompletionAssistantMessageParamToolCallsChatCompletionMessageToolCallInputFunction) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
 }
 
 // The type of the tool. Currently, only `function` is supported.
@@ -570,6 +681,245 @@ type ChatCompletionAudioParam struct {
 
 func (r ChatCompletionAudioParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
+}
+
+// Represents a streamed chunk of a chat completion response returned by the model,
+// based on the provided input.
+// [Learn more](https://platform.openai.com/docs/guides/streaming-responses).
+//
+// Fields:
+//
+// - id (required): str
+// - choices (required): list[ChoicesItem]
+// - created (required): int
+// - model (required): str
+// - service_tier (optional): ServiceTier
+// - system_fingerprint (optional): str
+// - object (required): Literal["chat.completion.chunk"]
+// - usage (optional): CompletionUsage
+type ChatCompletionChunk struct {
+	// A unique identifier for the chat completion. Each chunk has the same ID.
+	ID string `json:"id,required"`
+	// A list of chat completion choices. Can contain more than one elements if `n` is
+	// greater than 1. Can also be empty for the last chunk if you set
+	// `stream_options: {"include_usage": true}`.
+	Choices []ChatCompletionChunkChoice `json:"choices,required"`
+	// The Unix timestamp (in seconds) of when the chat completion was created. Each
+	// chunk has the same timestamp.
+	Created int64 `json:"created,required"`
+	// The model to generate the completion.
+	Model string `json:"model,required"`
+	// The object type, which is always `chat.completion.chunk`.
+	Object ChatCompletionChunkObject `json:"object,required"`
+	// Specifies the processing type used for serving the request.
+	//
+	//   - If set to 'auto', then the request will be processed with the service tier
+	//     configured in the Project settings. Unless otherwise configured, the Project
+	//     will use 'default'.
+	//   - If set to 'default', then the request will be processed with the standard
+	//     pricing and performance for the selected model.
+	//   - If set to '[flex](https://platform.openai.com/docs/guides/flex-processing)' or
+	//     '[priority](https://openai.com/api-priority-processing/)', then the request
+	//     will be processed with the corresponding service tier.
+	//   - When not set, the default behavior is 'auto'.
+	//
+	// When the `service_tier` parameter is set, the response body will include the
+	// `service_tier` value based on the processing mode actually used to serve the
+	// request. This response value may be different from the value set in the
+	// parameter.
+	ServiceTier ChatCompletionChunkServiceTier `json:"service_tier,nullable"`
+	// This fingerprint represents the backend configuration that the model runs with.
+	// Can be used in conjunction with the `seed` request parameter to understand when
+	// backend changes have been made that might impact determinism.
+	SystemFingerprint string `json:"system_fingerprint"`
+	// Usage statistics for the completion request.
+	//
+	// Fields:
+	//
+	// - completion_tokens (required): int
+	// - prompt_tokens (required): int
+	// - total_tokens (required): int
+	// - completion_tokens_details (optional): CompletionTokensDetails
+	// - prompt_tokens_details (optional): PromptTokensDetails
+	Usage CompletionUsage         `json:"usage,nullable"`
+	JSON  chatCompletionChunkJSON `json:"-"`
+}
+
+// chatCompletionChunkJSON contains the JSON metadata for the struct
+// [ChatCompletionChunk]
+type chatCompletionChunkJSON struct {
+	ID                apijson.Field
+	Choices           apijson.Field
+	Created           apijson.Field
+	Model             apijson.Field
+	Object            apijson.Field
+	ServiceTier       apijson.Field
+	SystemFingerprint apijson.Field
+	Usage             apijson.Field
+	raw               string
+	ExtraFields       map[string]apijson.Field
+}
+
+func (r *ChatCompletionChunk) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r chatCompletionChunkJSON) RawJSON() string {
+	return r.raw
+}
+
+// Schema for ChoicesItem.
+//
+// Fields:
+//
+//   - delta (required): ChatCompletionStreamResponseDelta
+//   - logprobs (optional): Logprobs
+//   - finish_reason (required): Literal["stop", "length", "tool_calls",
+//     "content_filter", "function_call"]
+//   - index (required): int
+type ChatCompletionChunkChoice struct {
+	// A chat completion delta generated by streamed model responses.
+	Delta ChoiceDelta `json:"delta,required"`
+	// The reason the model stopped generating tokens. This will be `stop` if the model
+	// hit a natural stop point or a provided stop sequence, `length` if the maximum
+	// number of tokens specified in the request was reached, `content_filter` if
+	// content was omitted due to a flag from our content filters, `tool_calls` if the
+	// model called a tool, or `function_call` (deprecated) if the model called a
+	// function.
+	FinishReason ChatCompletionChunkChoicesFinishReason `json:"finish_reason,required"`
+	// The index of the choice in the list of choices.
+	Index int64 `json:"index,required"`
+	// Log probability information for the choice.
+	//
+	// Fields:
+	//
+	// - content (required): list[ChatCompletionTokenLogprob]
+	// - refusal (required): list[ChatCompletionTokenLogprob]
+	Logprobs ChatCompletionChunkChoicesLogprobs `json:"logprobs,nullable"`
+	JSON     chatCompletionChunkChoiceJSON      `json:"-"`
+}
+
+// chatCompletionChunkChoiceJSON contains the JSON metadata for the struct
+// [ChatCompletionChunkChoice]
+type chatCompletionChunkChoiceJSON struct {
+	Delta        apijson.Field
+	FinishReason apijson.Field
+	Index        apijson.Field
+	Logprobs     apijson.Field
+	raw          string
+	ExtraFields  map[string]apijson.Field
+}
+
+func (r *ChatCompletionChunkChoice) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r chatCompletionChunkChoiceJSON) RawJSON() string {
+	return r.raw
+}
+
+// The reason the model stopped generating tokens. This will be `stop` if the model
+// hit a natural stop point or a provided stop sequence, `length` if the maximum
+// number of tokens specified in the request was reached, `content_filter` if
+// content was omitted due to a flag from our content filters, `tool_calls` if the
+// model called a tool, or `function_call` (deprecated) if the model called a
+// function.
+type ChatCompletionChunkChoicesFinishReason string
+
+const (
+	ChatCompletionChunkChoicesFinishReasonStop          ChatCompletionChunkChoicesFinishReason = "stop"
+	ChatCompletionChunkChoicesFinishReasonLength        ChatCompletionChunkChoicesFinishReason = "length"
+	ChatCompletionChunkChoicesFinishReasonToolCalls     ChatCompletionChunkChoicesFinishReason = "tool_calls"
+	ChatCompletionChunkChoicesFinishReasonContentFilter ChatCompletionChunkChoicesFinishReason = "content_filter"
+	ChatCompletionChunkChoicesFinishReasonFunctionCall  ChatCompletionChunkChoicesFinishReason = "function_call"
+)
+
+func (r ChatCompletionChunkChoicesFinishReason) IsKnown() bool {
+	switch r {
+	case ChatCompletionChunkChoicesFinishReasonStop, ChatCompletionChunkChoicesFinishReasonLength, ChatCompletionChunkChoicesFinishReasonToolCalls, ChatCompletionChunkChoicesFinishReasonContentFilter, ChatCompletionChunkChoicesFinishReasonFunctionCall:
+		return true
+	}
+	return false
+}
+
+// Log probability information for the choice.
+//
+// Fields:
+//
+// - content (required): list[ChatCompletionTokenLogprob]
+// - refusal (required): list[ChatCompletionTokenLogprob]
+type ChatCompletionChunkChoicesLogprobs struct {
+	// A list of message content tokens with log probability information.
+	Content []ChatCompletionTokenLogprob `json:"content,required"`
+	// A list of message refusal tokens with log probability information.
+	Refusal []ChatCompletionTokenLogprob           `json:"refusal,required"`
+	JSON    chatCompletionChunkChoicesLogprobsJSON `json:"-"`
+}
+
+// chatCompletionChunkChoicesLogprobsJSON contains the JSON metadata for the struct
+// [ChatCompletionChunkChoicesLogprobs]
+type chatCompletionChunkChoicesLogprobsJSON struct {
+	Content     apijson.Field
+	Refusal     apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *ChatCompletionChunkChoicesLogprobs) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r chatCompletionChunkChoicesLogprobsJSON) RawJSON() string {
+	return r.raw
+}
+
+// The object type, which is always `chat.completion.chunk`.
+type ChatCompletionChunkObject string
+
+const (
+	ChatCompletionChunkObjectChatCompletionChunk ChatCompletionChunkObject = "chat.completion.chunk"
+)
+
+func (r ChatCompletionChunkObject) IsKnown() bool {
+	switch r {
+	case ChatCompletionChunkObjectChatCompletionChunk:
+		return true
+	}
+	return false
+}
+
+// Specifies the processing type used for serving the request.
+//
+//   - If set to 'auto', then the request will be processed with the service tier
+//     configured in the Project settings. Unless otherwise configured, the Project
+//     will use 'default'.
+//   - If set to 'default', then the request will be processed with the standard
+//     pricing and performance for the selected model.
+//   - If set to '[flex](https://platform.openai.com/docs/guides/flex-processing)' or
+//     '[priority](https://openai.com/api-priority-processing/)', then the request
+//     will be processed with the corresponding service tier.
+//   - When not set, the default behavior is 'auto'.
+//
+// When the `service_tier` parameter is set, the response body will include the
+// `service_tier` value based on the processing mode actually used to serve the
+// request. This response value may be different from the value set in the
+// parameter.
+type ChatCompletionChunkServiceTier string
+
+const (
+	ChatCompletionChunkServiceTierAuto     ChatCompletionChunkServiceTier = "auto"
+	ChatCompletionChunkServiceTierDefault  ChatCompletionChunkServiceTier = "default"
+	ChatCompletionChunkServiceTierFlex     ChatCompletionChunkServiceTier = "flex"
+	ChatCompletionChunkServiceTierScale    ChatCompletionChunkServiceTier = "scale"
+	ChatCompletionChunkServiceTierPriority ChatCompletionChunkServiceTier = "priority"
+)
+
+func (r ChatCompletionChunkServiceTier) IsKnown() bool {
+	switch r {
+	case ChatCompletionChunkServiceTierAuto, ChatCompletionChunkServiceTierDefault, ChatCompletionChunkServiceTierFlex, ChatCompletionChunkServiceTierScale, ChatCompletionChunkServiceTierPriority:
+		return true
+	}
+	return false
 }
 
 // Learn about [audio inputs](https://platform.openai.com/docs/guides/audio).
@@ -1569,14 +1919,27 @@ func (r ChoiceFinishReason) IsKnown() bool {
 	return false
 }
 
+// A chat completion delta generated by streamed model responses.
+//
+// Fields:
+//
+// - content (optional): str | None
+// - function_call (optional): FunctionCall
+// - tool_calls (optional): list[ChatCompletionMessageToolCallChunk]
+// - role (optional): Literal["developer", "system", "user", "assistant", "tool"]
+// - refusal (optional): str | None
 type ChoiceDelta struct {
-	Content      string                  `json:"content,nullable"`
-	FunctionCall ChoiceDeltaFunctionCall `json:"function_call,nullable"`
-	Refusal      string                  `json:"refusal,nullable"`
-	Role         ChoiceDeltaRole         `json:"role,nullable"`
-	ToolCalls    []ChoiceDeltaToolCall   `json:"tool_calls,nullable"`
-	ExtraFields  map[string]interface{}  `json:"-,extras"`
-	JSON         choiceDeltaJSON         `json:"-"`
+	// The contents of the chunk message.
+	Content string `json:"content,nullable"`
+	// Deprecated and replaced by `tool_calls`. The name and arguments of a function
+	// that should be called, as generated by the model.
+	FunctionCall FunctionCall `json:"function_call"`
+	// The refusal message generated by the model.
+	Refusal string `json:"refusal,nullable"`
+	// The role of the author of this message.
+	Role      ChoiceDeltaRole       `json:"role"`
+	ToolCalls []ChoiceDeltaToolCall `json:"tool_calls"`
+	JSON      choiceDeltaJSON       `json:"-"`
 }
 
 // choiceDeltaJSON contains the JSON metadata for the struct [ChoiceDelta]
@@ -1598,6 +1961,7 @@ func (r choiceDeltaJSON) RawJSON() string {
 	return r.raw
 }
 
+// The role of the author of this message.
 type ChoiceDeltaRole string
 
 const (
@@ -1616,37 +1980,28 @@ func (r ChoiceDeltaRole) IsKnown() bool {
 	return false
 }
 
-type ChoiceDeltaFunctionCall struct {
-	Arguments   string                      `json:"arguments,nullable"`
-	Name        string                      `json:"name,nullable"`
-	ExtraFields map[string]interface{}      `json:"-,extras"`
-	JSON        choiceDeltaFunctionCallJSON `json:"-"`
-}
-
-// choiceDeltaFunctionCallJSON contains the JSON metadata for the struct
-// [ChoiceDeltaFunctionCall]
-type choiceDeltaFunctionCallJSON struct {
-	Arguments   apijson.Field
-	Name        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ChoiceDeltaFunctionCall) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r choiceDeltaFunctionCallJSON) RawJSON() string {
-	return r.raw
-}
-
+// Schema for ChatCompletionMessageToolCallChunk.
+//
+// Fields:
+//
+// - index (required): int
+// - id (optional): str
+// - type (optional): Literal["function"]
+// - function (optional): Function
 type ChoiceDeltaToolCall struct {
-	Index       int64                       `json:"index,required"`
-	ID          string                      `json:"id,nullable"`
-	Function    ChoiceDeltaToolCallFunction `json:"function,nullable"`
-	Type        ChoiceDeltaToolCallType     `json:"type,nullable"`
-	ExtraFields map[string]interface{}      `json:"-,extras"`
-	JSON        choiceDeltaToolCallJSON     `json:"-"`
+	Index int64 `json:"index,required"`
+	// The ID of the tool call.
+	ID string `json:"id"`
+	// The function that the model called.
+	//
+	// Fields:
+	//
+	// - name (required): str
+	// - arguments (required): str
+	Function Function `json:"function"`
+	// The type of the tool. Currently, only `function` is supported.
+	Type ChoiceDeltaToolCallType `json:"type"`
+	JSON choiceDeltaToolCallJSON `json:"-"`
 }
 
 // choiceDeltaToolCallJSON contains the JSON metadata for the struct
@@ -1668,6 +2023,7 @@ func (r choiceDeltaToolCallJSON) RawJSON() string {
 	return r.raw
 }
 
+// The type of the tool. Currently, only `function` is supported.
 type ChoiceDeltaToolCallType string
 
 const (
@@ -1682,28 +2038,24 @@ func (r ChoiceDeltaToolCallType) IsKnown() bool {
 	return false
 }
 
-type ChoiceDeltaToolCallFunction struct {
-	Arguments   string                          `json:"arguments,nullable"`
-	Name        string                          `json:"name,nullable"`
-	ExtraFields map[string]interface{}          `json:"-,extras"`
-	JSON        choiceDeltaToolCallFunctionJSON `json:"-"`
+// The function that the model called.
+//
+// Fields:
+//
+// - name (required): str
+// - arguments (required): str
+type ChoiceDeltaToolCallFunctionParam struct {
+	// The arguments to call the function with, as generated by the model in JSON
+	// format. Note that the model does not always generate valid JSON, and may
+	// hallucinate parameters not defined by your function schema. Validate the
+	// arguments in your code before calling your function.
+	Arguments param.Field[string] `json:"arguments,required"`
+	// The name of the function to call.
+	Name param.Field[string] `json:"name,required"`
 }
 
-// choiceDeltaToolCallFunctionJSON contains the JSON metadata for the struct
-// [ChoiceDeltaToolCallFunction]
-type choiceDeltaToolCallFunctionJSON struct {
-	Arguments   apijson.Field
-	Name        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ChoiceDeltaToolCallFunction) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r choiceDeltaToolCallFunctionJSON) RawJSON() string {
-	return r.raw
+func (r ChoiceDeltaToolCallFunctionParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
 }
 
 // Log probability information for the choice.
@@ -1729,184 +2081,6 @@ func (r *ChoiceLogprobs) UnmarshalJSON(data []byte) (err error) {
 
 func (r choiceLogprobsJSON) RawJSON() string {
 	return r.raw
-}
-
-// A streaming chat completion choice chunk.
-//
-// OpenAI-compatible choice object for streaming responses. Part of the
-// ChatCompletionChunk response in SSE streams.
-type ChunkChoice struct {
-	// Delta content for streaming responses
-	Delta ChoiceDelta `json:"delta,required"`
-	// The index of this choice in the list of choices
-	Index int64 `json:"index,required"`
-	// The reason the model stopped (only in final chunk)
-	FinishReason ChunkChoiceFinishReason `json:"finish_reason,nullable"`
-	// Log probability information for the choice.
-	Logprobs ChoiceLogprobs  `json:"logprobs,nullable"`
-	JSON     chunkChoiceJSON `json:"-"`
-}
-
-// chunkChoiceJSON contains the JSON metadata for the struct [ChunkChoice]
-type chunkChoiceJSON struct {
-	Delta        apijson.Field
-	Index        apijson.Field
-	FinishReason apijson.Field
-	Logprobs     apijson.Field
-	raw          string
-	ExtraFields  map[string]apijson.Field
-}
-
-func (r *ChunkChoice) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r chunkChoiceJSON) RawJSON() string {
-	return r.raw
-}
-
-// The reason the model stopped (only in final chunk)
-type ChunkChoiceFinishReason string
-
-const (
-	ChunkChoiceFinishReasonStop          ChunkChoiceFinishReason = "stop"
-	ChunkChoiceFinishReasonLength        ChunkChoiceFinishReason = "length"
-	ChunkChoiceFinishReasonToolCalls     ChunkChoiceFinishReason = "tool_calls"
-	ChunkChoiceFinishReasonContentFilter ChunkChoiceFinishReason = "content_filter"
-	ChunkChoiceFinishReasonFunctionCall  ChunkChoiceFinishReason = "function_call"
-)
-
-func (r ChunkChoiceFinishReason) IsKnown() bool {
-	switch r {
-	case ChunkChoiceFinishReasonStop, ChunkChoiceFinishReasonLength, ChunkChoiceFinishReasonToolCalls, ChunkChoiceFinishReasonContentFilter, ChunkChoiceFinishReasonFunctionCall:
-		return true
-	}
-	return false
-}
-
-// Chat completion response for Dedalus API.
-//
-// OpenAI-compatible chat completion response with Dedalus extensions. Maintains
-// full compatibility with OpenAI API while providing additional features like
-// server-side tool execution tracking and MCP error reporting.
-type Completion struct {
-	// A unique identifier for the chat completion.
-	ID string `json:"id,required"`
-	// A list of chat completion choices. Can be more than one if `n` is greater
-	// than 1.
-	Choices []Choice `json:"choices,required"`
-	// The Unix timestamp (in seconds) of when the chat completion was created.
-	Created int64 `json:"created,required"`
-	// The model used for the chat completion.
-	Model string `json:"model,required"`
-	// The object type, which is always `chat.completion`.
-	Object CompletionObject `json:"object,required"`
-	// Information about MCP server failures, if any occurred during the request.
-	// Contains details about which servers failed and why, along with recommendations
-	// for the user. Only present when MCP server failures occurred.
-	MCPServerErrors map[string]interface{} `json:"mcp_server_errors,nullable"`
-	// Specifies the processing type used for serving the request.
-	//
-	//   - If set to 'auto', then the request will be processed with the service tier
-	//     configured in the Project settings. Unless otherwise configured, the Project
-	//     will use 'default'.
-	//   - If set to 'default', then the request will be processed with the standard
-	//     pricing and performance for the selected model.
-	//   - If set to '[flex](https://platform.openai.com/docs/guides/flex-processing)' or
-	//     '[priority](https://openai.com/api-priority-processing/)', then the request
-	//     will be processed with the corresponding service tier.
-	//   - When not set, the default behavior is 'auto'.
-	//
-	// When the `service_tier` parameter is set, the response body will include the
-	// `service_tier` value based on the processing mode actually used to serve the
-	// request. This response value may be different from the value set in the
-	// parameter.
-	ServiceTier CompletionServiceTier `json:"service_tier,nullable"`
-	// This fingerprint represents the backend configuration that the model runs with.
-	//
-	// Can be used in conjunction with the `seed` request parameter to understand when
-	// backend changes have been made that might impact determinism.
-	SystemFingerprint string `json:"system_fingerprint"`
-	// List of tool names that were executed server-side (e.g., MCP tools). Only
-	// present when tools were executed on the server rather than returned for
-	// client-side execution.
-	ToolsExecuted []string `json:"tools_executed,nullable"`
-	// Usage statistics for the completion request.
-	Usage CompletionUsage `json:"usage"`
-	JSON  completionJSON  `json:"-"`
-}
-
-// completionJSON contains the JSON metadata for the struct [Completion]
-type completionJSON struct {
-	ID                apijson.Field
-	Choices           apijson.Field
-	Created           apijson.Field
-	Model             apijson.Field
-	Object            apijson.Field
-	MCPServerErrors   apijson.Field
-	ServiceTier       apijson.Field
-	SystemFingerprint apijson.Field
-	ToolsExecuted     apijson.Field
-	Usage             apijson.Field
-	raw               string
-	ExtraFields       map[string]apijson.Field
-}
-
-func (r *Completion) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r completionJSON) RawJSON() string {
-	return r.raw
-}
-
-// The object type, which is always `chat.completion`.
-type CompletionObject string
-
-const (
-	CompletionObjectChatCompletion CompletionObject = "chat.completion"
-)
-
-func (r CompletionObject) IsKnown() bool {
-	switch r {
-	case CompletionObjectChatCompletion:
-		return true
-	}
-	return false
-}
-
-// Specifies the processing type used for serving the request.
-//
-//   - If set to 'auto', then the request will be processed with the service tier
-//     configured in the Project settings. Unless otherwise configured, the Project
-//     will use 'default'.
-//   - If set to 'default', then the request will be processed with the standard
-//     pricing and performance for the selected model.
-//   - If set to '[flex](https://platform.openai.com/docs/guides/flex-processing)' or
-//     '[priority](https://openai.com/api-priority-processing/)', then the request
-//     will be processed with the corresponding service tier.
-//   - When not set, the default behavior is 'auto'.
-//
-// When the `service_tier` parameter is set, the response body will include the
-// `service_tier` value based on the processing mode actually used to serve the
-// request. This response value may be different from the value set in the
-// parameter.
-type CompletionServiceTier string
-
-const (
-	CompletionServiceTierAuto     CompletionServiceTier = "auto"
-	CompletionServiceTierDefault  CompletionServiceTier = "default"
-	CompletionServiceTierFlex     CompletionServiceTier = "flex"
-	CompletionServiceTierScale    CompletionServiceTier = "scale"
-	CompletionServiceTierPriority CompletionServiceTier = "priority"
-)
-
-func (r CompletionServiceTier) IsKnown() bool {
-	switch r {
-	case CompletionServiceTierAuto, CompletionServiceTierDefault, CompletionServiceTierFlex, CompletionServiceTierScale, CompletionServiceTierPriority:
-		return true
-	}
-	return false
 }
 
 // Breakdown of tokens used in a completion.
@@ -2262,91 +2436,6 @@ const (
 func (r ReasoningSummary) IsKnown() bool {
 	switch r {
 	case ReasoningSummaryAuto, ReasoningSummaryConcise, ReasoningSummaryDetailed:
-		return true
-	}
-	return false
-}
-
-// Server-Sent Event streaming format for chat completions
-type StreamChunk struct {
-	// Unique identifier for the chat completion
-	ID string `json:"id,required"`
-	// List of completion choice chunks
-	Choices []ChunkChoice `json:"choices,required"`
-	// Unix timestamp when the chunk was created
-	Created int64 `json:"created,required"`
-	// ID of the model used for the completion
-	Model string `json:"model,required"`
-	// Object type, always 'chat.completion.chunk'
-	Object StreamChunkObject `json:"object"`
-	// Service tier used for processing the request
-	ServiceTier StreamChunkServiceTier `json:"service_tier,nullable"`
-	// System fingerprint representing backend configuration
-	SystemFingerprint string `json:"system_fingerprint,nullable"`
-	// Usage statistics for the completion request.
-	//
-	// Fields:
-	//
-	// - completion_tokens (required): int
-	// - prompt_tokens (required): int
-	// - total_tokens (required): int
-	// - completion_tokens_details (optional): CompletionTokensDetails
-	// - prompt_tokens_details (optional): PromptTokensDetails
-	Usage CompletionUsage `json:"usage,nullable"`
-	JSON  streamChunkJSON `json:"-"`
-}
-
-// streamChunkJSON contains the JSON metadata for the struct [StreamChunk]
-type streamChunkJSON struct {
-	ID                apijson.Field
-	Choices           apijson.Field
-	Created           apijson.Field
-	Model             apijson.Field
-	Object            apijson.Field
-	ServiceTier       apijson.Field
-	SystemFingerprint apijson.Field
-	Usage             apijson.Field
-	raw               string
-	ExtraFields       map[string]apijson.Field
-}
-
-func (r *StreamChunk) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r streamChunkJSON) RawJSON() string {
-	return r.raw
-}
-
-// Object type, always 'chat.completion.chunk'
-type StreamChunkObject string
-
-const (
-	StreamChunkObjectChatCompletionChunk StreamChunkObject = "chat.completion.chunk"
-)
-
-func (r StreamChunkObject) IsKnown() bool {
-	switch r {
-	case StreamChunkObjectChatCompletionChunk:
-		return true
-	}
-	return false
-}
-
-// Service tier used for processing the request
-type StreamChunkServiceTier string
-
-const (
-	StreamChunkServiceTierAuto     StreamChunkServiceTier = "auto"
-	StreamChunkServiceTierDefault  StreamChunkServiceTier = "default"
-	StreamChunkServiceTierFlex     StreamChunkServiceTier = "flex"
-	StreamChunkServiceTierScale    StreamChunkServiceTier = "scale"
-	StreamChunkServiceTierPriority StreamChunkServiceTier = "priority"
-)
-
-func (r StreamChunkServiceTier) IsKnown() bool {
-	switch r {
-	case StreamChunkServiceTierAuto, StreamChunkServiceTierDefault, StreamChunkServiceTierFlex, StreamChunkServiceTierScale, StreamChunkServiceTierPriority:
 		return true
 	}
 	return false

@@ -53,7 +53,7 @@ func main() {
 	client := githubcomdedaluslabsdedalussdkgo.NewClient(
 		option.WithAPIKey("My API Key"), // defaults to os.LookupEnv("DEDALUS_API_KEY")
 	)
-	completion, err := client.Chat.Completions.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
+	chatCompletion, err := client.Chat.Completions.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
 		Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-5-nano")),
 		Messages: githubcomdedaluslabsdedalussdkgo.F([]githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessageUnion{githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParam{
 			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamRoleSystem),
@@ -66,7 +66,7 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
-	fmt.Printf("%+v\n", completion.ID)
+	fmt.Printf("%+v\n", chatCompletion.ID)
 }
 
 ```
@@ -308,7 +308,7 @@ you need to examine response headers, status codes, or other details.
 ```go
 // Create a variable to store the HTTP response
 var response *http.Response
-completion, err := client.Chat.Completions.New(
+chatCompletion, err := client.Chat.Completions.New(
 	context.TODO(),
 	githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
 		Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-5-nano")),
@@ -325,7 +325,7 @@ completion, err := client.Chat.Completions.New(
 if err != nil {
 	// handle error
 }
-fmt.Printf("%+v\n", completion)
+fmt.Printf("%+v\n", chatCompletion)
 
 fmt.Printf("Status Code: %d\n", response.StatusCode)
 fmt.Printf("Headers: %+#v\n", response.Header)
