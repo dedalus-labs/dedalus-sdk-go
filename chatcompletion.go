@@ -488,6 +488,7 @@ func (r ChatCompletionAssistantMessageParamFunctionCall) MarshalJSON() (data []b
 // - id (required): str
 // - type (required): Literal["function"]
 // - function (required): ChatCompletionMessageToolCallFunction
+// - thought_signature (optional): str
 type ChatCompletionAssistantMessageParamToolCall struct {
 	// The ID of the tool call.
 	ID param.Field[string] `json:"id,required"`
@@ -496,6 +497,9 @@ type ChatCompletionAssistantMessageParamToolCall struct {
 	Custom param.Field[interface{}]                                      `json:"custom"`
 	// The function that the model called.
 	Function param.Field[ChoiceDeltaToolCallFunctionParam] `json:"function"`
+	// Opaque signature for thought continuity in multi-turn tool use (Google-specific,
+	// base64 encoded)
+	ThoughtSignature param.Field[string] `json:"thought_signature"`
 }
 
 func (r ChatCompletionAssistantMessageParamToolCall) MarshalJSON() (data []byte, err error) {
@@ -512,6 +516,7 @@ func (r ChatCompletionAssistantMessageParamToolCall) implementsChatCompletionAss
 // - id (required): str
 // - type (required): Literal["function"]
 // - function (required): ChatCompletionMessageToolCallFunction
+// - thought_signature (optional): str
 //
 // Satisfied by
 // [ChatCompletionAssistantMessageParamToolCallsChatCompletionMessageToolCallInput],
@@ -528,6 +533,7 @@ type ChatCompletionAssistantMessageParamToolCallsUnion interface {
 // - id (required): str
 // - type (required): Literal["function"]
 // - function (required): ChatCompletionMessageToolCallFunction
+// - thought_signature (optional): str
 type ChatCompletionAssistantMessageParamToolCallsChatCompletionMessageToolCallInput struct {
 	// The ID of the tool call.
 	ID param.Field[string] `json:"id,required"`
@@ -535,6 +541,9 @@ type ChatCompletionAssistantMessageParamToolCallsChatCompletionMessageToolCallIn
 	Function param.Field[ChoiceDeltaToolCallFunctionParam] `json:"function,required"`
 	// The type of the tool. Currently, only `function` is supported.
 	Type param.Field[ChatCompletionAssistantMessageParamToolCallsChatCompletionMessageToolCallInputType] `json:"type,required"`
+	// Opaque signature for thought continuity in multi-turn tool use (Google-specific,
+	// base64 encoded)
+	ThoughtSignature param.Field[string] `json:"thought_signature"`
 }
 
 func (r ChatCompletionAssistantMessageParamToolCallsChatCompletionMessageToolCallInput) MarshalJSON() (data []byte, err error) {
@@ -1412,6 +1421,7 @@ func (r ChatCompletionMessageRole) IsKnown() bool {
 // - id (required): str
 // - type (required): Literal["function"]
 // - function (required): Function
+// - thought_signature (optional): str
 type ChatCompletionMessageToolCall struct {
 	// The ID of the tool call.
 	ID string `json:"id,required"`
@@ -1420,20 +1430,24 @@ type ChatCompletionMessageToolCall struct {
 	// The custom tool that the model called.
 	Custom Custom `json:"custom"`
 	// The function that the model called.
-	Function Function                          `json:"function"`
-	JSON     chatCompletionMessageToolCallJSON `json:"-"`
-	union    ChatCompletionMessageToolCallsUnion
+	Function Function `json:"function"`
+	// Opaque signature for thought continuity in multi-turn tool use (Google-specific,
+	// base64 encoded)
+	ThoughtSignature string                            `json:"thought_signature,nullable"`
+	JSON             chatCompletionMessageToolCallJSON `json:"-"`
+	union            ChatCompletionMessageToolCallsUnion
 }
 
 // chatCompletionMessageToolCallJSON contains the JSON metadata for the struct
 // [ChatCompletionMessageToolCall]
 type chatCompletionMessageToolCallJSON struct {
-	ID          apijson.Field
-	Type        apijson.Field
-	Custom      apijson.Field
-	Function    apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
+	ID               apijson.Field
+	Type             apijson.Field
+	Custom           apijson.Field
+	Function         apijson.Field
+	ThoughtSignature apijson.Field
+	raw              string
+	ExtraFields      map[string]apijson.Field
 }
 
 func (r chatCompletionMessageToolCallJSON) RawJSON() string {
@@ -1465,6 +1479,7 @@ func (r ChatCompletionMessageToolCall) AsUnion() ChatCompletionMessageToolCallsU
 // - id (required): str
 // - type (required): Literal["function"]
 // - function (required): Function
+// - thought_signature (optional): str
 //
 // Union satisfied by [ChatCompletionMessageToolCall] or
 // [ChatCompletionMessageCustomToolCall].
