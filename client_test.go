@@ -14,6 +14,7 @@ import (
 	"github.com/dedalus-labs/dedalus-sdk-go"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal"
 	"github.com/dedalus-labs/dedalus-sdk-go/option"
+	"github.com/dedalus-labs/dedalus-sdk-go/shared"
 )
 
 type closureTransport struct {
@@ -39,7 +40,16 @@ func TestUserAgentHeader(t *testing.T) {
 			},
 		}),
 	)
-	client.Health.Check(context.Background())
+	client.Chat.Completions.New(context.Background(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
+		Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-5-nano")),
+		Messages: githubcomdedaluslabsdedalussdkgo.F([]githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessageUnion{githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParam{
+			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamRoleSystem),
+			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamContentUnion](shared.UnionString("You are Stephen Dedalus. Respond in morose Joycean malaise.")),
+		}, githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParam{
+			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamRoleUser),
+			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamContentUnion](shared.UnionString("Hello, how are you today?")),
+		}}),
+	})
 	if userAgent != fmt.Sprintf("Dedalus/Go %s", internal.PackageVersion) {
 		t.Errorf("Expected User-Agent to be correct, but got: %#v", userAgent)
 	}
@@ -63,7 +73,16 @@ func TestRetryAfter(t *testing.T) {
 			},
 		}),
 	)
-	_, err := client.Health.Check(context.Background())
+	_, err := client.Chat.Completions.New(context.Background(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
+		Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-5-nano")),
+		Messages: githubcomdedaluslabsdedalussdkgo.F([]githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessageUnion{githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParam{
+			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamRoleSystem),
+			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamContentUnion](shared.UnionString("You are Stephen Dedalus. Respond in morose Joycean malaise.")),
+		}, githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParam{
+			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamRoleUser),
+			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamContentUnion](shared.UnionString("Hello, how are you today?")),
+		}}),
+	})
 	if err == nil {
 		t.Error("Expected there to be a cancel error")
 	}
@@ -98,7 +117,16 @@ func TestDeleteRetryCountHeader(t *testing.T) {
 		}),
 		option.WithHeaderDel("X-Stainless-Retry-Count"),
 	)
-	_, err := client.Health.Check(context.Background())
+	_, err := client.Chat.Completions.New(context.Background(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
+		Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-5-nano")),
+		Messages: githubcomdedaluslabsdedalussdkgo.F([]githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessageUnion{githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParam{
+			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamRoleSystem),
+			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamContentUnion](shared.UnionString("You are Stephen Dedalus. Respond in morose Joycean malaise.")),
+		}, githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParam{
+			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamRoleUser),
+			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamContentUnion](shared.UnionString("Hello, how are you today?")),
+		}}),
+	})
 	if err == nil {
 		t.Error("Expected there to be a cancel error")
 	}
@@ -128,7 +156,16 @@ func TestOverwriteRetryCountHeader(t *testing.T) {
 		}),
 		option.WithHeader("X-Stainless-Retry-Count", "42"),
 	)
-	_, err := client.Health.Check(context.Background())
+	_, err := client.Chat.Completions.New(context.Background(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
+		Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-5-nano")),
+		Messages: githubcomdedaluslabsdedalussdkgo.F([]githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessageUnion{githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParam{
+			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamRoleSystem),
+			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamContentUnion](shared.UnionString("You are Stephen Dedalus. Respond in morose Joycean malaise.")),
+		}, githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParam{
+			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamRoleUser),
+			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamContentUnion](shared.UnionString("Hello, how are you today?")),
+		}}),
+	})
 	if err == nil {
 		t.Error("Expected there to be a cancel error")
 	}
@@ -157,7 +194,16 @@ func TestRetryAfterMs(t *testing.T) {
 			},
 		}),
 	)
-	_, err := client.Health.Check(context.Background())
+	_, err := client.Chat.Completions.New(context.Background(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
+		Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-5-nano")),
+		Messages: githubcomdedaluslabsdedalussdkgo.F([]githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessageUnion{githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParam{
+			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamRoleSystem),
+			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamContentUnion](shared.UnionString("You are Stephen Dedalus. Respond in morose Joycean malaise.")),
+		}, githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParam{
+			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamRoleUser),
+			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamContentUnion](shared.UnionString("Hello, how are you today?")),
+		}}),
+	})
 	if err == nil {
 		t.Error("Expected there to be a cancel error")
 	}
@@ -180,7 +226,16 @@ func TestContextCancel(t *testing.T) {
 	)
 	cancelCtx, cancel := context.WithCancel(context.Background())
 	cancel()
-	_, err := client.Health.Check(cancelCtx)
+	_, err := client.Chat.Completions.New(cancelCtx, githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
+		Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-5-nano")),
+		Messages: githubcomdedaluslabsdedalussdkgo.F([]githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessageUnion{githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParam{
+			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamRoleSystem),
+			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamContentUnion](shared.UnionString("You are Stephen Dedalus. Respond in morose Joycean malaise.")),
+		}, githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParam{
+			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamRoleUser),
+			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamContentUnion](shared.UnionString("Hello, how are you today?")),
+		}}),
+	})
 	if err == nil {
 		t.Error("Expected there to be a cancel error")
 	}
@@ -200,7 +255,16 @@ func TestContextCancelDelay(t *testing.T) {
 	)
 	cancelCtx, cancel := context.WithTimeout(context.Background(), 2*time.Millisecond)
 	defer cancel()
-	_, err := client.Health.Check(cancelCtx)
+	_, err := client.Chat.Completions.New(cancelCtx, githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
+		Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-5-nano")),
+		Messages: githubcomdedaluslabsdedalussdkgo.F([]githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessageUnion{githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParam{
+			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamRoleSystem),
+			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamContentUnion](shared.UnionString("You are Stephen Dedalus. Respond in morose Joycean malaise.")),
+		}, githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParam{
+			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamRoleUser),
+			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamContentUnion](shared.UnionString("Hello, how are you today?")),
+		}}),
+	})
 	if err == nil {
 		t.Error("expected there to be a cancel error")
 	}
@@ -226,7 +290,16 @@ func TestContextDeadline(t *testing.T) {
 				},
 			}),
 		)
-		_, err := client.Health.Check(deadlineCtx)
+		_, err := client.Chat.Completions.New(deadlineCtx, githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
+			Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-5-nano")),
+			Messages: githubcomdedaluslabsdedalussdkgo.F([]githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessageUnion{githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParam{
+				Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamRoleSystem),
+				Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamContentUnion](shared.UnionString("You are Stephen Dedalus. Respond in morose Joycean malaise.")),
+			}, githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParam{
+				Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamRoleUser),
+				Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamContentUnion](shared.UnionString("Hello, how are you today?")),
+			}}),
+		})
 		if err == nil {
 			t.Error("expected there to be a deadline error")
 		}
@@ -272,15 +345,7 @@ func TestContextDeadlineStreaming(t *testing.T) {
 			}),
 		)
 		stream := client.Chat.Completions.NewStreaming(deadlineCtx, githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
-			Messages: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesUnion{
-				OfMapOfAnyMap: []map[string]any{{
-					"content": "bar",
-					"role":    "bar",
-				}},
-			},
-			Model: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion{
-				OfModelID: githubcomdedaluslabsdedalussdkgo.String("openai/gpt-4"),
-			},
+			Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-5")),
 		})
 		for stream.Next() {
 			_ = stream.Current()
@@ -329,15 +394,7 @@ func TestContextDeadlineStreamingWithRequestTimeout(t *testing.T) {
 		stream := client.Chat.Completions.NewStreaming(
 			context.Background(),
 			githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
-				Messages: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesUnion{
-					OfMapOfAnyMap: []map[string]any{{
-						"content": "bar",
-						"role":    "bar",
-					}},
-				},
-				Model: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion{
-					OfModelID: githubcomdedaluslabsdedalussdkgo.String("openai/gpt-4"),
-				},
+				Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-5")),
 			},
 			option.WithRequestTimeout((100 * time.Millisecond)),
 		)

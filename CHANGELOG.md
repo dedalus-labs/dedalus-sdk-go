@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.1.0-alpha.4 (2025-12-05)
+
+Full Changelog: [v0.1.0-alpha.3...v0.1.0-alpha.4](https://github.com/dedalus-labs/dedalus-sdk-go/compare/v0.1.0-alpha.3...v0.1.0-alpha.4)
+
+### Features
+
+* **api:** config update for dedalus-ai/dev ([af41fea](https://github.com/dedalus-labs/dedalus-sdk-go/commit/af41fea3fa08b1c8c0595ae7346c0c525be5ae24))
+* **api:** config update for dedalus-ai/dev ([d240153](https://github.com/dedalus-labs/dedalus-sdk-go/commit/d240153d2233d17c0cd9a1407e4a15b8e2816528))
+* **api:** improve types ([981e302](https://github.com/dedalus-labs/dedalus-sdk-go/commit/981e302628d2adcf5448289b7834746f142c1b26))
+* **api:** mcp server params ([3417509](https://github.com/dedalus-labs/dedalus-sdk-go/commit/34175093b827bf28d333fccc6b46d233a5a375d0))
+* **api:** messages param nullable ([4408331](https://github.com/dedalus-labs/dedalus-sdk-go/commit/4408331c403387ad0b0e944dcc4141e1d5c3eafa))
+* **api:** response format ([87661ed](https://github.com/dedalus-labs/dedalus-sdk-go/commit/87661ede914cd98aeeacb141a533292623beedc6))
+* **api:** schema compiler landed ([77a9162](https://github.com/dedalus-labs/dedalus-sdk-go/commit/77a9162eacfa2f4aedfd3cc9a144c0a85fcac482))
+* **api:** standardize name casing with stainless initialism ([4291ed2](https://github.com/dedalus-labs/dedalus-sdk-go/commit/4291ed2e093ed660295f87992eec81bf5479012f))
+
+
+### Bug Fixes
+
+* **api:** add thought signature ([3320501](https://github.com/dedalus-labs/dedalus-sdk-go/commit/3320501ff18f520c131398a789e424f6540d185e))
+* **mcp:** correct code tool API endpoint ([10eac06](https://github.com/dedalus-labs/dedalus-sdk-go/commit/10eac06866c6bc23286992a33ed20cd0f5b27cb7))
+* rename param to avoid collision ([9dfa024](https://github.com/dedalus-labs/dedalus-sdk-go/commit/9dfa024195bd09e018fc929d28872d3605f9a0a3))
+
+
+### Chores
+
+* **api:** migrate pkg manager to uv ([a3152f2](https://github.com/dedalus-labs/dedalus-sdk-go/commit/a3152f2f36b47e8ddf3a219e67a8516fe34ee384))
+* bump gjson version ([aef2b2d](https://github.com/dedalus-labs/dedalus-sdk-go/commit/aef2b2de5b5d9c540c15313b88dc98a6118a2ed0))
+* elide duplicate aliases ([45e32df](https://github.com/dedalus-labs/dedalus-sdk-go/commit/45e32df175a4c4c25cc6a443bc7ca7de1946a99f))
+* **internal:** codegen related update ([99a5aae](https://github.com/dedalus-labs/dedalus-sdk-go/commit/99a5aae0ad7f6fd85d5f865094570038ca9eb9dd))
+
 ## 0.1.0-alpha.3 (2025-11-08)
 
 Full Changelog: [v0.1.0-alpha.2...v0.1.0-alpha.3](https://github.com/dedalus-labs/dedalus-sdk-go/compare/v0.1.0-alpha.2...v0.1.0-alpha.3)
