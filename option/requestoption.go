@@ -266,6 +266,13 @@ func WithEnvironmentProduction() RequestOption {
 	return requestconfig.WithDefaultBaseURL("https://api.dedaluslabs.ai/")
 }
 
+// WithEnvironmentDevelopment returns a RequestOption that sets the current
+// environment to be the "development" environment. An environment specifies which base URL
+// to use by default.
+func WithEnvironmentDevelopment() RequestOption {
+	return requestconfig.WithDefaultBaseURL("http://localhost:4010/")
+}
+
 // WithAPIKey returns a RequestOption that sets the client setting "api_key".
 func WithAPIKey(value string) RequestOption {
 	return requestconfig.RequestOptionFunc(func(r *requestconfig.RequestConfig) error {
