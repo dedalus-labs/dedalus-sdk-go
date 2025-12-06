@@ -169,6 +169,12 @@ type MCPServerInputUnionParam interface {
 // Slug-based: {"slug": "dedalus-labs/brave-search", "version": "v1.0.0"}
 // URL-based: {"url": "https://mcp.dedaluslabs.ai/acme/my-server/mcp"}
 type MCPServerParam struct {
+	// Connection name for credential matching. Must match a key in the client's
+	// credentials list.
+	Connection param.Field[string] `json:"connection"`
+	// Schema declaring what credentials are needed. Maps field names to their bindings
+	// (e.g., env var names).
+	Credentials param.Field[map[string]MCPServerParamCredentialsUnion] `json:"credentials"`
 	// Marketplace slug.
 	Slug param.Field[string] `json:"slug"`
 	// Direct URL to MCP server endpoint.
@@ -184,6 +190,36 @@ func (r MCPServerParam) MarshalJSON() (data []byte, err error) {
 func (r MCPServerParam) ImplementsMCPServerInputUnionParam() {}
 
 func (r MCPServerParam) ImplementsChatCompletionNewParamsMCPServersUnion() {}
+
+// Detailed credential binding with options.
+//
+// Used when a binding needs default values, optional flags, or type casting.
+//
+// Satisfied by [shared.UnionString],
+// [shared.MCPServerParamCredentialsBindingSpec].
+type MCPServerParamCredentialsUnion interface {
+	ImplementsMCPServerParamCredentialsUnion()
+}
+
+// Detailed credential binding with options.
+//
+// Used when a binding needs default values, optional flags, or type casting.
+type MCPServerParamCredentialsBindingSpec struct {
+	// Environment variable name or source identifier.
+	Name param.Field[string] `json:"name,required"`
+	// Type to cast value to (e.g., 'int', 'bool').
+	Cast param.Field[string] `json:"cast"`
+	// Default value if source not set.
+	Default param.Field[interface{}] `json:"default"`
+	// If true, missing value is allowed.
+	Optional param.Field[bool] `json:"optional"`
+}
+
+func (r MCPServerParamCredentialsBindingSpec) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r MCPServerParamCredentialsBindingSpec) ImplementsMCPServerParamCredentialsUnion() {}
 
 type MCPServersParam []MCPServerInputUnionParam
 
