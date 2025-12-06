@@ -79,6 +79,20 @@ type MCPServerInputUnionParam = shared.MCPServerInputUnionParam
 // This is an alias to an internal type.
 type MCPServerParam = shared.MCPServerParam
 
+// Detailed credential binding with options.
+//
+// Used when a binding needs default values, optional flags, or type casting.
+//
+// This is an alias to an internal type.
+type MCPServerParamCredentialsUnion = shared.MCPServerParamCredentialsUnion
+
+// Detailed credential binding with options.
+//
+// Used when a binding needs default values, optional flags, or type casting.
+//
+// This is an alias to an internal type.
+type MCPServerParamCredentialsBindingSpec = shared.MCPServerParamCredentialsBindingSpec
+
 // List of MCP server inputs.
 //
 // This is an alias to an internal type.
