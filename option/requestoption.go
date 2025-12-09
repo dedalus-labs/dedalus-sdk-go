@@ -289,6 +289,14 @@ func WithXAPIKey(value string) RequestOption {
 	})
 }
 
+// WithAsBaseURL returns a RequestOption that sets the client setting "as_base_url".
+func WithAsBaseURL(value string) RequestOption {
+	return requestconfig.RequestOptionFunc(func(r *requestconfig.RequestConfig) error {
+		r.AsBaseURL = value
+		return nil
+	})
+}
+
 // WithOrganization returns a RequestOption that sets the client setting "organization".
 func WithOrganization(value string) RequestOption {
 	return requestconfig.RequestOptionFunc(func(r *requestconfig.RequestConfig) error {

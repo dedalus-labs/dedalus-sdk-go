@@ -103,11 +103,10 @@ func TestChatCompletionNewWithOptionalParams(t *testing.T) {
 		SearchParameters: githubcomdedaluslabsdedalussdkgo.F(map[string]interface{}{
 			"foo": "bar",
 		}),
-		Seed:          githubcomdedaluslabsdedalussdkgo.F(int64(0)),
-		ServiceTier:   githubcomdedaluslabsdedalussdkgo.F("service_tier"),
-		Stop:          githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsStopUnion](githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsStopArray([]string{"string"})),
-		StopSequences: githubcomdedaluslabsdedalussdkgo.F([]string{"string"}),
-		Store:         githubcomdedaluslabsdedalussdkgo.F(true),
+		Seed:        githubcomdedaluslabsdedalussdkgo.F(int64(0)),
+		ServiceTier: githubcomdedaluslabsdedalussdkgo.F("service_tier"),
+		Stop:        githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsStopUnion](githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsStopArray([]string{"string"})),
+		Store:       githubcomdedaluslabsdedalussdkgo.F(true),
 		StreamOptions: githubcomdedaluslabsdedalussdkgo.F(map[string]interface{}{
 			"foo": "bar",
 		}),
