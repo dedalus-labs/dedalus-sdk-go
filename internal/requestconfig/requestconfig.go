@@ -223,6 +223,7 @@ type RequestConfig struct {
 	Middlewares    []middleware
 	APIKey         string
 	XAPIKey        string
+	AsBaseURL      string
 	Organization   string
 	Provider       string
 	ProviderKey    string
@@ -600,6 +601,7 @@ func (cfg *RequestConfig) Clone(ctx context.Context) *RequestConfig {
 		Middlewares:    cfg.Middlewares,
 		APIKey:         cfg.APIKey,
 		XAPIKey:        cfg.XAPIKey,
+		AsBaseURL:      cfg.AsBaseURL,
 		Organization:   cfg.Organization,
 		Provider:       cfg.Provider,
 		ProviderKey:    cfg.ProviderKey,

@@ -66,32 +66,32 @@ type FunctionDefinitionParam = shared.FunctionDefinitionParam
 // This is an alias to an internal type.
 type FunctionParameters = shared.FunctionParameters
 
-// Single MCP server input: slug string or structured MCPServerParam.
+// Single MCP server input: slug string or structured MCPServerSpec.
 //
 // This is an alias to an internal type.
 type MCPServerInputUnionParam = shared.MCPServerInputUnionParam
 
-// Structured MCP server parameter.
+// Structured MCP server specification.
 //
 // Slug-based: {"slug": "dedalus-labs/brave-search", "version": "v1.0.0"}
 // URL-based: {"url": "https://mcp.dedaluslabs.ai/acme/my-server/mcp"}
 //
 // This is an alias to an internal type.
-type MCPServerParam = shared.MCPServerParam
+type MCPServerSpecParam = shared.MCPServerSpecParam
 
 // Detailed credential binding with options.
 //
 // Used when a binding needs default values, optional flags, or type casting.
 //
 // This is an alias to an internal type.
-type MCPServerParamCredentialsUnion = shared.MCPServerParamCredentialsUnion
+type MCPServerSpecCredentialsUnionParam = shared.MCPServerSpecCredentialsUnionParam
 
 // Detailed credential binding with options.
 //
 // Used when a binding needs default values, optional flags, or type casting.
 //
 // This is an alias to an internal type.
-type MCPServerParamCredentialsBindingSpec = shared.MCPServerParamCredentialsBindingSpec
+type MCPServerSpecCredentialsBindingSpecParam = shared.MCPServerSpecCredentialsBindingSpecParam
 
 // List of MCP server inputs.
 //

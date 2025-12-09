@@ -2808,7 +2808,7 @@ type ChatCompletionNewParams struct {
 	MaxTokens param.Field[int64] `json:"max_tokens"`
 	// Maximum conversation turns.
 	MaxTurns param.Field[int64] `json:"max_turns"`
-	// MCP server identifiers. Accepts marketplace slugs, URLs, or MCPServerParam
+	// MCP server identifiers. Accepts marketplace slugs, URLs, or MCPServerSpec
 	// objects. MCP tools are executed server-side and billed separately.
 	MCPServers param.Field[ChatCompletionNewParamsMCPServersUnion] `json:"mcp_servers"`
 	// Conversation history (OpenAI: messages, Google: contents, Responses: input)
@@ -2858,10 +2858,8 @@ type ChatCompletionNewParams struct {
 	Seed param.Field[int64] `json:"seed"`
 	// Service tier for request processing
 	ServiceTier param.Field[string] `json:"service_tier"`
-	// Not supported with latest reasoning models `o3` and `o4-mini`. Up to 4 seque...
+	// Sequences that stop generation
 	Stop param.Field[ChatCompletionNewParamsStopUnion] `json:"stop"`
-	// Custom text sequences that will cause the model to stop generating. Our mode...
-	StopSequences param.Field[[]string] `json:"stop_sequences"`
 	// Whether or not to store the output of this chat completion request for use in...
 	Store param.Field[bool] `json:"store"`
 	// Options for streaming response. Only set this when you set `stream: true`.
@@ -2909,10 +2907,10 @@ type ChatCompletionNewParamsModelArray []shared.DedalusModelChoiceUnionParam
 
 func (r ChatCompletionNewParamsModelArray) ImplementsChatCompletionNewParamsModelUnion() {}
 
-// MCP server identifiers. Accepts marketplace slugs, URLs, or MCPServerParam
+// MCP server identifiers. Accepts marketplace slugs, URLs, or MCPServerSpec
 // objects. MCP tools are executed server-side and billed separately.
 //
-// Satisfied by [shared.UnionString], [shared.MCPServerParam],
+// Satisfied by [shared.UnionString], [shared.MCPServerSpecParam],
 // [shared.MCPServersParam].
 type ChatCompletionNewParamsMCPServersUnion interface {
 	ImplementsChatCompletionNewParamsMCPServersUnion()
@@ -3120,7 +3118,7 @@ func (r ChatCompletionNewParamsSafetySettingsThreshold) IsKnown() bool {
 	return false
 }
 
-// Not supported with latest reasoning models `o3` and `o4-mini`. Up to 4 seque...
+// Sequences that stop generation
 //
 // Satisfied by [ChatCompletionNewParamsStopArray], [shared.UnionString].
 type ChatCompletionNewParamsStopUnion interface {
