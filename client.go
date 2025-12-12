@@ -43,7 +43,7 @@ func DefaultClientOptions() []option.RequestOption {
 		defaults = append(defaults, option.WithAsBaseURL(o))
 	}
 	if o, ok := os.LookupEnv("DEDALUS_ORG_ID"); ok {
-		defaults = append(defaults, option.WithOrganization(o))
+		defaults = append(defaults, option.WithDedalusOrgID(o))
 	}
 	if o, ok := os.LookupEnv("DEDALUS_PROVIDER"); ok {
 		defaults = append(defaults, option.WithProvider(o))

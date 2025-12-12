@@ -8,6 +8,33 @@ import (
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/param"
 )
 
+// Detailed credential binding with options.
+//
+// Used when a binding needs default values, optional flags, or type casting.
+type CredentialsBindingSpecParam struct {
+	// Environment variable name or source identifier.
+	Name param.Field[string] `json:"name,required"`
+	// Type to cast value to (e.g., 'int', 'bool').
+	Cast param.Field[string] `json:"cast"`
+	// Default value if source not set.
+	Default param.Field[CredentialsBindingSpecDefaultUnionParam] `json:"default"`
+	// If true, missing value is allowed.
+	Optional param.Field[bool] `json:"optional"`
+}
+
+func (r CredentialsBindingSpecParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r CredentialsBindingSpecParam) ImplementsMCPServerSpecCredentialsUnionParam() {}
+
+// Default value if source not set.
+//
+// Satisfied by [shared.UnionString], [shared.UnionInt], [shared.UnionBool].
+type CredentialsBindingSpecDefaultUnionParam interface {
+	ImplementsCredentialsBindingSpecDefaultUnionParam()
+}
+
 // Structured model selection entry used in request payloads.
 //
 // Supports OpenAI-style semantics (string model id) while enabling optional
@@ -175,9 +202,8 @@ type MCPServerSpecParam struct {
 	// Schema declaring what credentials are needed. Maps field names to their bindings
 	// (e.g., env var names).
 	Credentials param.Field[map[string]MCPServerSpecCredentialsUnionParam] `json:"credentials"`
-	// Client-encrypted credential values. Maps connection names to encrypted envelopes
-	// (base64url JWE). SDK encrypts credentials client-side using the enclave's public
-	// key from authorization server.
+	// Client-encrypted credential values. Maps connection names to encrypted
+	// envelopes.
 	EncryptedCredentials param.Field[map[string]string] `json:"encrypted_credentials"`
 	// Marketplace slug.
 	Slug param.Field[string] `json:"slug"`
@@ -199,31 +225,10 @@ func (r MCPServerSpecParam) ImplementsChatCompletionNewParamsMCPServersUnion() {
 //
 // Used when a binding needs default values, optional flags, or type casting.
 //
-// Satisfied by [shared.UnionString],
-// [shared.MCPServerSpecCredentialsBindingSpecParam].
+// Satisfied by [shared.UnionString], [shared.CredentialsBindingSpecParam].
 type MCPServerSpecCredentialsUnionParam interface {
 	ImplementsMCPServerSpecCredentialsUnionParam()
 }
-
-// Detailed credential binding with options.
-//
-// Used when a binding needs default values, optional flags, or type casting.
-type MCPServerSpecCredentialsBindingSpecParam struct {
-	// Environment variable name or source identifier.
-	Name param.Field[string] `json:"name,required"`
-	// Type to cast value to (e.g., 'int', 'bool').
-	Cast param.Field[string] `json:"cast"`
-	// Default value if source not set.
-	Default param.Field[interface{}] `json:"default"`
-	// If true, missing value is allowed.
-	Optional param.Field[bool] `json:"optional"`
-}
-
-func (r MCPServerSpecCredentialsBindingSpecParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r MCPServerSpecCredentialsBindingSpecParam) ImplementsMCPServerSpecCredentialsUnionParam() {}
 
 type MCPServersParam []MCPServerInputUnionParam
 

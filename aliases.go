@@ -9,6 +9,18 @@ import (
 
 type Error = apierror.Error
 
+// Detailed credential binding with options.
+//
+// Used when a binding needs default values, optional flags, or type casting.
+//
+// This is an alias to an internal type.
+type CredentialsBindingSpecParam = shared.CredentialsBindingSpecParam
+
+// Default value if source not set.
+//
+// This is an alias to an internal type.
+type CredentialsBindingSpecDefaultUnionParam = shared.CredentialsBindingSpecDefaultUnionParam
+
 // Structured model selection entry used in request payloads.
 //
 // Supports OpenAI-style semantics (string model id) while enabling optional
@@ -85,13 +97,6 @@ type MCPServerSpecParam = shared.MCPServerSpecParam
 //
 // This is an alias to an internal type.
 type MCPServerSpecCredentialsUnionParam = shared.MCPServerSpecCredentialsUnionParam
-
-// Detailed credential binding with options.
-//
-// Used when a binding needs default values, optional flags, or type casting.
-//
-// This is an alias to an internal type.
-type MCPServerSpecCredentialsBindingSpecParam = shared.MCPServerSpecCredentialsBindingSpecParam
 
 // List of MCP server inputs.
 //
