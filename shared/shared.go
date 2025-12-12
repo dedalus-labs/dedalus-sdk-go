@@ -8,6 +8,29 @@ import (
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/param"
 )
 
+// Credential for MCP server authentication.
+//
+// Passed at endpoint level (e.g., chat.completions.create) and matched to MCP
+// servers by connection name. Wire format matches
+// dedalus_mcp.Credential.to_dict().
+type CredentialParam struct {
+	// Connection name. Must match an MCPServerSpec's connection field.
+	ConnectionName param.Field[string] `json:"connection_name,required"`
+	// Credential values. Keys are credential field names, values are the secrets.
+	Values param.Field[map[string]CredentialValuesUnionParam] `json:"values,required"`
+}
+
+func (r CredentialParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r CredentialParam) ImplementsChatCompletionNewParamsCredentialsUnion() {}
+
+// Satisfied by [shared.UnionString], [shared.UnionInt], [shared.UnionBool].
+type CredentialValuesUnionParam interface {
+	ImplementsCredentialValuesUnionParam()
+}
+
 // Detailed credential binding with options.
 //
 // Used when a binding needs default values, optional flags, or type casting.
@@ -183,6 +206,10 @@ func (r FunctionDefinitionParam) MarshalJSON() (data []byte, err error) {
 }
 
 type FunctionParameters map[string]interface{}
+
+type MCPCredentialsParam []CredentialParam
+
+func (r MCPCredentialsParam) ImplementsChatCompletionNewParamsCredentialsUnion() {}
 
 // Single MCP server input: slug string or structured MCPServerSpec.
 //

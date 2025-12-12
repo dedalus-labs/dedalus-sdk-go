@@ -9,6 +9,18 @@ import (
 
 type Error = apierror.Error
 
+// Credential for MCP server authentication.
+//
+// Passed at endpoint level (e.g., chat.completions.create) and matched to MCP
+// servers by connection name. Wire format matches
+// dedalus_mcp.Credential.to_dict().
+//
+// This is an alias to an internal type.
+type CredentialParam = shared.CredentialParam
+
+// This is an alias to an internal type.
+type CredentialValuesUnionParam = shared.CredentialValuesUnionParam
+
 // Detailed credential binding with options.
 //
 // Used when a binding needs default values, optional flags, or type casting.
@@ -77,6 +89,11 @@ type FunctionDefinitionParam = shared.FunctionDefinitionParam
 //
 // This is an alias to an internal type.
 type FunctionParameters = shared.FunctionParameters
+
+// List of credentials for MCP server authentication.
+//
+// This is an alias to an internal type.
+type MCPCredentialsParam = shared.MCPCredentialsParam
 
 // Single MCP server input: slug string or structured MCPServerSpec.
 //

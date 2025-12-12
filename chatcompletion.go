@@ -2784,6 +2784,9 @@ type ChatCompletionNewParams struct {
 	AutomaticToolExecution param.Field[bool] `json:"automatic_tool_execution"`
 	// Optional. The name of the content [cached](https://ai.google.dev/gemini-api/d...
 	CachedContent param.Field[string] `json:"cached_content"`
+	// Credentials for MCP server authentication. Each credential is matched to servers
+	// by connection name.
+	Credentials param.Field[ChatCompletionNewParamsCredentialsUnion] `json:"credentials"`
 	// If set to `true`, the request returns a `request_id`. You can then get the de...
 	Deferred param.Field[bool] `json:"deferred"`
 	// Number between -2.0 and 2.0. Positive values penalize new tokens based on the...
@@ -2906,6 +2909,14 @@ type ChatCompletionNewParamsModelUnion interface {
 type ChatCompletionNewParamsModelArray []shared.DedalusModelChoiceUnionParam
 
 func (r ChatCompletionNewParamsModelArray) ImplementsChatCompletionNewParamsModelUnion() {}
+
+// Credentials for MCP server authentication. Each credential is matched to servers
+// by connection name.
+//
+// Satisfied by [shared.CredentialParam], [shared.MCPCredentialsParam].
+type ChatCompletionNewParamsCredentialsUnion interface {
+	ImplementsChatCompletionNewParamsCredentialsUnion()
+}
 
 // MCP server identifiers. Accepts marketplace slugs, URLs, or MCPServerSpec
 // objects. MCP tools are executed server-side and billed separately.

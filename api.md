@@ -1,10 +1,12 @@
 # Shared Params Types
 
+- <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared#CredentialParam">CredentialParam</a>
 - <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared#CredentialsBindingSpecParam">CredentialsBindingSpecParam</a>
 - <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared#DedalusModelParam">DedalusModelParam</a>
 - <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared#DedalusModelChoiceUnionParam">DedalusModelChoiceUnionParam</a>
 - <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared#FunctionDefinitionParam">FunctionDefinitionParam</a>
 - <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared#FunctionParameters">FunctionParameters</a>
+- <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared#MCPCredentialsParam">MCPCredentialsParam</a>
 - <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared#MCPServerInputUnionParam">MCPServerInputUnionParam</a>
 - <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared#MCPServerSpecParam">MCPServerSpecParam</a>
 - <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/shared#MCPServersParam">MCPServersParam</a>
