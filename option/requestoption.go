@@ -297,10 +297,10 @@ func WithAsBaseURL(value string) RequestOption {
 	})
 }
 
-// WithOrganization returns a RequestOption that sets the client setting "organization".
-func WithOrganization(value string) RequestOption {
+// WithDedalusOrgID returns a RequestOption that sets the client setting "dedalus_org_id".
+func WithDedalusOrgID(value string) RequestOption {
 	return requestconfig.RequestOptionFunc(func(r *requestconfig.RequestConfig) error {
-		r.Organization = value
+		r.DedalusOrgID = value
 		return nil
 	})
 }

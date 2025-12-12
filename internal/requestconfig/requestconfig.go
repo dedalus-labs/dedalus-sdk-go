@@ -224,7 +224,7 @@ type RequestConfig struct {
 	APIKey         string
 	XAPIKey        string
 	AsBaseURL      string
-	Organization   string
+	DedalusOrgID   string
 	Provider       string
 	ProviderKey    string
 	ProviderModel  string
@@ -602,7 +602,7 @@ func (cfg *RequestConfig) Clone(ctx context.Context) *RequestConfig {
 		APIKey:         cfg.APIKey,
 		XAPIKey:        cfg.XAPIKey,
 		AsBaseURL:      cfg.AsBaseURL,
-		Organization:   cfg.Organization,
+		DedalusOrgID:   cfg.DedalusOrgID,
 		Provider:       cfg.Provider,
 		ProviderKey:    cfg.ProviderKey,
 		ProviderModel:  cfg.ProviderModel,

@@ -4,6 +4,7 @@ package shared
 
 type UnionString string
 
+func (UnionString) ImplementsCredentialsBindingSpecDefaultUnionParam()         {}
 func (UnionString) ImplementsDedalusModelSettingsStopUnionParam()              {}
 func (UnionString) ImplementsDedalusModelChoiceUnionParam()                    {}
 func (UnionString) ImplementsMCPServerInputUnionParam()                        {}
@@ -21,3 +22,11 @@ func (UnionString) ImplementsChatCompletionNewParamsModelUnion()               {
 func (UnionString) ImplementsChatCompletionNewParamsMCPServersUnion()          {}
 func (UnionString) ImplementsChatCompletionNewParamsStopUnion()                {}
 func (UnionString) ImplementsChatCompletionNewParamsSystemInstructionUnion()   {}
+
+type UnionBool bool
+
+func (UnionBool) ImplementsCredentialsBindingSpecDefaultUnionParam() {}
+
+type UnionInt int64
+
+func (UnionInt) ImplementsCredentialsBindingSpecDefaultUnionParam() {}
