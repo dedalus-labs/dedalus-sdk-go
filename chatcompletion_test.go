@@ -38,9 +38,15 @@ func TestChatCompletionNewWithOptionalParams(t *testing.T) {
 		}),
 		AutomaticToolExecution: githubcomdedaluslabsdedalussdkgo.F(true),
 		CachedContent:          githubcomdedaluslabsdedalussdkgo.F("cached_content"),
-		Deferred:               githubcomdedaluslabsdedalussdkgo.F(true),
-		FrequencyPenalty:       githubcomdedaluslabsdedalussdkgo.F(-2.000000),
-		FunctionCall:           githubcomdedaluslabsdedalussdkgo.F("function_call"),
+		Credentials: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsCredentialsUnion](shared.CredentialParam{
+			ConnectionName: githubcomdedaluslabsdedalussdkgo.F("brave-api"),
+			Values: githubcomdedaluslabsdedalussdkgo.F(map[string]shared.CredentialValuesUnionParam{
+				"api_key": shared.UnionString("sk-..."),
+			}),
+		}),
+		Deferred:         githubcomdedaluslabsdedalussdkgo.F(true),
+		FrequencyPenalty: githubcomdedaluslabsdedalussdkgo.F(-2.000000),
+		FunctionCall:     githubcomdedaluslabsdedalussdkgo.F("function_call"),
 		Functions: githubcomdedaluslabsdedalussdkgo.F([]githubcomdedaluslabsdedalussdkgo.ChatCompletionFunctionsParam{{
 			Name:        githubcomdedaluslabsdedalussdkgo.F("name"),
 			Description: githubcomdedaluslabsdedalussdkgo.F("description"),

@@ -4,6 +4,7 @@ package shared
 
 type UnionString string
 
+func (UnionString) ImplementsCredentialValuesUnionParam()                      {}
 func (UnionString) ImplementsCredentialsBindingSpecDefaultUnionParam()         {}
 func (UnionString) ImplementsDedalusModelSettingsStopUnionParam()              {}
 func (UnionString) ImplementsDedalusModelChoiceUnionParam()                    {}
@@ -25,8 +26,10 @@ func (UnionString) ImplementsChatCompletionNewParamsSystemInstructionUnion()   {
 
 type UnionBool bool
 
+func (UnionBool) ImplementsCredentialValuesUnionParam()              {}
 func (UnionBool) ImplementsCredentialsBindingSpecDefaultUnionParam() {}
 
 type UnionInt int64
 
+func (UnionInt) ImplementsCredentialValuesUnionParam()              {}
 func (UnionInt) ImplementsCredentialsBindingSpecDefaultUnionParam() {}
