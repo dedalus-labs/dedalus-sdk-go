@@ -1,0 +1,35 @@
+// File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
+
+package shared
+
+type UnionString string
+
+func (UnionString) ImplementsCredentialValuesUnionParam()                      {}
+func (UnionString) ImplementsCredentialsBindingSpecDefaultUnionParam()         {}
+func (UnionString) ImplementsDedalusModelSettingsStopUnionParam()              {}
+func (UnionString) ImplementsDedalusModelChoiceUnionParam()                    {}
+func (UnionString) ImplementsMCPServerInputUnionParam()                        {}
+func (UnionString) ImplementsMCPServerSpecCredentialsUnionParam()              {}
+func (UnionString) ImplementsCreateEmbeddingRequestInputUnionParam()           {}
+func (UnionString) ImplementsCreateEmbeddingResponseDataEmbeddingUnion()       {}
+func (UnionString) ImplementsChatCompletionAssistantMessageParamContentUnion() {}
+func (UnionString) ImplementsChatCompletionDeveloperMessageParamContentUnion() {}
+func (UnionString) ImplementsChatCompletionSystemMessageParamContentUnion()    {}
+func (UnionString) ImplementsChatCompletionToolMessageParamContentUnion()      {}
+func (UnionString) ImplementsChatCompletionUserMessageParamContentUnion()      {}
+func (UnionString) ImplementsPredictionContentContentUnionParam()              {}
+func (UnionString) ImplementsToolChoiceUnionParam()                            {}
+func (UnionString) ImplementsChatCompletionNewParamsModelUnion()               {}
+func (UnionString) ImplementsChatCompletionNewParamsMCPServersUnion()          {}
+func (UnionString) ImplementsChatCompletionNewParamsStopUnion()                {}
+func (UnionString) ImplementsChatCompletionNewParamsSystemInstructionUnion()   {}
+
+type UnionBool bool
+
+func (UnionBool) ImplementsCredentialValuesUnionParam()              {}
+func (UnionBool) ImplementsCredentialsBindingSpecDefaultUnionParam() {}
+
+type UnionInt int64
+
+func (UnionInt) ImplementsCredentialValuesUnionParam()              {}
+func (UnionInt) ImplementsCredentialsBindingSpecDefaultUnionParam() {}

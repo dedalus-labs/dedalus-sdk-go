@@ -29,11 +29,11 @@ func TestAudioTranslationNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Audio.Translations.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.AudioTranslationNewParams{
-		File:           io.Reader(bytes.NewBuffer([]byte("some file contents"))),
-		Model:          "model",
-		Prompt:         githubcomdedaluslabsdedalussdkgo.String("prompt"),
-		ResponseFormat: githubcomdedaluslabsdedalussdkgo.String("response_format"),
-		Temperature:    githubcomdedaluslabsdedalussdkgo.Float(0),
+		File:           githubcomdedaluslabsdedalussdkgo.F(io.Reader(bytes.NewBuffer([]byte("some file contents")))),
+		Model:          githubcomdedaluslabsdedalussdkgo.F("model"),
+		Prompt:         githubcomdedaluslabsdedalussdkgo.F("prompt"),
+		ResponseFormat: githubcomdedaluslabsdedalussdkgo.F("response_format"),
+		Temperature:    githubcomdedaluslabsdedalussdkgo.F(0.000000),
 	})
 	if err != nil {
 		var apierr *githubcomdedaluslabsdedalussdkgo.Error
