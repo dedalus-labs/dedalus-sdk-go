@@ -25,6 +25,7 @@ func TestUsage(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
+	t.Skip("Prism tests are disabled")
 	chatCompletion, err := client.Chat.Completions.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
 		Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-5-nano")),
 		Messages: githubcomdedaluslabsdedalussdkgo.F([]githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessageUnion{githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParam{
