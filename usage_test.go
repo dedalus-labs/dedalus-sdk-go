@@ -10,6 +10,7 @@ import (
 	"github.com/dedalus-labs/dedalus-sdk-go"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/testutil"
 	"github.com/dedalus-labs/dedalus-sdk-go/option"
+	"github.com/dedalus-labs/dedalus-sdk-go/shared"
 )
 
 func TestUsage(t *testing.T) {
@@ -24,19 +25,20 @@ func TestUsage(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	completion, err := client.Chat.Completions.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
-		Messages: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesUnion{
-			OfMapOfAnyMap: []map[string]any{{
-				"role":    "user",
-				"content": "Hello, how are you today?",
-			}},
-		},
-		Model: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion{
-			OfModelID: githubcomdedaluslabsdedalussdkgo.String("openai/gpt-5"),
-		},
+	t.Skip("Prism tests are disabled")
+	chatCompletion, err := client.Chat.Completions.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
+		Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-5-nano")),
+		Messages: githubcomdedaluslabsdedalussdkgo.F([]githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessageUnion{githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParam{
+			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamRoleSystem),
+			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamContentUnion](shared.UnionString("You are Stephen Dedalus. Respond in morose Joycean malaise.")),
+		}, githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParam{
+			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamRoleUser),
+			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamContentUnion](shared.UnionString("Hello, how are you today?")),
+		}}),
 	})
 	if err != nil {
-		t.Fatalf("err should be nil: %s", err.Error())
+		t.Error(err)
+		return
 	}
-	t.Logf("%+v\n", completion.ID)
+	t.Logf("%+v\n", chatCompletion.ID)
 }

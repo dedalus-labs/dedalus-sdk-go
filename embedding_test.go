@@ -11,6 +11,7 @@ import (
 	"github.com/dedalus-labs/dedalus-sdk-go"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/testutil"
 	"github.com/dedalus-labs/dedalus-sdk-go/option"
+	"github.com/dedalus-labs/dedalus-sdk-go/shared"
 )
 
 func TestEmbeddingNewWithOptionalParams(t *testing.T) {
@@ -28,13 +29,11 @@ func TestEmbeddingNewWithOptionalParams(t *testing.T) {
 	)
 	_, err := client.Embeddings.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.EmbeddingNewParams{
 		CreateEmbeddingRequest: githubcomdedaluslabsdedalussdkgo.CreateEmbeddingRequestParam{
-			Input: githubcomdedaluslabsdedalussdkgo.CreateEmbeddingRequestInputUnionParam{
-				OfString: githubcomdedaluslabsdedalussdkgo.String("string"),
-			},
-			Model:          githubcomdedaluslabsdedalussdkgo.CreateEmbeddingRequestModelTextEmbeddingAda002,
-			Dimensions:     githubcomdedaluslabsdedalussdkgo.Int(1),
-			EncodingFormat: githubcomdedaluslabsdedalussdkgo.CreateEmbeddingRequestEncodingFormatFloat,
-			User:           githubcomdedaluslabsdedalussdkgo.String("user"),
+			Input:          githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.CreateEmbeddingRequestInputUnionParam](shared.UnionString("string")),
+			Model:          githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.CreateEmbeddingRequestModelTextEmbeddingAda002),
+			Dimensions:     githubcomdedaluslabsdedalussdkgo.F(int64(1)),
+			EncodingFormat: githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.CreateEmbeddingRequestEncodingFormatFloat),
+			User:           githubcomdedaluslabsdedalussdkgo.F("user"),
 		},
 	})
 	if err != nil {

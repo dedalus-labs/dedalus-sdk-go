@@ -5,19 +5,18 @@ package githubcomdedaluslabsdedalussdkgo
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"io"
 	"mime/multipart"
 	"net/http"
+	"reflect"
 	"slices"
 
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/apiform"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/apijson"
+	"github.com/dedalus-labs/dedalus-sdk-go/internal/param"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/requestconfig"
 	"github.com/dedalus-labs/dedalus-sdk-go/option"
-	"github.com/dedalus-labs/dedalus-sdk-go/packages/param"
-	"github.com/dedalus-labs/dedalus-sdk-go/packages/respjson"
-	"github.com/dedalus-labs/dedalus-sdk-go/shared/constant"
+	"github.com/tidwall/gjson"
 )
 
 // AudioTranscriptionService contains methods and other services that help with
@@ -33,8 +32,8 @@ type AudioTranscriptionService struct {
 // NewAudioTranscriptionService generates a new service that applies the given
 // options to each request. These options are applied after the parent client's
 // options (if there is one), and before any request-specific options.
-func NewAudioTranscriptionService(opts ...option.RequestOption) (r AudioTranscriptionService) {
-	r = AudioTranscriptionService{}
+func NewAudioTranscriptionService(opts ...option.RequestOption) (r *AudioTranscriptionService) {
+	r = &AudioTranscriptionService{}
 	r.Options = opts
 	return
 }
@@ -52,102 +51,11 @@ func NewAudioTranscriptionService(opts ...option.RequestOption) (r AudioTranscri
 // temperature: Sampling temperature between 0 and 1
 //
 // Returns: Transcription object with the transcribed text
-func (r *AudioTranscriptionService) New(ctx context.Context, body AudioTranscriptionNewParams, opts ...option.RequestOption) (res *AudioTranscriptionNewResponseUnion, err error) {
+func (r *AudioTranscriptionService) New(ctx context.Context, body AudioTranscriptionNewParams, opts ...option.RequestOption) (res *AudioTranscriptionNewResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	path := "v1/audio/transcriptions"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
-}
-
-// AudioTranscriptionNewResponseUnion contains all possible properties and values
-// from [AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJson],
-// [AudioTranscriptionNewResponseCreateTranscriptionResponseJson].
-//
-// Use the methods beginning with 'As' to cast the union to one of its variants.
-type AudioTranscriptionNewResponseUnion struct {
-	// This field is from variant
-	// [AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJson].
-	Duration float64 `json:"duration"`
-	// This field is from variant
-	// [AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJson].
-	Language string `json:"language"`
-	Text     string `json:"text"`
-	// This field is from variant
-	// [AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJson].
-	Segments []AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJsonSegment `json:"segments"`
-	// This field is a union of
-	// [AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJsonUsage],
-	// [AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageUnion]
-	Usage AudioTranscriptionNewResponseUnionUsage `json:"usage"`
-	// This field is from variant
-	// [AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJson].
-	Words []AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJsonWord `json:"words"`
-	// This field is from variant
-	// [AudioTranscriptionNewResponseCreateTranscriptionResponseJson].
-	Logprobs []AudioTranscriptionNewResponseCreateTranscriptionResponseJsonLogprob `json:"logprobs"`
-	JSON     struct {
-		Duration respjson.Field
-		Language respjson.Field
-		Text     respjson.Field
-		Segments respjson.Field
-		Usage    respjson.Field
-		Words    respjson.Field
-		Logprobs respjson.Field
-		raw      string
-	} `json:"-"`
-}
-
-func (u AudioTranscriptionNewResponseUnion) AsCreateTranscriptionResponseVerboseJson() (v AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJson) {
-	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
-	return
-}
-
-func (u AudioTranscriptionNewResponseUnion) AsCreateTranscriptionResponseJson() (v AudioTranscriptionNewResponseCreateTranscriptionResponseJson) {
-	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
-	return
-}
-
-// Returns the unmodified JSON received from the API
-func (u AudioTranscriptionNewResponseUnion) RawJSON() string { return u.JSON.raw }
-
-func (r *AudioTranscriptionNewResponseUnion) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// AudioTranscriptionNewResponseUnionUsage is an implicit subunion of
-// [AudioTranscriptionNewResponseUnion]. AudioTranscriptionNewResponseUnionUsage
-// provides convenient access to the sub-properties of the union.
-//
-// For type safety it is recommended to directly use a variant of the
-// [AudioTranscriptionNewResponseUnion].
-type AudioTranscriptionNewResponseUnionUsage struct {
-	Seconds float64 `json:"seconds"`
-	Type    string  `json:"type"`
-	// This field is from variant
-	// [AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageUnion].
-	InputTokens int64 `json:"input_tokens"`
-	// This field is from variant
-	// [AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageUnion].
-	OutputTokens int64 `json:"output_tokens"`
-	// This field is from variant
-	// [AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageUnion].
-	TotalTokens int64 `json:"total_tokens"`
-	// This field is from variant
-	// [AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageUnion].
-	InputTokenDetails AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageTokensInputTokenDetails `json:"input_token_details"`
-	JSON              struct {
-		Seconds           respjson.Field
-		Type              respjson.Field
-		InputTokens       respjson.Field
-		OutputTokens      respjson.Field
-		TotalTokens       respjson.Field
-		InputTokenDetails respjson.Field
-		raw               string
-	} `json:"-"`
-}
-
-func (r *AudioTranscriptionNewResponseUnionUsage) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
 }
 
 // Represents a verbose json transcription response returned by model, based on the
@@ -161,7 +69,113 @@ func (r *AudioTranscriptionNewResponseUnionUsage) UnmarshalJSON(data []byte) err
 // - words (optional): list[TranscriptionWord]
 // - segments (optional): list[TranscriptionSegment]
 // - usage (optional): TranscriptTextUsageDuration
-type AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJson struct {
+type AudioTranscriptionNewResponse struct {
+	// The transcribed text.
+	Text string `json:"text,required"`
+	// The duration of the input audio.
+	Duration float64 `json:"duration"`
+	// The language of the input audio.
+	Language string `json:"language"`
+	// This field can have the runtime type of
+	// [[]AudioTranscriptionNewResponseCreateTranscriptionResponseJSONLogprob].
+	Logprobs interface{} `json:"logprobs"`
+	// This field can have the runtime type of
+	// [[]AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONSegment].
+	Segments interface{} `json:"segments"`
+	// This field can have the runtime type of
+	// [AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONUsage],
+	// [AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsage].
+	Usage interface{} `json:"usage"`
+	// This field can have the runtime type of
+	// [[]AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONWord].
+	Words interface{}                       `json:"words"`
+	JSON  audioTranscriptionNewResponseJSON `json:"-"`
+	union AudioTranscriptionNewResponseUnion
+}
+
+// audioTranscriptionNewResponseJSON contains the JSON metadata for the struct
+// [AudioTranscriptionNewResponse]
+type audioTranscriptionNewResponseJSON struct {
+	Text        apijson.Field
+	Duration    apijson.Field
+	Language    apijson.Field
+	Logprobs    apijson.Field
+	Segments    apijson.Field
+	Usage       apijson.Field
+	Words       apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r audioTranscriptionNewResponseJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r *AudioTranscriptionNewResponse) UnmarshalJSON(data []byte) (err error) {
+	*r = AudioTranscriptionNewResponse{}
+	err = apijson.UnmarshalRoot(data, &r.union)
+	if err != nil {
+		return err
+	}
+	return apijson.Port(r.union, &r)
+}
+
+// AsUnion returns a [AudioTranscriptionNewResponseUnion] interface which you can
+// cast to the specific types for more type safety.
+//
+// Possible runtime types of the union are
+// [AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSON],
+// [AudioTranscriptionNewResponseCreateTranscriptionResponseJSON].
+func (r AudioTranscriptionNewResponse) AsUnion() AudioTranscriptionNewResponseUnion {
+	return r.union
+}
+
+// Represents a verbose json transcription response returned by model, based on the
+// provided input.
+//
+// Fields:
+//
+// - language (required): str
+// - duration (required): float
+// - text (required): str
+// - words (optional): list[TranscriptionWord]
+// - segments (optional): list[TranscriptionSegment]
+// - usage (optional): TranscriptTextUsageDuration
+//
+// Union satisfied by
+// [AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSON] or
+// [AudioTranscriptionNewResponseCreateTranscriptionResponseJSON].
+type AudioTranscriptionNewResponseUnion interface {
+	implementsAudioTranscriptionNewResponse()
+}
+
+func init() {
+	apijson.RegisterUnion(
+		reflect.TypeOf((*AudioTranscriptionNewResponseUnion)(nil)).Elem(),
+		"",
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSON{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(AudioTranscriptionNewResponseCreateTranscriptionResponseJSON{}),
+		},
+	)
+}
+
+// Represents a verbose json transcription response returned by model, based on the
+// provided input.
+//
+// Fields:
+//
+// - language (required): str
+// - duration (required): float
+// - text (required): str
+// - words (optional): list[TranscriptionWord]
+// - segments (optional): list[TranscriptionSegment]
+// - usage (optional): TranscriptTextUsageDuration
+type AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSON struct {
 	// The duration of the input audio.
 	Duration float64 `json:"duration,required"`
 	// The language of the input audio.
@@ -169,30 +183,37 @@ type AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJson struct 
 	// The transcribed text.
 	Text string `json:"text,required"`
 	// Segments of the transcribed text and their corresponding details.
-	Segments []AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJsonSegment `json:"segments"`
+	Segments []AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONSegment `json:"segments"`
 	// Usage statistics for models billed by audio input duration.
-	Usage AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJsonUsage `json:"usage"`
+	Usage AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONUsage `json:"usage"`
 	// Extracted words and their corresponding timestamps.
-	Words []AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJsonWord `json:"words"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Duration    respjson.Field
-		Language    respjson.Field
-		Text        respjson.Field
-		Segments    respjson.Field
-		Usage       respjson.Field
-		Words       respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
+	Words []AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONWord `json:"words"`
+	JSON  audioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONJSON   `json:"-"`
 }
 
-// Returns the unmodified JSON received from the API
-func (r AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJson) RawJSON() string {
-	return r.JSON.raw
+// audioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONJSON contains
+// the JSON metadata for the struct
+// [AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSON]
+type audioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONJSON struct {
+	Duration    apijson.Field
+	Language    apijson.Field
+	Text        apijson.Field
+	Segments    apijson.Field
+	Usage       apijson.Field
+	Words       apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
 }
-func (r *AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJson) UnmarshalJSON(data []byte) error {
+
+func (r *AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSON) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r audioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSON) implementsAudioTranscriptionNewResponse() {
 }
 
 // Fields:
@@ -207,7 +228,7 @@ func (r *AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJson) Un
 // - avg_logprob (required): float
 // - compression_ratio (required): float
 // - no_speech_prob (required): float
-type AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJsonSegment struct {
+type AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONSegment struct {
 	// Unique identifier of the segment.
 	ID int64 `json:"id,required"`
 	// Average logprob of the segment. If the value is lower than -1, consider the
@@ -230,53 +251,76 @@ type AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJsonSegment 
 	// Text content of the segment.
 	Text string `json:"text,required"`
 	// Array of token IDs for the text content.
-	Tokens []int64 `json:"tokens,required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		ID               respjson.Field
-		AvgLogprob       respjson.Field
-		CompressionRatio respjson.Field
-		End              respjson.Field
-		NoSpeechProb     respjson.Field
-		Seek             respjson.Field
-		Start            respjson.Field
-		Temperature      respjson.Field
-		Text             respjson.Field
-		Tokens           respjson.Field
-		ExtraFields      map[string]respjson.Field
-		raw              string
-	} `json:"-"`
+	Tokens []int64                                                                        `json:"tokens,required"`
+	JSON   audioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONSegmentJSON `json:"-"`
 }
 
-// Returns the unmodified JSON received from the API
-func (r AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJsonSegment) RawJSON() string {
-	return r.JSON.raw
+// audioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONSegmentJSON
+// contains the JSON metadata for the struct
+// [AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONSegment]
+type audioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONSegmentJSON struct {
+	ID               apijson.Field
+	AvgLogprob       apijson.Field
+	CompressionRatio apijson.Field
+	End              apijson.Field
+	NoSpeechProb     apijson.Field
+	Seek             apijson.Field
+	Start            apijson.Field
+	Temperature      apijson.Field
+	Text             apijson.Field
+	Tokens           apijson.Field
+	raw              string
+	ExtraFields      map[string]apijson.Field
 }
-func (r *AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJsonSegment) UnmarshalJSON(data []byte) error {
+
+func (r *AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONSegment) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r audioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONSegmentJSON) RawJSON() string {
+	return r.raw
 }
 
 // Usage statistics for models billed by audio input duration.
-type AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJsonUsage struct {
+type AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONUsage struct {
 	// Duration of the input audio in seconds.
 	Seconds float64 `json:"seconds,required"`
 	// The type of the usage object. Always `duration` for this variant.
-	Type constant.Duration `json:"type,required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Seconds     respjson.Field
-		Type        respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
+	Type AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONUsageType `json:"type,required"`
+	JSON audioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONUsageJSON `json:"-"`
 }
 
-// Returns the unmodified JSON received from the API
-func (r AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJsonUsage) RawJSON() string {
-	return r.JSON.raw
+// audioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONUsageJSON
+// contains the JSON metadata for the struct
+// [AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONUsage]
+type audioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONUsageJSON struct {
+	Seconds     apijson.Field
+	Type        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
 }
-func (r *AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJsonUsage) UnmarshalJSON(data []byte) error {
+
+func (r *AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONUsage) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r audioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONUsageJSON) RawJSON() string {
+	return r.raw
+}
+
+// The type of the usage object. Always `duration` for this variant.
+type AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONUsageType string
+
+const (
+	AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONUsageTypeDuration AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONUsageType = "duration"
+)
+
+func (r AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONUsageType) IsKnown() bool {
+	switch r {
+	case AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONUsageTypeDuration:
+		return true
+	}
+	return false
 }
 
 // Fields:
@@ -284,29 +328,33 @@ func (r *AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJsonUsag
 // - word (required): str
 // - start (required): float
 // - end (required): float
-type AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJsonWord struct {
+type AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONWord struct {
 	// End time of the word in seconds.
 	End float64 `json:"end,required"`
 	// Start time of the word in seconds.
 	Start float64 `json:"start,required"`
 	// The text content of the word.
-	Word string `json:"word,required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		End         respjson.Field
-		Start       respjson.Field
-		Word        respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
+	Word string                                                                      `json:"word,required"`
+	JSON audioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONWordJSON `json:"-"`
 }
 
-// Returns the unmodified JSON received from the API
-func (r AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJsonWord) RawJSON() string {
-	return r.JSON.raw
+// audioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONWordJSON
+// contains the JSON metadata for the struct
+// [AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONWord]
+type audioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONWordJSON struct {
+	End         apijson.Field
+	Start       apijson.Field
+	Word        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
 }
-func (r *AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJsonWord) UnmarshalJSON(data []byte) error {
+
+func (r *AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONWord) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r audioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONWordJSON) RawJSON() string {
+	return r.raw
 }
 
 // Represents a transcription response returned by model, based on the provided
@@ -317,31 +365,38 @@ func (r *AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJsonWord
 // - text (required): str
 // - logprobs (optional): list[LogprobsItem]
 // - usage (optional): Usage
-type AudioTranscriptionNewResponseCreateTranscriptionResponseJson struct {
+type AudioTranscriptionNewResponseCreateTranscriptionResponseJSON struct {
 	// The transcribed text.
 	Text string `json:"text,required"`
 	// The log probabilities of the tokens in the transcription. Only returned with the
 	// models `gpt-4o-transcribe` and `gpt-4o-mini-transcribe` if `logprobs` is added
 	// to the `include` array.
-	Logprobs []AudioTranscriptionNewResponseCreateTranscriptionResponseJsonLogprob `json:"logprobs"`
+	Logprobs []AudioTranscriptionNewResponseCreateTranscriptionResponseJSONLogprob `json:"logprobs"`
 	// Token usage statistics for the request.
-	Usage AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageUnion `json:"usage"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Text        respjson.Field
-		Logprobs    respjson.Field
-		Usage       respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
+	Usage AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsage `json:"usage"`
+	JSON  audioTranscriptionNewResponseCreateTranscriptionResponseJSONJSON  `json:"-"`
 }
 
-// Returns the unmodified JSON received from the API
-func (r AudioTranscriptionNewResponseCreateTranscriptionResponseJson) RawJSON() string {
-	return r.JSON.raw
+// audioTranscriptionNewResponseCreateTranscriptionResponseJSONJSON contains the
+// JSON metadata for the struct
+// [AudioTranscriptionNewResponseCreateTranscriptionResponseJSON]
+type audioTranscriptionNewResponseCreateTranscriptionResponseJSONJSON struct {
+	Text        apijson.Field
+	Logprobs    apijson.Field
+	Usage       apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
 }
-func (r *AudioTranscriptionNewResponseCreateTranscriptionResponseJson) UnmarshalJSON(data []byte) error {
+
+func (r *AudioTranscriptionNewResponseCreateTranscriptionResponseJSON) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r audioTranscriptionNewResponseCreateTranscriptionResponseJSONJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r AudioTranscriptionNewResponseCreateTranscriptionResponseJSON) implementsAudioTranscriptionNewResponse() {
 }
 
 // Fields:
@@ -349,119 +404,116 @@ func (r *AudioTranscriptionNewResponseCreateTranscriptionResponseJson) Unmarshal
 // - token (optional): str
 // - logprob (optional): float
 // - bytes (optional): list[float]
-type AudioTranscriptionNewResponseCreateTranscriptionResponseJsonLogprob struct {
+type AudioTranscriptionNewResponseCreateTranscriptionResponseJSONLogprob struct {
 	// The token in the transcription.
 	Token string `json:"token"`
 	// The bytes of the token.
 	Bytes []float64 `json:"bytes"`
 	// The log probability of the token.
-	Logprob float64 `json:"logprob"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Token       respjson.Field
-		Bytes       respjson.Field
-		Logprob     respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
+	Logprob float64                                                                 `json:"logprob"`
+	JSON    audioTranscriptionNewResponseCreateTranscriptionResponseJSONLogprobJSON `json:"-"`
 }
 
-// Returns the unmodified JSON received from the API
-func (r AudioTranscriptionNewResponseCreateTranscriptionResponseJsonLogprob) RawJSON() string {
-	return r.JSON.raw
+// audioTranscriptionNewResponseCreateTranscriptionResponseJSONLogprobJSON contains
+// the JSON metadata for the struct
+// [AudioTranscriptionNewResponseCreateTranscriptionResponseJSONLogprob]
+type audioTranscriptionNewResponseCreateTranscriptionResponseJSONLogprobJSON struct {
+	Token       apijson.Field
+	Bytes       apijson.Field
+	Logprob     apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
 }
-func (r *AudioTranscriptionNewResponseCreateTranscriptionResponseJsonLogprob) UnmarshalJSON(data []byte) error {
+
+func (r *AudioTranscriptionNewResponseCreateTranscriptionResponseJSONLogprob) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageUnion contains
-// all possible properties and values from
-// [AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageTokens],
-// [AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageDuration].
-//
-// Use the
-// [AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageUnion.AsAny]
-// method to switch on the variant.
-//
-// Use the methods beginning with 'As' to cast the union to one of its variants.
-type AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageUnion struct {
-	// This field is from variant
-	// [AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageTokens].
+func (r audioTranscriptionNewResponseCreateTranscriptionResponseJSONLogprobJSON) RawJSON() string {
+	return r.raw
+}
+
+// Token usage statistics for the request.
+type AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsage struct {
+	// The type of the usage object. Always `tokens` for this variant.
+	Type AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageType `json:"type,required"`
+	// Details about the input tokens billed for this request.
+	InputTokenDetails InputTokenDetails `json:"input_token_details"`
+	// Number of input tokens billed for this request.
 	InputTokens int64 `json:"input_tokens"`
-	// This field is from variant
-	// [AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageTokens].
+	// Number of output tokens generated.
 	OutputTokens int64 `json:"output_tokens"`
-	// This field is from variant
-	// [AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageTokens].
-	TotalTokens int64 `json:"total_tokens"`
-	// Any of "tokens", "duration".
-	Type string `json:"type"`
-	// This field is from variant
-	// [AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageTokens].
-	InputTokenDetails AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageTokensInputTokenDetails `json:"input_token_details"`
-	// This field is from variant
-	// [AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageDuration].
+	// Duration of the input audio in seconds.
 	Seconds float64 `json:"seconds"`
-	JSON    struct {
-		InputTokens       respjson.Field
-		OutputTokens      respjson.Field
-		TotalTokens       respjson.Field
-		Type              respjson.Field
-		InputTokenDetails respjson.Field
-		Seconds           respjson.Field
-		raw               string
-	} `json:"-"`
+	// Total number of tokens used (input + output).
+	TotalTokens int64                                                                 `json:"total_tokens"`
+	JSON        audioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageJSON `json:"-"`
+	union       AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageUnion
 }
 
-// anyAudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsage is
-// implemented by each variant of
-// [AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageUnion] to add
-// type safety for the return type of
-// [AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageUnion.AsAny]
-type anyAudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsage interface {
-	implAudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageUnion()
+// audioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageJSON contains
+// the JSON metadata for the struct
+// [AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsage]
+type audioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageJSON struct {
+	Type              apijson.Field
+	InputTokenDetails apijson.Field
+	InputTokens       apijson.Field
+	OutputTokens      apijson.Field
+	Seconds           apijson.Field
+	TotalTokens       apijson.Field
+	raw               string
+	ExtraFields       map[string]apijson.Field
 }
 
-func (AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageTokens) implAudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageUnion() {
-}
-func (AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageDuration) implAudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageUnion() {
+func (r audioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageJSON) RawJSON() string {
+	return r.raw
 }
 
-// Use the following switch statement to find the correct variant
-//
-//	switch variant := AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageUnion.AsAny().(type) {
-//	case githubcomdedaluslabsdedalussdkgo.AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageTokens:
-//	case githubcomdedaluslabsdedalussdkgo.AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageDuration:
-//	default:
-//	  fmt.Errorf("no variant present")
-//	}
-func (u AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageUnion) AsAny() anyAudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsage {
-	switch u.Type {
-	case "tokens":
-		return u.AsTokens()
-	case "duration":
-		return u.AsDuration()
+func (r *AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsage) UnmarshalJSON(data []byte) (err error) {
+	*r = AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsage{}
+	err = apijson.UnmarshalRoot(data, &r.union)
+	if err != nil {
+		return err
 	}
-	return nil
+	return apijson.Port(r.union, &r)
 }
 
-func (u AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageUnion) AsTokens() (v AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageTokens) {
-	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
-	return
+// AsUnion returns a
+// [AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageUnion]
+// interface which you can cast to the specific types for more type safety.
+//
+// Possible runtime types of the union are
+// [AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokens],
+// [AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageDuration].
+func (r AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsage) AsUnion() AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageUnion {
+	return r.union
 }
 
-func (u AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageUnion) AsDuration() (v AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageDuration) {
-	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
-	return
+// Token usage statistics for the request.
+//
+// Union satisfied by
+// [AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokens]
+// or
+// [AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageDuration].
+type AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageUnion interface {
+	implementsAudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsage()
 }
 
-// Returns the unmodified JSON received from the API
-func (u AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageUnion) RawJSON() string {
-	return u.JSON.raw
-}
-
-func (r *AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageUnion) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
+func init() {
+	apijson.RegisterUnion(
+		reflect.TypeOf((*AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageUnion)(nil)).Elem(),
+		"type",
+		apijson.UnionVariant{
+			TypeFilter:         gjson.JSON,
+			Type:               reflect.TypeOf(AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokens{}),
+			DiscriminatorValue: "tokens",
+		},
+		apijson.UnionVariant{
+			TypeFilter:         gjson.JSON,
+			Type:               reflect.TypeOf(AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageDuration{}),
+			DiscriminatorValue: "duration",
+		},
+	)
 }
 
 // Usage statistics for models billed by token usage.
@@ -473,7 +525,7 @@ func (r *AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageUnion)
 // - input_token_details (optional): InputTokenDetails
 // - output_tokens (required): int
 // - total_tokens (required): int
-type AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageTokens struct {
+type AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokens struct {
 	// Number of input tokens billed for this request.
 	InputTokens int64 `json:"input_tokens,required"`
 	// Number of output tokens generated.
@@ -481,50 +533,49 @@ type AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageTokens str
 	// Total number of tokens used (input + output).
 	TotalTokens int64 `json:"total_tokens,required"`
 	// The type of the usage object. Always `tokens` for this variant.
-	Type constant.Tokens `json:"type,required"`
+	Type AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokensType `json:"type,required"`
 	// Details about the input tokens billed for this request.
-	InputTokenDetails AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageTokensInputTokenDetails `json:"input_token_details"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		InputTokens       respjson.Field
-		OutputTokens      respjson.Field
-		TotalTokens       respjson.Field
-		Type              respjson.Field
-		InputTokenDetails respjson.Field
-		ExtraFields       map[string]respjson.Field
-		raw               string
-	} `json:"-"`
+	InputTokenDetails InputTokenDetails                                                                              `json:"input_token_details"`
+	JSON              audioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokensJSON `json:"-"`
 }
 
-// Returns the unmodified JSON received from the API
-func (r AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageTokens) RawJSON() string {
-	return r.JSON.raw
+// audioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokensJSON
+// contains the JSON metadata for the struct
+// [AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokens]
+type audioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokensJSON struct {
+	InputTokens       apijson.Field
+	OutputTokens      apijson.Field
+	TotalTokens       apijson.Field
+	Type              apijson.Field
+	InputTokenDetails apijson.Field
+	raw               string
+	ExtraFields       map[string]apijson.Field
 }
-func (r *AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageTokens) UnmarshalJSON(data []byte) error {
+
+func (r *AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokens) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Details about the input tokens billed for this request.
-type AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageTokensInputTokenDetails struct {
-	// Number of audio tokens billed for this request.
-	AudioTokens int64 `json:"audio_tokens"`
-	// Number of text tokens billed for this request.
-	TextTokens int64 `json:"text_tokens"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		AudioTokens respjson.Field
-		TextTokens  respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
+func (r audioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokensJSON) RawJSON() string {
+	return r.raw
 }
 
-// Returns the unmodified JSON received from the API
-func (r AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageTokensInputTokenDetails) RawJSON() string {
-	return r.JSON.raw
+func (r AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokens) implementsAudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsage() {
 }
-func (r *AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageTokensInputTokenDetails) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
+
+// The type of the usage object. Always `tokens` for this variant.
+type AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokensType string
+
+const (
+	AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokensTypeTokens AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokensType = "tokens"
+)
+
+func (r AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokensType) IsKnown() bool {
+	switch r {
+	case AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokensTypeTokens:
+		return true
+	}
+	return false
 }
 
 // Usage statistics for models billed by audio input duration.
@@ -533,45 +584,79 @@ func (r *AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageTokens
 //
 // - type (required): Literal['duration']
 // - seconds (required): float
-type AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageDuration struct {
+type AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageDuration struct {
 	// Duration of the input audio in seconds.
 	Seconds float64 `json:"seconds,required"`
 	// The type of the usage object. Always `duration` for this variant.
-	Type constant.Duration `json:"type,required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Seconds     respjson.Field
-		Type        respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
+	Type AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageDurationType `json:"type,required"`
+	JSON audioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageDurationJSON `json:"-"`
 }
 
-// Returns the unmodified JSON received from the API
-func (r AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageDuration) RawJSON() string {
-	return r.JSON.raw
+// audioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageDurationJSON
+// contains the JSON metadata for the struct
+// [AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageDuration]
+type audioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageDurationJSON struct {
+	Seconds     apijson.Field
+	Type        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
 }
-func (r *AudioTranscriptionNewResponseCreateTranscriptionResponseJsonUsageDuration) UnmarshalJSON(data []byte) error {
+
+func (r *AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageDuration) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+func (r audioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageDurationJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageDuration) implementsAudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsage() {
+}
+
+// The type of the usage object. Always `duration` for this variant.
+type AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageDurationType string
+
+const (
+	AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageDurationTypeDuration AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageDurationType = "duration"
+)
+
+func (r AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageDurationType) IsKnown() bool {
+	switch r {
+	case AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageDurationTypeDuration:
+		return true
+	}
+	return false
+}
+
+// The type of the usage object. Always `tokens` for this variant.
+type AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageType string
+
+const (
+	AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTypeTokens   AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageType = "tokens"
+	AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTypeDuration AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageType = "duration"
+)
+
+func (r AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageType) IsKnown() bool {
+	switch r {
+	case AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTypeTokens, AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTypeDuration:
+		return true
+	}
+	return false
+}
+
 type AudioTranscriptionNewParams struct {
-	File           io.Reader          `json:"file,omitzero,required" format:"binary"`
-	Model          string             `json:"model,required"`
-	Language       param.Opt[string]  `json:"language,omitzero"`
-	Prompt         param.Opt[string]  `json:"prompt,omitzero"`
-	ResponseFormat param.Opt[string]  `json:"response_format,omitzero"`
-	Temperature    param.Opt[float64] `json:"temperature,omitzero"`
-	paramObj
+	File           param.Field[io.Reader] `json:"file,required" format:"binary"`
+	Model          param.Field[string]    `json:"model,required"`
+	Language       param.Field[string]    `json:"language"`
+	Prompt         param.Field[string]    `json:"prompt"`
+	ResponseFormat param.Field[string]    `json:"response_format"`
+	Temperature    param.Field[float64]   `json:"temperature"`
 }
 
 func (r AudioTranscriptionNewParams) MarshalMultipart() (data []byte, contentType string, err error) {
 	buf := bytes.NewBuffer(nil)
 	writer := multipart.NewWriter(buf)
 	err = apiform.MarshalRoot(r, writer)
-	if err == nil {
-		err = apiform.WriteExtras(writer, r.ExtraFields())
-	}
 	if err != nil {
 		writer.Close()
 		return nil, "", err
