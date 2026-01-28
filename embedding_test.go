@@ -30,7 +30,7 @@ func TestEmbeddingNewWithOptionalParams(t *testing.T) {
 	_, err := client.Embeddings.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.EmbeddingNewParams{
 		CreateEmbeddingRequest: githubcomdedaluslabsdedalussdkgo.CreateEmbeddingRequestParam{
 			Input:          githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.CreateEmbeddingRequestInputUnionParam](shared.UnionString("string")),
-			Model:          githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.CreateEmbeddingRequestModel("string")),
+			Model:          githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.CreateEmbeddingRequestModelTextEmbeddingAda002),
 			Dimensions:     githubcomdedaluslabsdedalussdkgo.F(int64(1)),
 			EncodingFormat: githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.CreateEmbeddingRequestEncodingFormatFloat),
 			User:           githubcomdedaluslabsdedalussdkgo.F("user"),
