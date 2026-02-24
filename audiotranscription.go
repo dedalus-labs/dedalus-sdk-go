@@ -71,7 +71,7 @@ func (r *AudioTranscriptionService) New(ctx context.Context, body AudioTranscrip
 // - usage (optional): TranscriptTextUsageDuration
 type AudioTranscriptionNewResponse struct {
 	// The transcribed text.
-	Text string `json:"text,required"`
+	Text string `json:"text" api:"required"`
 	// The duration of the input audio.
 	Duration float64 `json:"duration"`
 	// The language of the input audio.
@@ -177,11 +177,11 @@ func init() {
 // - usage (optional): TranscriptTextUsageDuration
 type AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSON struct {
 	// The duration of the input audio.
-	Duration float64 `json:"duration,required"`
+	Duration float64 `json:"duration" api:"required"`
 	// The language of the input audio.
-	Language string `json:"language,required"`
+	Language string `json:"language" api:"required"`
 	// The transcribed text.
-	Text string `json:"text,required"`
+	Text string `json:"text" api:"required"`
 	// Segments of the transcribed text and their corresponding details.
 	Segments []AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONSegment `json:"segments"`
 	// Usage statistics for models billed by audio input duration.
@@ -230,28 +230,28 @@ func (r AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSON) imp
 // - no_speech_prob (required): float
 type AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONSegment struct {
 	// Unique identifier of the segment.
-	ID int64 `json:"id,required"`
+	ID int64 `json:"id" api:"required"`
 	// Average logprob of the segment. If the value is lower than -1, consider the
 	// logprobs failed.
-	AvgLogprob float64 `json:"avg_logprob,required"`
+	AvgLogprob float64 `json:"avg_logprob" api:"required"`
 	// Compression ratio of the segment. If the value is greater than 2.4, consider the
 	// compression failed.
-	CompressionRatio float64 `json:"compression_ratio,required"`
+	CompressionRatio float64 `json:"compression_ratio" api:"required"`
 	// End time of the segment in seconds.
-	End float64 `json:"end,required"`
+	End float64 `json:"end" api:"required"`
 	// Probability of no speech in the segment. If the value is higher than 1.0 and the
 	// `avg_logprob` is below -1, consider this segment silent.
-	NoSpeechProb float64 `json:"no_speech_prob,required"`
+	NoSpeechProb float64 `json:"no_speech_prob" api:"required"`
 	// Seek offset of the segment.
-	Seek int64 `json:"seek,required"`
+	Seek int64 `json:"seek" api:"required"`
 	// Start time of the segment in seconds.
-	Start float64 `json:"start,required"`
+	Start float64 `json:"start" api:"required"`
 	// Temperature parameter used for generating the segment.
-	Temperature float64 `json:"temperature,required"`
+	Temperature float64 `json:"temperature" api:"required"`
 	// Text content of the segment.
-	Text string `json:"text,required"`
+	Text string `json:"text" api:"required"`
 	// Array of token IDs for the text content.
-	Tokens []int64                                                                        `json:"tokens,required"`
+	Tokens []int64                                                                        `json:"tokens" api:"required"`
 	JSON   audioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONSegmentJSON `json:"-"`
 }
 
@@ -284,9 +284,9 @@ func (r audioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONSegme
 // Usage statistics for models billed by audio input duration.
 type AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONUsage struct {
 	// Duration of the input audio in seconds.
-	Seconds float64 `json:"seconds,required"`
+	Seconds float64 `json:"seconds" api:"required"`
 	// The type of the usage object. Always `duration` for this variant.
-	Type AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONUsageType `json:"type,required"`
+	Type AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONUsageType `json:"type" api:"required"`
 	JSON audioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONUsageJSON `json:"-"`
 }
 
@@ -330,11 +330,11 @@ func (r AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONUsage
 // - end (required): float
 type AudioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONWord struct {
 	// End time of the word in seconds.
-	End float64 `json:"end,required"`
+	End float64 `json:"end" api:"required"`
 	// Start time of the word in seconds.
-	Start float64 `json:"start,required"`
+	Start float64 `json:"start" api:"required"`
 	// The text content of the word.
-	Word string                                                                      `json:"word,required"`
+	Word string                                                                      `json:"word" api:"required"`
 	JSON audioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONWordJSON `json:"-"`
 }
 
@@ -367,7 +367,7 @@ func (r audioTranscriptionNewResponseCreateTranscriptionResponseVerboseJSONWordJ
 // - usage (optional): Usage
 type AudioTranscriptionNewResponseCreateTranscriptionResponseJSON struct {
 	// The transcribed text.
-	Text string `json:"text,required"`
+	Text string `json:"text" api:"required"`
 	// The log probabilities of the tokens in the transcription. Only returned with the
 	// models `gpt-4o-transcribe` and `gpt-4o-mini-transcribe` if `logprobs` is added
 	// to the `include` array.
@@ -436,7 +436,7 @@ func (r audioTranscriptionNewResponseCreateTranscriptionResponseJSONLogprobJSON)
 // Token usage statistics for the request.
 type AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsage struct {
 	// The type of the usage object. Always `tokens` for this variant.
-	Type AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageType `json:"type,required"`
+	Type AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageType `json:"type" api:"required"`
 	// Details about the input tokens billed for this request.
 	InputTokenDetails InputTokenDetails `json:"input_token_details"`
 	// Number of input tokens billed for this request.
@@ -527,13 +527,13 @@ func init() {
 // - total_tokens (required): int
 type AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokens struct {
 	// Number of input tokens billed for this request.
-	InputTokens int64 `json:"input_tokens,required"`
+	InputTokens int64 `json:"input_tokens" api:"required"`
 	// Number of output tokens generated.
-	OutputTokens int64 `json:"output_tokens,required"`
+	OutputTokens int64 `json:"output_tokens" api:"required"`
 	// Total number of tokens used (input + output).
-	TotalTokens int64 `json:"total_tokens,required"`
+	TotalTokens int64 `json:"total_tokens" api:"required"`
 	// The type of the usage object. Always `tokens` for this variant.
-	Type AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokensType `json:"type,required"`
+	Type AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokensType `json:"type" api:"required"`
 	// Details about the input tokens billed for this request.
 	InputTokenDetails InputTokenDetails                                                                              `json:"input_token_details"`
 	JSON              audioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageTokensJSON `json:"-"`
@@ -586,9 +586,9 @@ func (r AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscr
 // - seconds (required): float
 type AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageDuration struct {
 	// Duration of the input audio in seconds.
-	Seconds float64 `json:"seconds,required"`
+	Seconds float64 `json:"seconds" api:"required"`
 	// The type of the usage object. Always `duration` for this variant.
-	Type AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageDurationType `json:"type,required"`
+	Type AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageDurationType `json:"type" api:"required"`
 	JSON audioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageTranscriptTextUsageDurationJSON `json:"-"`
 }
 
@@ -645,8 +645,8 @@ func (r AudioTranscriptionNewResponseCreateTranscriptionResponseJSONUsageType) I
 }
 
 type AudioTranscriptionNewParams struct {
-	File           param.Field[io.Reader] `json:"file,required" format:"binary"`
-	Model          param.Field[string]    `json:"model,required"`
+	File           param.Field[io.Reader] `json:"file" api:"required" format:"binary"`
+	Model          param.Field[string]    `json:"model" api:"required"`
 	Language       param.Field[string]    `json:"language"`
 	Prompt         param.Field[string]    `json:"prompt"`
 	ResponseFormat param.Field[string]    `json:"response_format"`

@@ -68,13 +68,13 @@ type CreateEmbeddingRequestParam struct {
 	// for counting tokens. In addition to the per-input token limit, all embedding
 	// models enforce a maximum of 300,000 tokens summed across all inputs in a single
 	// request.
-	Input param.Field[CreateEmbeddingRequestInputUnionParam] `json:"input,required"`
+	Input param.Field[CreateEmbeddingRequestInputUnionParam] `json:"input" api:"required"`
 	// ID of the model to use. You can use the
 	// [List models](https://platform.openai.com/docs/api-reference/models/list) API to
 	// see all of your available models, or see our
 	// [Model overview](https://platform.openai.com/docs/models) for descriptions of
 	// them.
-	Model param.Field[CreateEmbeddingRequestModel] `json:"model,required"`
+	Model param.Field[CreateEmbeddingRequestModel] `json:"model" api:"required"`
 	// The number of dimensions the resulting output embeddings should have. Only
 	// supported in `text-embedding-3` and later models.
 	Dimensions param.Field[int64] `json:"dimensions"`
@@ -155,11 +155,11 @@ func (r CreateEmbeddingRequestEncodingFormat) IsKnown() bool {
 // Response from embeddings endpoint.
 type CreateEmbeddingResponse struct {
 	// List of embedding objects
-	Data []CreateEmbeddingResponseData `json:"data,required"`
+	Data []CreateEmbeddingResponseData `json:"data" api:"required"`
 	// The model used for embeddings
-	Model string `json:"model,required"`
+	Model string `json:"model" api:"required"`
 	// Usage statistics (prompt_tokens, total_tokens)
-	Usage map[string]int64 `json:"usage,required"`
+	Usage map[string]int64 `json:"usage" api:"required"`
 	// Object type, always 'list'
 	Object CreateEmbeddingResponseObject `json:"object"`
 	JSON   createEmbeddingResponseJSON   `json:"-"`
@@ -187,9 +187,9 @@ func (r createEmbeddingResponseJSON) RawJSON() string {
 // Single embedding object.
 type CreateEmbeddingResponseData struct {
 	// The embedding vector (float array or base64 string)
-	Embedding CreateEmbeddingResponseDataEmbeddingUnion `json:"embedding,required"`
+	Embedding CreateEmbeddingResponseDataEmbeddingUnion `json:"embedding" api:"required"`
 	// Index of the embedding in the list
-	Index int64 `json:"index,required"`
+	Index int64 `json:"index" api:"required"`
 	// Object type, always 'embedding'
 	Object CreateEmbeddingResponseDataObject `json:"object"`
 	JSON   createEmbeddingResponseDataJSON   `json:"-"`
@@ -287,7 +287,7 @@ type EmbeddingNewParams struct {
 	//   - encoding_format (optional): Literal["float", "base64"]
 	//   - dimensions (optional): int
 	//   - user (optional): str
-	CreateEmbeddingRequest CreateEmbeddingRequestParam `json:"create_embedding_request,required"`
+	CreateEmbeddingRequest CreateEmbeddingRequestParam `json:"create_embedding_request" api:"required"`
 }
 
 func (r EmbeddingNewParams) MarshalJSON() (data []byte, err error) {

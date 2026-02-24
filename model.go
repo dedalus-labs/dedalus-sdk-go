@@ -96,7 +96,7 @@ func (r *ModelService) List(ctx context.Context, opts ...option.RequestOption) (
 // Response for /v1/models endpoint.
 type ListModelsResponse struct {
 	// List of available models
-	Data []Model `json:"data,required"`
+	Data []Model `json:"data" api:"required"`
 	// Response object type
 	Object ListModelsResponseObject `json:"object"`
 	JSON   listModelsResponseJSON   `json:"-"`
@@ -140,25 +140,25 @@ func (r ListModelsResponseObject) IsKnown() bool {
 // aren't available from a provider are set to None.
 type Model struct {
 	// Unique model identifier with provider prefix (e.g., 'openai/gpt-4')
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// When the model was released (RFC 3339)
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// Provider that hosts this model
-	Provider ModelProvider `json:"provider,required"`
+	Provider ModelProvider `json:"provider" api:"required"`
 	// Normalized model capabilities across all providers.
-	Capabilities ModelCapabilities `json:"capabilities,nullable"`
+	Capabilities ModelCapabilities `json:"capabilities" api:"nullable"`
 	// Provider-declared default parameters for model generation.
-	Defaults ModelDefaults `json:"defaults,nullable"`
+	Defaults ModelDefaults `json:"defaults" api:"nullable"`
 	// Model description
-	Description string `json:"description,nullable"`
+	Description string `json:"description" api:"nullable"`
 	// Human-readable model name
-	DisplayName string `json:"display_name,nullable"`
+	DisplayName string `json:"display_name" api:"nullable"`
 	// Provider-specific generation method names (None = not declared)
-	ProviderDeclaredGenerationMethods []string `json:"provider_declared_generation_methods,nullable"`
+	ProviderDeclaredGenerationMethods []string `json:"provider_declared_generation_methods" api:"nullable"`
 	// Raw provider-specific metadata
-	ProviderInfo map[string]interface{} `json:"provider_info,nullable"`
+	ProviderInfo map[string]interface{} `json:"provider_info" api:"nullable"`
 	// Model version identifier
-	Version string    `json:"version,nullable"`
+	Version string    `json:"version" api:"nullable"`
 	JSON    modelJSON `json:"-"`
 }
 
@@ -211,25 +211,25 @@ func (r ModelProvider) IsKnown() bool {
 // Normalized model capabilities across all providers.
 type ModelCapabilities struct {
 	// Supports audio processing
-	Audio bool `json:"audio,nullable"`
+	Audio bool `json:"audio" api:"nullable"`
 	// Supports image generation
-	ImageGeneration bool `json:"image_generation,nullable"`
+	ImageGeneration bool `json:"image_generation" api:"nullable"`
 	// Maximum input tokens
-	InputTokenLimit int64 `json:"input_token_limit,nullable"`
+	InputTokenLimit int64 `json:"input_token_limit" api:"nullable"`
 	// Maximum output tokens
-	OutputTokenLimit int64 `json:"output_token_limit,nullable"`
+	OutputTokenLimit int64 `json:"output_token_limit" api:"nullable"`
 	// Supports streaming responses
-	Streaming bool `json:"streaming,nullable"`
+	Streaming bool `json:"streaming" api:"nullable"`
 	// Supports structured JSON output
-	StructuredOutput bool `json:"structured_output,nullable"`
+	StructuredOutput bool `json:"structured_output" api:"nullable"`
 	// Supports text generation
-	Text bool `json:"text,nullable"`
+	Text bool `json:"text" api:"nullable"`
 	// Supports extended thinking/reasoning
-	Thinking bool `json:"thinking,nullable"`
+	Thinking bool `json:"thinking" api:"nullable"`
 	// Supports function/tool calling
-	Tools bool `json:"tools,nullable"`
+	Tools bool `json:"tools" api:"nullable"`
 	// Supports image understanding
-	Vision bool                  `json:"vision,nullable"`
+	Vision bool                  `json:"vision" api:"nullable"`
 	JSON   modelCapabilitiesJSON `json:"-"`
 }
 
@@ -261,13 +261,13 @@ func (r modelCapabilitiesJSON) RawJSON() string {
 // Provider-declared default parameters for model generation.
 type ModelDefaults struct {
 	// Default maximum output tokens
-	MaxOutputTokens int64 `json:"max_output_tokens,nullable"`
+	MaxOutputTokens int64 `json:"max_output_tokens" api:"nullable"`
 	// Default temperature setting
-	Temperature float64 `json:"temperature,nullable"`
+	Temperature float64 `json:"temperature" api:"nullable"`
 	// Default top_k setting
-	TopK int64 `json:"top_k,nullable"`
+	TopK int64 `json:"top_k" api:"nullable"`
 	// Default top_p setting
-	TopP float64           `json:"top_p,nullable"`
+	TopP float64           `json:"top_p" api:"nullable"`
 	JSON modelDefaultsJSON `json:"-"`
 }
 

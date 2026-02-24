@@ -73,7 +73,7 @@ type CreateImageRequestParam struct {
 	// A text description of the desired image(s). The maximum length is 32000
 	// characters for `gpt-image-1`, 1000 characters for `dall-e-2` and 4000 characters
 	// for `dall-e-3`.
-	Prompt param.Field[string] `json:"prompt,required"`
+	Prompt param.Field[string] `json:"prompt" api:"required"`
 	// Allows to set transparency for the background of the generated image(s). This
 	// parameter is only supported for `gpt-image-1`. Must be one of `transparent`,
 	// `opaque` or `auto` (default value). When `auto` is used, the model will
@@ -293,11 +293,11 @@ func (r CreateImageRequestStyle) IsKnown() bool {
 // Single image object.
 type Image struct {
 	// Base64-encoded image data (if response_format=b64_json)
-	B64JSON string `json:"b64_json,nullable"`
+	B64JSON string `json:"b64_json" api:"nullable"`
 	// Revised prompt used for generation (dall-e-3)
-	RevisedPrompt string `json:"revised_prompt,nullable"`
+	RevisedPrompt string `json:"revised_prompt" api:"nullable"`
 	// URL of the generated image (if response_format=url)
-	URL  string    `json:"url,nullable"`
+	URL  string    `json:"url" api:"nullable"`
 	JSON imageJSON `json:"-"`
 }
 
@@ -321,9 +321,9 @@ func (r imageJSON) RawJSON() string {
 // Response from image generation.
 type ImagesResponse struct {
 	// Unix timestamp when images were created
-	Created int64 `json:"created,required"`
+	Created int64 `json:"created" api:"required"`
 	// List of generated images
-	Data []Image            `json:"data,required"`
+	Data []Image            `json:"data" api:"required"`
 	JSON imagesResponseJSON `json:"-"`
 }
 
@@ -344,7 +344,7 @@ func (r imagesResponseJSON) RawJSON() string {
 }
 
 type ImageNewVariationParams struct {
-	Image          param.Field[io.Reader] `json:"image,required" format:"binary"`
+	Image          param.Field[io.Reader] `json:"image" api:"required" format:"binary"`
 	Model          param.Field[string]    `json:"model"`
 	N              param.Field[int64]     `json:"n"`
 	ResponseFormat param.Field[string]    `json:"response_format"`
@@ -368,8 +368,8 @@ func (r ImageNewVariationParams) MarshalMultipart() (data []byte, contentType st
 }
 
 type ImageEditParams struct {
-	Image          param.Field[io.Reader] `json:"image,required" format:"binary"`
-	Prompt         param.Field[string]    `json:"prompt,required"`
+	Image          param.Field[io.Reader] `json:"image" api:"required" format:"binary"`
+	Prompt         param.Field[string]    `json:"prompt" api:"required"`
 	Mask           param.Field[io.Reader] `json:"mask" format:"binary"`
 	Model          param.Field[string]    `json:"model"`
 	N              param.Field[int64]     `json:"n"`
@@ -395,7 +395,7 @@ func (r ImageEditParams) MarshalMultipart() (data []byte, contentType string, er
 
 type ImageGenerateParams struct {
 	// Request to generate images.
-	CreateImageRequest CreateImageRequestParam `json:"create_image_request,required"`
+	CreateImageRequest CreateImageRequestParam `json:"create_image_request" api:"required"`
 }
 
 func (r ImageGenerateParams) MarshalJSON() (data []byte, err error) {
