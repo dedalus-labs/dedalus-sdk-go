@@ -65,7 +65,7 @@ func (r *AudioTranslationService) New(ctx context.Context, body AudioTranslation
 // - segments (optional): list[TranscriptionSegment]
 type AudioTranslationNewResponse struct {
 	// The translated text.
-	Text string `json:"text,required"`
+	Text string `json:"text" api:"required"`
 	// The duration of the input audio.
 	Duration float64 `json:"duration"`
 	// The language of the output translation (always `english`).
@@ -148,11 +148,11 @@ func init() {
 // - segments (optional): list[TranscriptionSegment]
 type AudioTranslationNewResponseCreateTranslationResponseVerboseJSON struct {
 	// The duration of the input audio.
-	Duration float64 `json:"duration,required"`
+	Duration float64 `json:"duration" api:"required"`
 	// The language of the output translation (always `english`).
-	Language string `json:"language,required"`
+	Language string `json:"language" api:"required"`
 	// The translated text.
-	Text string `json:"text,required"`
+	Text string `json:"text" api:"required"`
 	// Segments of the translated text and their corresponding details.
 	Segments []AudioTranslationNewResponseCreateTranslationResponseVerboseJSONSegment `json:"segments"`
 	JSON     audioTranslationNewResponseCreateTranslationResponseVerboseJSONJSON      `json:"-"`
@@ -195,28 +195,28 @@ func (r AudioTranslationNewResponseCreateTranslationResponseVerboseJSON) impleme
 // - no_speech_prob (required): float
 type AudioTranslationNewResponseCreateTranslationResponseVerboseJSONSegment struct {
 	// Unique identifier of the segment.
-	ID int64 `json:"id,required"`
+	ID int64 `json:"id" api:"required"`
 	// Average logprob of the segment. If the value is lower than -1, consider the
 	// logprobs failed.
-	AvgLogprob float64 `json:"avg_logprob,required"`
+	AvgLogprob float64 `json:"avg_logprob" api:"required"`
 	// Compression ratio of the segment. If the value is greater than 2.4, consider the
 	// compression failed.
-	CompressionRatio float64 `json:"compression_ratio,required"`
+	CompressionRatio float64 `json:"compression_ratio" api:"required"`
 	// End time of the segment in seconds.
-	End float64 `json:"end,required"`
+	End float64 `json:"end" api:"required"`
 	// Probability of no speech in the segment. If the value is higher than 1.0 and the
 	// `avg_logprob` is below -1, consider this segment silent.
-	NoSpeechProb float64 `json:"no_speech_prob,required"`
+	NoSpeechProb float64 `json:"no_speech_prob" api:"required"`
 	// Seek offset of the segment.
-	Seek int64 `json:"seek,required"`
+	Seek int64 `json:"seek" api:"required"`
 	// Start time of the segment in seconds.
-	Start float64 `json:"start,required"`
+	Start float64 `json:"start" api:"required"`
 	// Temperature parameter used for generating the segment.
-	Temperature float64 `json:"temperature,required"`
+	Temperature float64 `json:"temperature" api:"required"`
 	// Text content of the segment.
-	Text string `json:"text,required"`
+	Text string `json:"text" api:"required"`
 	// Array of token IDs for the text content.
-	Tokens []int64                                                                    `json:"tokens,required"`
+	Tokens []int64                                                                    `json:"tokens" api:"required"`
 	JSON   audioTranslationNewResponseCreateTranslationResponseVerboseJSONSegmentJSON `json:"-"`
 }
 
@@ -250,7 +250,7 @@ func (r audioTranslationNewResponseCreateTranslationResponseVerboseJSONSegmentJS
 //
 // - text (required): str
 type AudioTranslationNewResponseCreateTranslationResponseJSON struct {
-	Text string                                                       `json:"text,required"`
+	Text string                                                       `json:"text" api:"required"`
 	JSON audioTranslationNewResponseCreateTranslationResponseJSONJSON `json:"-"`
 }
 
@@ -275,8 +275,8 @@ func (r AudioTranslationNewResponseCreateTranslationResponseJSON) implementsAudi
 }
 
 type AudioTranslationNewParams struct {
-	File           param.Field[io.Reader] `json:"file,required" format:"binary"`
-	Model          param.Field[string]    `json:"model,required"`
+	File           param.Field[io.Reader] `json:"file" api:"required" format:"binary"`
+	Model          param.Field[string]    `json:"model" api:"required"`
 	Prompt         param.Field[string]    `json:"prompt"`
 	ResponseFormat param.Field[string]    `json:"response_format"`
 	Temperature    param.Field[float64]   `json:"temperature"`

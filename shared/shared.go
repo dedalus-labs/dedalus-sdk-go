@@ -15,9 +15,9 @@ import (
 // dedalus_mcp.Credential.to_dict().
 type CredentialParam struct {
 	// Connection name. Must match an MCPServerSpec's connection field.
-	ConnectionName param.Field[string] `json:"connection_name,required"`
+	ConnectionName param.Field[string] `json:"connection_name" api:"required"`
 	// Credential values. Keys are credential field names, values are the secrets.
-	Values param.Field[map[string]CredentialValuesUnionParam] `json:"values,required"`
+	Values param.Field[map[string]CredentialValuesUnionParam] `json:"values" api:"required"`
 }
 
 func (r CredentialParam) MarshalJSON() (data []byte, err error) {
@@ -36,7 +36,7 @@ type CredentialValuesUnionParam interface {
 // Used when a binding needs default values, optional flags, or type casting.
 type CredentialsBindingSpecParam struct {
 	// Environment variable name or source identifier.
-	Name param.Field[string] `json:"name,required"`
+	Name param.Field[string] `json:"name" api:"required"`
 	// Type to cast value to (e.g., 'int', 'bool').
 	Cast param.Field[string] `json:"cast"`
 	// Default value if source not set.
@@ -65,7 +65,7 @@ type CredentialsBindingSpecDefaultUnionParam interface {
 type DedalusModelParam struct {
 	// Model identifier with provider prefix (e.g., 'openai/gpt-5',
 	// 'anthropic/claude-3-5-sonnet').
-	Model param.Field[string] `json:"model,required"`
+	Model param.Field[string] `json:"model" api:"required"`
 	// Optional default generation settings (e.g., temperature, max_tokens) applied
 	// when this model is selected.
 	Settings param.Field[DedalusModelSettingsParam] `json:"settings"`
@@ -181,7 +181,7 @@ type DedalusModelChoiceUnionParam interface {
 type FunctionDefinitionParam struct {
 	// The name of the function to be called. Must be a-z, A-Z, 0-9, or contain
 	// underscores and dashes, with a maximum length of 64.
-	Name param.Field[string] `json:"name,required"`
+	Name param.Field[string] `json:"name" api:"required"`
 	// A description of what the function does, used by the model to choose when and
 	// how to call the function.
 	Description param.Field[string] `json:"description"`
@@ -270,7 +270,7 @@ func (r MCPServersParam) ImplementsChatCompletionNewParamsMCPServersUnion() {}
 // - type (required): Literal["json_object"]
 type ResponseFormatJSONObjectParam struct {
 	// The type of response format being defined. Always `json_object`.
-	Type param.Field[ResponseFormatJSONObjectType] `json:"type,required"`
+	Type param.Field[ResponseFormatJSONObjectType] `json:"type" api:"required"`
 }
 
 func (r ResponseFormatJSONObjectParam) MarshalJSON() (data []byte, err error) {
@@ -304,9 +304,9 @@ func (r ResponseFormatJSONObjectType) IsKnown() bool {
 // - json_schema (required): JSONSchema
 type ResponseFormatJSONSchemaParam struct {
 	// Structured Outputs configuration options, including a JSON Schema.
-	JSONSchema param.Field[ResponseFormatJSONSchemaJSONSchemaParam] `json:"json_schema,required"`
+	JSONSchema param.Field[ResponseFormatJSONSchemaJSONSchemaParam] `json:"json_schema" api:"required"`
 	// The type of response format being defined. Always `json_schema`.
-	Type param.Field[ResponseFormatJSONSchemaType] `json:"type,required"`
+	Type param.Field[ResponseFormatJSONSchemaType] `json:"type" api:"required"`
 }
 
 func (r ResponseFormatJSONSchemaParam) MarshalJSON() (data []byte, err error) {
@@ -319,7 +319,7 @@ func (r ResponseFormatJSONSchemaParam) ImplementsChatCompletionNewParamsResponse
 type ResponseFormatJSONSchemaJSONSchemaParam struct {
 	// The name of the response format. Must be a-z, A-Z, 0-9, or contain underscores
 	// and dashes, with a maximum length of 64.
-	Name param.Field[string] `json:"name,required"`
+	Name param.Field[string] `json:"name" api:"required"`
 	// A description of what the response format is for, used by the model to determine
 	// how to respond in the format.
 	Description param.Field[string] `json:"description"`
@@ -360,7 +360,7 @@ func (r ResponseFormatJSONSchemaType) IsKnown() bool {
 // - type (required): Literal["text"]
 type ResponseFormatTextParam struct {
 	// The type of response format being defined. Always `text`.
-	Type param.Field[ResponseFormatTextType] `json:"type,required"`
+	Type param.Field[ResponseFormatTextType] `json:"type" api:"required"`
 }
 
 func (r ResponseFormatTextParam) MarshalJSON() (data []byte, err error) {
