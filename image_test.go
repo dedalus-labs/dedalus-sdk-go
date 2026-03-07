@@ -29,7 +29,7 @@ func TestImageNewVariationWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Images.NewVariation(context.TODO(), githubcomdedaluslabsdedalussdkgo.ImageNewVariationParams{
-		Image:          githubcomdedaluslabsdedalussdkgo.F(io.Reader(bytes.NewBuffer([]byte("some file contents")))),
+		Image:          githubcomdedaluslabsdedalussdkgo.F(io.Reader(bytes.NewBuffer([]byte("Example data")))),
 		Model:          githubcomdedaluslabsdedalussdkgo.F("model"),
 		N:              githubcomdedaluslabsdedalussdkgo.F(int64(0)),
 		ResponseFormat: githubcomdedaluslabsdedalussdkgo.F("response_format"),
@@ -59,9 +59,9 @@ func TestImageEditWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Images.Edit(context.TODO(), githubcomdedaluslabsdedalussdkgo.ImageEditParams{
-		Image:          githubcomdedaluslabsdedalussdkgo.F(io.Reader(bytes.NewBuffer([]byte("some file contents")))),
+		Image:          githubcomdedaluslabsdedalussdkgo.F(io.Reader(bytes.NewBuffer([]byte("Example data")))),
 		Prompt:         githubcomdedaluslabsdedalussdkgo.F("prompt"),
-		Mask:           githubcomdedaluslabsdedalussdkgo.F(io.Reader(bytes.NewBuffer([]byte("some file contents")))),
+		Mask:           githubcomdedaluslabsdedalussdkgo.F(io.Reader(bytes.NewBuffer([]byte("Example data")))),
 		Model:          githubcomdedaluslabsdedalussdkgo.F("model"),
 		N:              githubcomdedaluslabsdedalussdkgo.F(int64(0)),
 		ResponseFormat: githubcomdedaluslabsdedalussdkgo.F("response_format"),
