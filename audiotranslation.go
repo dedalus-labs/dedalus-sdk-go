@@ -54,7 +54,7 @@ func (r *AudioTranslationService) New(ctx context.Context, body AudioTranslation
 	opts = slices.Concat(r.Options, opts)
 	path := "v1/audio/translations"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // Fields:

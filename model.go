@@ -72,11 +72,11 @@ func (r *ModelService) Get(ctx context.Context, modelID string, opts ...option.R
 	opts = slices.Concat(r.Options, opts)
 	if modelID == "" {
 		err = errors.New("missing required model_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("v1/models/%s", modelID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // List available models.
@@ -90,7 +90,7 @@ func (r *ModelService) List(ctx context.Context, opts ...option.RequestOption) (
 	opts = slices.Concat(r.Options, opts)
 	path := "v1/models"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Response for /v1/models endpoint.
