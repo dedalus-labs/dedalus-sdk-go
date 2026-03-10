@@ -41,6 +41,7 @@ func parseFormStructTag(field reflect.StructField) (tag parsedStructTag, ok bool
 		}
 	}
 
+	// the `api` struct tag is only used alongside `json` for custom behaviour
 	parseApiStructTag(field, &tag)
 	return
 }
@@ -57,6 +58,8 @@ func parseApiStructTag(field reflect.StructField, tag *parsedStructTag) {
 			tag.extras = true
 		case "required":
 			tag.required = true
+		case "metadata":
+			tag.metadata = true
 		}
 	}
 }
