@@ -55,7 +55,7 @@ func (r *AudioTranscriptionService) New(ctx context.Context, body AudioTranscrip
 	opts = slices.Concat(r.Options, opts)
 	path := "v1/audio/transcriptions"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // Represents a verbose json transcription response returned by model, based on the

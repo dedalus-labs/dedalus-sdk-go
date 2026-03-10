@@ -43,7 +43,7 @@ func (r *ImageService) NewVariation(ctx context.Context, body ImageNewVariationP
 	opts = slices.Concat(r.Options, opts)
 	path := "v1/images/variations"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // Edit images using inpainting.
@@ -54,7 +54,7 @@ func (r *ImageService) Edit(ctx context.Context, body ImageEditParams, opts ...o
 	opts = slices.Concat(r.Options, opts)
 	path := "v1/images/edits"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // Generate images from text prompts.
@@ -65,7 +65,7 @@ func (r *ImageService) Generate(ctx context.Context, body ImageGenerateParams, o
 	opts = slices.Concat(r.Options, opts)
 	path := "v1/images/generations"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // Request to generate images.

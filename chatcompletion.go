@@ -91,7 +91,7 @@ func (r *ChatCompletionService) New(ctx context.Context, body ChatCompletionNewP
 	opts = slices.Concat(r.Options, opts)
 	path := "v1/chat/completions"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // Create a chat completion.

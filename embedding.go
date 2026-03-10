@@ -40,7 +40,7 @@ func (r *EmbeddingService) New(ctx context.Context, body EmbeddingNewParams, opt
 	opts = slices.Concat(r.Options, opts)
 	path := "v1/embeddings"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // Schema for CreateEmbeddingRequest.

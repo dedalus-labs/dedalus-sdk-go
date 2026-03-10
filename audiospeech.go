@@ -44,7 +44,7 @@ func (r *AudioSpeechService) New(ctx context.Context, body AudioSpeechNewParams,
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "audio/mpeg")}, opts...)
 	path := "v1/audio/speech"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 type AudioSpeechNewParams struct {
