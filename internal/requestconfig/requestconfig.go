@@ -119,7 +119,16 @@ func NewRequestConfig(ctx context.Context, method string, u string, body interfa
 		hasSerializationFunc = true
 		params := body.URLQuery().Encode()
 		if params != "" {
-			u = u + "?" + params
+			parsed, err := url.Parse(u)
+			if err != nil {
+				return nil, err
+			}
+			if parsed.RawQuery != "" {
+				parsed.RawQuery = parsed.RawQuery + "&" + params
+				u = parsed.String()
+			} else {
+				u = u + "?" + params
+			}
 		}
 	}
 	if body, ok := body.([]byte); ok {
