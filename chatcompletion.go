@@ -2396,65 +2396,32 @@ func (r promptTokensDetailsJSON) RawJSON() string {
 	return r.raw
 }
 
-type ReasoningParam struct {
-	Effort          param.Field[ReasoningEffort]          `json:"effort"`
-	GenerateSummary param.Field[ReasoningGenerateSummary] `json:"generate_summary"`
-	Summary         param.Field[ReasoningSummary]         `json:"summary"`
-	ExtraFields     map[string]interface{}                `json:"-,extras"`
-}
+type ReasoningParam = shared.ReasoningParam
 
-func (r ReasoningParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type ReasoningEffort string
+type ReasoningEffort = shared.ReasoningEffort
 
 const (
-	ReasoningEffortMinimal ReasoningEffort = "minimal"
-	ReasoningEffortLow     ReasoningEffort = "low"
-	ReasoningEffortMedium  ReasoningEffort = "medium"
-	ReasoningEffortHigh    ReasoningEffort = "high"
+	ReasoningEffortMinimal = shared.ReasoningEffortMinimal
+	ReasoningEffortLow     = shared.ReasoningEffortLow
+	ReasoningEffortMedium  = shared.ReasoningEffortMedium
+	ReasoningEffortHigh    = shared.ReasoningEffortHigh
 )
 
-func (r ReasoningEffort) IsKnown() bool {
-	switch r {
-	case ReasoningEffortMinimal, ReasoningEffortLow, ReasoningEffortMedium, ReasoningEffortHigh:
-		return true
-	}
-	return false
-}
-
-type ReasoningGenerateSummary string
+type ReasoningGenerateSummary = shared.ReasoningGenerateSummary
 
 const (
-	ReasoningGenerateSummaryAuto     ReasoningGenerateSummary = "auto"
-	ReasoningGenerateSummaryConcise  ReasoningGenerateSummary = "concise"
-	ReasoningGenerateSummaryDetailed ReasoningGenerateSummary = "detailed"
+	ReasoningGenerateSummaryAuto     = shared.ReasoningGenerateSummaryAuto
+	ReasoningGenerateSummaryConcise  = shared.ReasoningGenerateSummaryConcise
+	ReasoningGenerateSummaryDetailed = shared.ReasoningGenerateSummaryDetailed
 )
 
-func (r ReasoningGenerateSummary) IsKnown() bool {
-	switch r {
-	case ReasoningGenerateSummaryAuto, ReasoningGenerateSummaryConcise, ReasoningGenerateSummaryDetailed:
-		return true
-	}
-	return false
-}
-
-type ReasoningSummary string
+type ReasoningSummary = shared.ReasoningSummary
 
 const (
-	ReasoningSummaryAuto     ReasoningSummary = "auto"
-	ReasoningSummaryConcise  ReasoningSummary = "concise"
-	ReasoningSummaryDetailed ReasoningSummary = "detailed"
+	ReasoningSummaryAuto     = shared.ReasoningSummaryAuto
+	ReasoningSummaryConcise  = shared.ReasoningSummaryConcise
+	ReasoningSummaryDetailed = shared.ReasoningSummaryDetailed
 )
-
-func (r ReasoningSummary) IsKnown() bool {
-	switch r {
-	case ReasoningSummaryAuto, ReasoningSummaryConcise, ReasoningSummaryDetailed:
-		return true
-	}
-	return false
-}
 
 // Schema for ThinkingConfigDisabled.
 //
@@ -2527,42 +2494,19 @@ func (r ThinkingConfigEnabledType) IsKnown() bool {
 
 // Satisfied by [ToolChoiceString], [shared.UnionString], [ToolChoiceMapParam],
 // [ToolChoiceMCPToolChoiceParam].
-type ToolChoiceUnionParam interface {
-	ImplementsToolChoiceUnionParam()
-}
+type ToolChoiceUnionParam = shared.ToolChoiceUnionParam
 
-type ToolChoiceString string
+type ToolChoiceString = shared.ToolChoiceString
 
 const (
-	ToolChoiceStringAuto     ToolChoiceString = "auto"
-	ToolChoiceStringRequired ToolChoiceString = "required"
-	ToolChoiceStringNone     ToolChoiceString = "none"
+	ToolChoiceStringAuto     = shared.ToolChoiceStringAuto
+	ToolChoiceStringRequired = shared.ToolChoiceStringRequired
+	ToolChoiceStringNone     = shared.ToolChoiceStringNone
 )
 
-func (r ToolChoiceString) IsKnown() bool {
-	switch r {
-	case ToolChoiceStringAuto, ToolChoiceStringRequired, ToolChoiceStringNone:
-		return true
-	}
-	return false
-}
+type ToolChoiceMapParam = shared.ToolChoiceMapParam
 
-func (r ToolChoiceString) ImplementsToolChoiceUnionParam() {}
-
-type ToolChoiceMapParam map[string]interface{}
-
-func (r ToolChoiceMapParam) ImplementsToolChoiceUnionParam() {}
-
-type ToolChoiceMCPToolChoiceParam struct {
-	Name        param.Field[string] `json:"name" api:"required"`
-	ServerLabel param.Field[string] `json:"server_label" api:"required"`
-}
-
-func (r ToolChoiceMCPToolChoiceParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r ToolChoiceMCPToolChoiceParam) ImplementsToolChoiceUnionParam() {}
+type ToolChoiceMCPToolChoiceParam = shared.ToolChoiceMCPToolChoiceParam
 
 // The model will use any available tools.
 //

@@ -3,7 +3,6 @@
 package shared
 
 import (
-	"github.com/dedalus-labs/dedalus-sdk-go"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/apijson"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/param"
 )
@@ -105,7 +104,7 @@ type DedalusModelSettingsParam struct {
 	Prediction              param.Field[map[string]interface{}]                                `json:"prediction"`
 	PresencePenalty         param.Field[float64]                                               `json:"presence_penalty"`
 	PromptCacheKey          param.Field[string]                                                `json:"prompt_cache_key"`
-	Reasoning               param.Field[githubcomdedaluslabsdedalussdkgo.ReasoningParam]       `json:"reasoning"`
+	Reasoning               param.Field[ReasoningParam]                                     `json:"reasoning"`
 	ReasoningEffort         param.Field[string]                                                `json:"reasoning_effort"`
 	ResponseFormat          param.Field[map[string]interface{}]                                `json:"response_format"`
 	SafetyIdentifier        param.Field[string]                                                `json:"safety_identifier"`
@@ -122,7 +121,7 @@ type DedalusModelSettingsParam struct {
 	Temperature             param.Field[float64]                                               `json:"temperature"`
 	Thinking                param.Field[map[string]interface{}]                                `json:"thinking"`
 	Timeout                 param.Field[float64]                                               `json:"timeout"`
-	ToolChoice              param.Field[githubcomdedaluslabsdedalussdkgo.ToolChoiceUnionParam] `json:"tool_choice"`
+	ToolChoice              param.Field[ToolChoiceUnionParam]                               `json:"tool_choice"`
 	ToolConfig              param.Field[map[string]interface{}]                                `json:"tool_config"`
 	TopK                    param.Field[int64]                                                 `json:"top_k"`
 	TopLogprobs             param.Field[int64]                                                 `json:"top_logprobs"`
@@ -371,6 +370,105 @@ func (r ResponseFormatTextParam) ImplementsChatCompletionNewParamsResponseFormat
 
 // The type of response format being defined. Always `text`.
 type ResponseFormatTextType string
+
+type ReasoningParam struct {
+	Effort          param.Field[ReasoningEffort]          `json:"effort"`
+	GenerateSummary param.Field[ReasoningGenerateSummary] `json:"generate_summary"`
+	Summary         param.Field[ReasoningSummary]         `json:"summary"`
+	ExtraFields     map[string]interface{}                `json:"-,extras"`
+}
+
+func (r ReasoningParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+type ReasoningEffort string
+
+const (
+	ReasoningEffortMinimal ReasoningEffort = "minimal"
+	ReasoningEffortLow     ReasoningEffort = "low"
+	ReasoningEffortMedium  ReasoningEffort = "medium"
+	ReasoningEffortHigh    ReasoningEffort = "high"
+)
+
+func (r ReasoningEffort) IsKnown() bool {
+	switch r {
+	case ReasoningEffortMinimal, ReasoningEffortLow, ReasoningEffortMedium, ReasoningEffortHigh:
+		return true
+	}
+	return false
+}
+
+type ReasoningGenerateSummary string
+
+const (
+	ReasoningGenerateSummaryAuto     ReasoningGenerateSummary = "auto"
+	ReasoningGenerateSummaryConcise  ReasoningGenerateSummary = "concise"
+	ReasoningGenerateSummaryDetailed ReasoningGenerateSummary = "detailed"
+)
+
+func (r ReasoningGenerateSummary) IsKnown() bool {
+	switch r {
+	case ReasoningGenerateSummaryAuto, ReasoningGenerateSummaryConcise, ReasoningGenerateSummaryDetailed:
+		return true
+	}
+	return false
+}
+
+type ReasoningSummary string
+
+const (
+	ReasoningSummaryAuto     ReasoningSummary = "auto"
+	ReasoningSummaryConcise  ReasoningSummary = "concise"
+	ReasoningSummaryDetailed ReasoningSummary = "detailed"
+)
+
+func (r ReasoningSummary) IsKnown() bool {
+	switch r {
+	case ReasoningSummaryAuto, ReasoningSummaryConcise, ReasoningSummaryDetailed:
+		return true
+	}
+	return false
+}
+
+// Satisfied by [ToolChoiceString], [shared.UnionString], [ToolChoiceMapParam],
+// [ToolChoiceMCPToolChoiceParam].
+type ToolChoiceUnionParam interface {
+	ImplementsToolChoiceUnionParam()
+}
+
+type ToolChoiceString string
+
+const (
+	ToolChoiceStringAuto     ToolChoiceString = "auto"
+	ToolChoiceStringRequired ToolChoiceString = "required"
+	ToolChoiceStringNone     ToolChoiceString = "none"
+)
+
+func (r ToolChoiceString) IsKnown() bool {
+	switch r {
+	case ToolChoiceStringAuto, ToolChoiceStringRequired, ToolChoiceStringNone:
+		return true
+	}
+	return false
+}
+
+func (r ToolChoiceString) ImplementsToolChoiceUnionParam() {}
+
+type ToolChoiceMapParam map[string]interface{}
+
+func (r ToolChoiceMapParam) ImplementsToolChoiceUnionParam() {}
+
+type ToolChoiceMCPToolChoiceParam struct {
+	Name        param.Field[string] `json:"name" api:"required"`
+	ServerLabel param.Field[string] `json:"server_label" api:"required"`
+}
+
+func (r ToolChoiceMCPToolChoiceParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r ToolChoiceMCPToolChoiceParam) ImplementsToolChoiceUnionParam() {}
 
 const (
 	ResponseFormatTextTypeText ResponseFormatTextType = "text"
