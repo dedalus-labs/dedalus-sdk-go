@@ -17,18 +17,17 @@ import (
 // directly, and instead use the [NewClient] method instead.
 type Client struct {
 	Options    []option.RequestOption
-	Root       RootService
-	_Private   PrivateService
-	Health     HealthService
-	Models     ModelService
-	Embeddings EmbeddingService
-	Audio      AudioService
-	Images     ImageService
-	Chat       ChatService
+	Models     *ModelService
+	Embeddings *EmbeddingService
+	Audio      *AudioService
+	Images     *ImageService
+	Chat       *ChatService
 }
 
-// DefaultClientOptions read from the environment (DEDALUS_API_KEY, DEDALUS_ORG_ID,
-// DEDALUS_BASE_URL). This should be used to initialize new clients.
+// DefaultClientOptions read from the environment (DEDALUS_API_KEY,
+// DEDALUS_X_API_KEY, DEDALUS_PROVIDER_KEY, DEDALUS_AS_URL, DEDALUS_ORG_ID,
+// DEDALUS_PROVIDER, DEDALUS_PROVIDER_MODEL, DEDALUS_BASE_URL). This should be used
+// to initialize new clients.
 func DefaultClientOptions() []option.RequestOption {
 	defaults := []option.RequestOption{option.WithEnvironmentProduction()}
 	if o, ok := os.LookupEnv("DEDALUS_BASE_URL"); ok {
@@ -37,24 +36,38 @@ func DefaultClientOptions() []option.RequestOption {
 	if o, ok := os.LookupEnv("DEDALUS_API_KEY"); ok {
 		defaults = append(defaults, option.WithAPIKey(o))
 	}
+	if o, ok := os.LookupEnv("DEDALUS_X_API_KEY"); ok {
+		defaults = append(defaults, option.WithXAPIKey(o))
+	}
+	if o, ok := os.LookupEnv("DEDALUS_AS_URL"); ok {
+		defaults = append(defaults, option.WithAsBaseURL(o))
+	}
 	if o, ok := os.LookupEnv("DEDALUS_ORG_ID"); ok {
-		defaults = append(defaults, option.WithOrganization(o))
+		defaults = append(defaults, option.WithDedalusOrgID(o))
+	}
+	if o, ok := os.LookupEnv("DEDALUS_PROVIDER"); ok {
+		defaults = append(defaults, option.WithProvider(o))
+	}
+	if o, ok := os.LookupEnv("DEDALUS_PROVIDER_KEY"); ok {
+		defaults = append(defaults, option.WithProviderKey(o))
+	}
+	if o, ok := os.LookupEnv("DEDALUS_PROVIDER_MODEL"); ok {
+		defaults = append(defaults, option.WithProviderModel(o))
 	}
 	return defaults
 }
 
 // NewClient generates a new client with the default option read from the
-// environment (DEDALUS_API_KEY, DEDALUS_ORG_ID, DEDALUS_BASE_URL). The option
-// passed in as arguments are applied after these default arguments, and all option
-// will be passed down to the services and requests that this client makes.
-func NewClient(opts ...option.RequestOption) (r Client) {
+// environment (DEDALUS_API_KEY, DEDALUS_X_API_KEY, DEDALUS_PROVIDER_KEY,
+// DEDALUS_AS_URL, DEDALUS_ORG_ID, DEDALUS_PROVIDER, DEDALUS_PROVIDER_MODEL,
+// DEDALUS_BASE_URL). The option passed in as arguments are applied after these
+// default arguments, and all option will be passed down to the services and
+// requests that this client makes.
+func NewClient(opts ...option.RequestOption) (r *Client) {
 	opts = append(DefaultClientOptions(), opts...)
 
-	r = Client{Options: opts}
+	r = &Client{Options: opts}
 
-	r.Root = NewRootService(opts...)
-	r._Private = NewPrivateService(opts...)
-	r.Health = NewHealthService(opts...)
 	r.Models = NewModelService(opts...)
 	r.Embeddings = NewEmbeddingService(opts...)
 	r.Audio = NewAudioService(opts...)
@@ -95,40 +108,40 @@ func NewClient(opts ...option.RequestOption) (r Client) {
 //
 // For even greater flexibility, see [option.WithResponseInto] and
 // [option.WithResponseBodyInto].
-func (r *Client) Execute(ctx context.Context, method string, path string, params any, res any, opts ...option.RequestOption) error {
+func (r *Client) Execute(ctx context.Context, method string, path string, params interface{}, res interface{}, opts ...option.RequestOption) error {
 	opts = slices.Concat(r.Options, opts)
 	return requestconfig.ExecuteNewRequest(ctx, method, path, params, res, opts...)
 }
 
 // Get makes a GET request with the given URL, params, and optionally deserializes
 // to a response. See [Execute] documentation on the params and response.
-func (r *Client) Get(ctx context.Context, path string, params any, res any, opts ...option.RequestOption) error {
+func (r *Client) Get(ctx context.Context, path string, params interface{}, res interface{}, opts ...option.RequestOption) error {
 	return r.Execute(ctx, http.MethodGet, path, params, res, opts...)
 }
 
 // Post makes a POST request with the given URL, params, and optionally
 // deserializes to a response. See [Execute] documentation on the params and
 // response.
-func (r *Client) Post(ctx context.Context, path string, params any, res any, opts ...option.RequestOption) error {
+func (r *Client) Post(ctx context.Context, path string, params interface{}, res interface{}, opts ...option.RequestOption) error {
 	return r.Execute(ctx, http.MethodPost, path, params, res, opts...)
 }
 
 // Put makes a PUT request with the given URL, params, and optionally deserializes
 // to a response. See [Execute] documentation on the params and response.
-func (r *Client) Put(ctx context.Context, path string, params any, res any, opts ...option.RequestOption) error {
+func (r *Client) Put(ctx context.Context, path string, params interface{}, res interface{}, opts ...option.RequestOption) error {
 	return r.Execute(ctx, http.MethodPut, path, params, res, opts...)
 }
 
 // Patch makes a PATCH request with the given URL, params, and optionally
 // deserializes to a response. See [Execute] documentation on the params and
 // response.
-func (r *Client) Patch(ctx context.Context, path string, params any, res any, opts ...option.RequestOption) error {
+func (r *Client) Patch(ctx context.Context, path string, params interface{}, res interface{}, opts ...option.RequestOption) error {
 	return r.Execute(ctx, http.MethodPatch, path, params, res, opts...)
 }
 
 // Delete makes a DELETE request with the given URL, params, and optionally
 // deserializes to a response. See [Execute] documentation on the params and
 // response.
-func (r *Client) Delete(ctx context.Context, path string, params any, res any, opts ...option.RequestOption) error {
+func (r *Client) Delete(ctx context.Context, path string, params interface{}, res interface{}, opts ...option.RequestOption) error {
 	return r.Execute(ctx, http.MethodDelete, path, params, res, opts...)
 }

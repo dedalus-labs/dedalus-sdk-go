@@ -1,15 +1,20 @@
 # Dedalus Go API Library
 
-<!-- x-release-please-start-version -->
-
 <a href="https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go"><img src="https://pkg.go.dev/badge/github.com/dedalus-labs/dedalus-sdk-go.svg" alt="Go Reference"></a>
-
-<!-- x-release-please-end -->
 
 The Dedalus Go library provides convenient access to the [Dedalus REST API](https://docs.dedaluslabs.ai)
 from applications written in Go.
 
 It is generated with [Stainless](https://www.stainless.com/).
+
+## MCP Server
+
+Use the Dedalus MCP Server to enable AI assistants to interact with this API, allowing them to explore endpoints, make test requests, and use documentation to help integrate this SDK into your application.
+
+[![Add to Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=dedalus-labs-mcp&config=eyJuYW1lIjoiZGVkYWx1cy1sYWJzLW1jcCIsInRyYW5zcG9ydCI6Imh0dHAiLCJ1cmwiOiJodHRwczovL2RlZGFsdXMtc2RrLnN0bG1jcC5jb20iLCJoZWFkZXJzIjp7IngtZGVkYWx1cy1hcGkta2V5IjoiTXkgQVBJIEtleSIsIngtYXBpLWtleSI6Ik15IFggQVBJIEtleSJ9fQ)
+[![Install in VS Code](https://img.shields.io/badge/_-Add_to_VS_Code-blue?style=for-the-badge&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9Im5vbmUiIHZpZXdCb3g9IjAgMCA0MCA0MCI+PHBhdGggZmlsbD0iI0VFRSIgZmlsbC1ydWxlPSJldmVub2RkIiBkPSJNMzAuMjM1IDM5Ljg4NGEyLjQ5MSAyLjQ5MSAwIDAgMS0xLjc4MS0uNzNMMTIuNyAyNC43OGwtMy40NiAyLjYyNC0zLjQwNiAyLjU4MmExLjY2NSAxLjY2NSAwIDAgMS0xLjA4Mi4zMzggMS42NjQgMS42NjQgMCAwIDEtMS4wNDYtLjQzMWwtMi4yLTJhMS42NjYgMS42NjYgMCAwIDEgMC0yLjQ2M0w3LjQ1OCAyMCA0LjY3IDE3LjQ1MyAxLjUwNyAxNC41N2ExLjY2NSAxLjY2NSAwIDAgMSAwLTIuNDYzbDIuMi0yYTEuNjY1IDEuNjY1IDAgMCAxIDIuMTMtLjA5N2w2Ljg2MyA1LjIwOUwyOC40NTIuODQ0YTIuNDg4IDIuNDg4IDAgMCAxIDEuODQxLS43MjljLjM1MS4wMDkuNjk5LjA5MSAxLjAxOS4yNDVsOC4yMzYgMy45NjFhMi41IDIuNSAwIDAgMSAxLjQxNSAyLjI1M3YuMDk5LS4wNDVWMzMuMzd2LS4wNDUuMDk1YTIuNTAxIDIuNTAxIDAgMCAxLTEuNDE2IDIuMjU3bC04LjIzNSAzLjk2MWEyLjQ5MiAyLjQ5MiAwIDAgMS0xLjA3Ny4yNDZabS43MTYtMjguOTQ3LTExLjk0OCA5LjA2MiAxMS45NTIgOS4wNjUtLjAwNC0xOC4xMjdaIi8+PC9zdmc+)](https://vscode.stainless.com/mcp/%7B%22name%22%3A%22dedalus-labs-mcp%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fdedalus-sdk.stlmcp.com%22%2C%22headers%22%3A%7B%22x-dedalus-api-key%22%3A%22My%20API%20Key%22%2C%22x-api-key%22%3A%22My%20X%20API%20Key%22%7D%7D)
+
+> Note: You may need to set environment variables in your MCP client.
 
 ## Installation
 
@@ -50,6 +55,7 @@ import (
 
 	"github.com/dedalus-labs/dedalus-sdk-go"
 	"github.com/dedalus-labs/dedalus-sdk-go/option"
+	"github.com/dedalus-labs/dedalus-sdk-go/shared"
 )
 
 func main() {
@@ -57,211 +63,93 @@ func main() {
 		option.WithAPIKey("My API Key"),     // defaults to os.LookupEnv("DEDALUS_API_KEY")
 		option.WithEnvironmentDevelopment(), // defaults to option.WithEnvironmentProduction()
 	)
-	completion, err := client.Chat.Completions.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
-		Messages: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessagesUnion{
-			OfMapOfAnyMap: []map[string]any{{
-				"role":    "user",
-				"content": "Hello, how are you today?",
-			}},
-		},
-		Model: githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion{
-			OfModelID: githubcomdedaluslabsdedalussdkgo.String("openai/gpt-5"),
-		},
+	chatCompletion, err := client.Chat.Completions.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
+		Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-5-nano")),
+		Messages: githubcomdedaluslabsdedalussdkgo.F([]githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessageUnion{githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParam{
+			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamRoleSystem),
+			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamContentUnion](shared.UnionString("You are Stephen Dedalus. Respond in morose Joycean malaise.")),
+		}, githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParam{
+			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamRoleUser),
+			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamContentUnion](shared.UnionString("Hello, how are you today?")),
+		}}),
 	})
 	if err != nil {
 		panic(err.Error())
 	}
-	fmt.Printf("%+v\n", completion.ID)
+	fmt.Printf("%+v\n", chatCompletion.ID)
 }
 
 ```
 
 ### Request fields
 
-The githubcomdedaluslabsdedalussdkgo library uses the [`omitzero`](https://tip.golang.org/doc/go1.24#encodingjsonpkgencodingjson)
-semantics from the Go 1.24+ `encoding/json` release for request fields.
+All request parameters are wrapped in a generic `Field` type,
+which we use to distinguish zero values from null or omitted fields.
 
-Required primitive fields (`int64`, `string`, etc.) feature the tag <code>\`json:"...,required"\`</code>. These
-fields are always serialized, even their zero values.
+This prevents accidentally sending a zero value if you forget a required parameter,
+and enables explicitly sending `null`, `false`, `''`, or `0` on optional parameters.
+Any field not specified is not sent.
 
-Optional primitive types are wrapped in a `param.Opt[T]`. These fields can be set with the provided constructors, `githubcomdedaluslabsdedalussdkgo.String(string)`, `githubcomdedaluslabsdedalussdkgo.Int(int64)`, etc.
-
-Any `param.Opt[T]`, map, slice, struct or string enum uses the
-tag <code>\`json:"...,omitzero"\`</code>. Its zero value is considered omitted.
-
-The `param.IsOmitted(any)` function can confirm the presence of any `omitzero` field.
+To construct fields with values, use the helpers `String()`, `Int()`, `Float()`, or most commonly, the generic `F[T]()`.
+To send a null, use `Null[T]()`, and to send a nonconforming value, use `Raw[T](any)`. For example:
 
 ```go
-p := githubcomdedaluslabsdedalussdkgo.ExampleParams{
-	ID:   "id_xxx",                                       // required property
-	Name: githubcomdedaluslabsdedalussdkgo.String("..."), // optional property
+params := FooParams{
+	Name: githubcomdedaluslabsdedalussdkgo.F("hello"),
 
-	Point: githubcomdedaluslabsdedalussdkgo.Point{
-		X: 0,                                       // required field will serialize as 0
-		Y: githubcomdedaluslabsdedalussdkgo.Int(1), // optional field will serialize as 1
-		// ... omitted non-required fields will not be serialized
-	},
+	// Explicitly send `"description": null`
+	Description: githubcomdedaluslabsdedalussdkgo.Null[string](),
 
-	Origin: githubcomdedaluslabsdedalussdkgo.Origin{}, // the zero value of [Origin] is considered omitted
-}
-```
+	Point: githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.Point{
+		X: githubcomdedaluslabsdedalussdkgo.Int(0),
+		Y: githubcomdedaluslabsdedalussdkgo.Int(1),
 
-To send `null` instead of a `param.Opt[T]`, use `param.Null[T]()`.
-To send `null` instead of a struct `T`, use `param.NullStruct[T]()`.
-
-```go
-p.Name = param.Null[string]()       // 'null' instead of string
-p.Point = param.NullStruct[Point]() // 'null' instead of struct
-
-param.IsNull(p.Name)  // true
-param.IsNull(p.Point) // true
-```
-
-Request structs contain a `.SetExtraFields(map[string]any)` method which can send non-conforming
-fields in the request body. Extra fields overwrite any struct fields with a matching
-key. For security reasons, only use `SetExtraFields` with trusted data.
-
-To send a custom value instead of a struct, use `param.Override[T](value)`.
-
-```go
-// In cases where the API specifies a given type,
-// but you want to send something else, use [SetExtraFields]:
-p.SetExtraFields(map[string]any{
-	"x": 0.01, // send "x" as a float instead of int
-})
-
-// Send a number instead of an object
-custom := param.Override[githubcomdedaluslabsdedalussdkgo.FooParams](12)
-```
-
-### Request unions
-
-Unions are represented as a struct with fields prefixed by "Of" for each of its variants,
-only one field can be non-zero. The non-zero field will be serialized.
-
-Sub-properties of the union can be accessed via methods on the union struct.
-These methods return a mutable pointer to the underlying data, if present.
-
-```go
-// Only one field can be non-zero, use param.IsOmitted() to check if a field is set
-type AnimalUnionParam struct {
-	OfCat *Cat `json:",omitzero,inline`
-	OfDog *Dog `json:",omitzero,inline`
-}
-
-animal := AnimalUnionParam{
-	OfCat: &Cat{
-		Name: "Whiskers",
-		Owner: PersonParam{
-			Address: AddressParam{Street: "3333 Coyote Hill Rd", Zip: 0},
-		},
-	},
-}
-
-// Mutating a field
-if address := animal.GetOwner().GetAddress(); address != nil {
-	address.ZipCode = 94304
+		// In cases where the API specifies a given type,
+		// but you want to send something else, use `Raw`:
+		Z: githubcomdedaluslabsdedalussdkgo.Raw[int64](0.01), // sends a float
+	}),
 }
 ```
 
 ### Response objects
 
-All fields in response structs are ordinary value types (not pointers or wrappers).
-Response structs also include a special `JSON` field containing metadata about
-each property.
+All fields in response structs are value types (not pointers or wrappers).
+
+If a given field is `null`, not present, or invalid, the corresponding field
+will simply be its zero value.
+
+All response structs also include a special `JSON` field, containing more detailed
+information about each property, which you can use like so:
 
 ```go
-type Animal struct {
-	Name   string `json:"name,nullable"`
-	Owners int    `json:"owners"`
-	Age    int    `json:"age"`
-	JSON   struct {
-		Name        respjson.Field
-		Owner       respjson.Field
-		Age         respjson.Field
-		ExtraFields map[string]respjson.Field
-	} `json:"-"`
+if res.Name == "" {
+	// true if `"name"` is either not present or explicitly null
+	res.JSON.Name.IsNull()
+
+	// true if the `"name"` key was not present in the response JSON at all
+	res.JSON.Name.IsMissing()
+
+	// When the API returns data that cannot be coerced to the expected type:
+	if res.JSON.Name.IsInvalid() {
+		raw := res.JSON.Name.Raw()
+
+		legacyName := struct{
+			First string `json:"first"`
+			Last  string `json:"last"`
+		}{}
+		json.Unmarshal([]byte(raw), &legacyName)
+		name = legacyName.First + " " + legacyName.Last
+	}
 }
 ```
 
-To handle optional data, use the `.Valid()` method on the JSON field.
-`.Valid()` returns true if a field is not `null`, not present, or couldn't be marshaled.
-
-If `.Valid()` is false, the corresponding field will simply be its zero value.
-
-```go
-raw := `{"owners": 1, "name": null}`
-
-var res Animal
-json.Unmarshal([]byte(raw), &res)
-
-// Accessing regular fields
-
-res.Owners // 1
-res.Name   // ""
-res.Age    // 0
-
-// Optional field checks
-
-res.JSON.Owners.Valid() // true
-res.JSON.Name.Valid()   // false
-res.JSON.Age.Valid()    // false
-
-// Raw JSON values
-
-res.JSON.Owners.Raw()                  // "1"
-res.JSON.Name.Raw() == "null"          // true
-res.JSON.Name.Raw() == respjson.Null   // true
-res.JSON.Age.Raw() == ""               // true
-res.JSON.Age.Raw() == respjson.Omitted // true
-```
-
-These `.JSON` structs also include an `ExtraFields` map containing
+These `.JSON` structs also include an `Extras` map containing
 any properties in the json response that were not specified
 in the struct. This can be useful for API features not yet
 present in the SDK.
 
 ```go
 body := res.JSON.ExtraFields["my_unexpected_field"].Raw()
-```
-
-### Response Unions
-
-In responses, unions are represented by a flattened struct containing all possible fields from each of the
-object variants.
-To convert it to a variant use the `.AsFooVariant()` method or the `.AsAny()` method if present.
-
-If a response value union contains primitive values, primitive fields will be alongside
-the properties but prefixed with `Of` and feature the tag `json:"...,inline"`.
-
-```go
-type AnimalUnion struct {
-	// From variants [Dog], [Cat]
-	Owner Person `json:"owner"`
-	// From variant [Dog]
-	DogBreed string `json:"dog_breed"`
-	// From variant [Cat]
-	CatBreed string `json:"cat_breed"`
-	// ...
-
-	JSON struct {
-		Owner respjson.Field
-		// ...
-	} `json:"-"`
-}
-
-// If animal variant
-if animal.Owner.Address.ZipCode == "" {
-	panic("missing zip code")
-}
-
-// Switch on the variant
-switch variant := animal.AsAny().(type) {
-case Dog:
-case Cat:
-default:
-	panic("unexpected type")
-}
 ```
 
 ### RequestOptions
@@ -277,15 +165,13 @@ client := githubcomdedaluslabsdedalussdkgo.NewClient(
 	option.WithHeader("X-Some-Header", "custom_header_info"),
 )
 
-client.Health.Check(context.TODO(), ...,
+client.Chat.Completions.New(context.TODO(), ...,
 	// Override the header
 	option.WithHeader("X-Some-Header", "some_other_custom_header_info"),
 	// Add an undocumented field to the request body, using sjson syntax
 	option.WithJSONSet("some.json.path", map[string]string{"my": "object"}),
 )
 ```
-
-The request option `option.WithDebugLog(nil)` may be helpful while debugging.
 
 See the [full list of request options](https://pkg.go.dev/github.com/dedalus-labs/dedalus-sdk-go/option).
 
@@ -308,14 +194,23 @@ When the API returns a non-success status code, we return an error with type
 To handle errors, we recommend that you use the `errors.As` pattern:
 
 ```go
-_, err := client.Health.Check(context.TODO())
+_, err := client.Chat.Completions.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
+	Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-5-nano")),
+	Messages: githubcomdedaluslabsdedalussdkgo.F([]githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessageUnion{githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParam{
+		Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamRoleSystem),
+		Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamContentUnion](shared.UnionString("You are Stephen Dedalus. Respond in morose Joycean malaise.")),
+	}, githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParam{
+		Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamRoleUser),
+		Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamContentUnion](shared.UnionString("Hello, how are you today?")),
+	}}),
+})
 if err != nil {
 	var apierr *githubcomdedaluslabsdedalussdkgo.Error
 	if errors.As(err, &apierr) {
 		println(string(apierr.DumpRequest(true)))  // Prints the serialized HTTP request
 		println(string(apierr.DumpResponse(true))) // Prints the serialized HTTP response
 	}
-	panic(err.Error()) // GET "/health": 400 Bad Request { ... }
+	panic(err.Error()) // GET "/v1/chat/completions": 400 Bad Request { ... }
 }
 ```
 
@@ -333,8 +228,18 @@ To set a per-retry timeout, use `option.WithRequestTimeout()`.
 // This sets the timeout for the request, including all the retries.
 ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 defer cancel()
-client.Health.Check(
+client.Chat.Completions.New(
 	ctx,
+	githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
+		Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-5-nano")),
+		Messages: githubcomdedaluslabsdedalussdkgo.F([]githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessageUnion{githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParam{
+			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamRoleSystem),
+			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamContentUnion](shared.UnionString("You are Stephen Dedalus. Respond in morose Joycean malaise.")),
+		}, githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParam{
+			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamRoleUser),
+			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamContentUnion](shared.UnionString("Hello, how are you today?")),
+		}}),
+	},
 	// This sets the per-retry timeout
 	option.WithRequestTimeout(20*time.Second),
 )
@@ -343,34 +248,34 @@ client.Health.Check(
 ### File uploads
 
 Request parameters that correspond to file uploads in multipart requests are typed as
-`io.Reader`. The contents of the `io.Reader` will by default be sent as a multipart form
+`param.Field[io.Reader]`. The contents of the `io.Reader` will by default be sent as a multipart form
 part with the file name of "anonymous_file" and content-type of "application/octet-stream".
 
 The file name and content-type can be customized by implementing `Name() string` or `ContentType()
 string` on the run-time type of `io.Reader`. Note that `os.File` implements `Name() string`, so a
 file returned by `os.Open` will be sent with the file name on disk.
 
-We also provide a helper `githubcomdedaluslabsdedalussdkgo.File(reader io.Reader, filename string, contentType string)`
+We also provide a helper `githubcomdedaluslabsdedalussdkgo.FileParam(reader io.Reader, filename string, contentType string)`
 which can be used to wrap any `io.Reader` with the appropriate file name and content type.
 
 ```go
 // A file from the file system
 file, err := os.Open("/path/to/file")
 githubcomdedaluslabsdedalussdkgo.AudioTranscriptionNewParams{
-	File:  file,
-	Model: "model",
+	File:  githubcomdedaluslabsdedalussdkgo.F[io.Reader](file),
+	Model: githubcomdedaluslabsdedalussdkgo.F("model"),
 }
 
 // A file from a string
 githubcomdedaluslabsdedalussdkgo.AudioTranscriptionNewParams{
-	File:  strings.NewReader("my file contents"),
-	Model: "model",
+	File:  githubcomdedaluslabsdedalussdkgo.F[io.Reader](strings.NewReader("my file contents")),
+	Model: githubcomdedaluslabsdedalussdkgo.F("model"),
 }
 
 // With a custom filename and contentType
 githubcomdedaluslabsdedalussdkgo.AudioTranscriptionNewParams{
-	File:  githubcomdedaluslabsdedalussdkgo.File(strings.NewReader(`{"hello": "foo"}`), "file.go", "application/json"),
-	Model: "model",
+	File:  githubcomdedaluslabsdedalussdkgo.FileParam(strings.NewReader(`{"hello": "foo"}`), "file.go", "application/json"),
+	Model: githubcomdedaluslabsdedalussdkgo.F("model"),
 }
 ```
 
@@ -389,7 +294,20 @@ client := githubcomdedaluslabsdedalussdkgo.NewClient(
 )
 
 // Override per-request:
-client.Health.Check(context.TODO(), option.WithMaxRetries(5))
+client.Chat.Completions.New(
+	context.TODO(),
+	githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
+		Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-5-nano")),
+		Messages: githubcomdedaluslabsdedalussdkgo.F([]githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessageUnion{githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParam{
+			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamRoleSystem),
+			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamContentUnion](shared.UnionString("You are Stephen Dedalus. Respond in morose Joycean malaise.")),
+		}, githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParam{
+			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamRoleUser),
+			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamContentUnion](shared.UnionString("Hello, how are you today?")),
+		}}),
+	},
+	option.WithMaxRetries(5),
+)
 ```
 
 ### Accessing raw response data (e.g. response headers)
@@ -400,11 +318,24 @@ you need to examine response headers, status codes, or other details.
 ```go
 // Create a variable to store the HTTP response
 var response *http.Response
-response, err := client.Health.Check(context.TODO(), option.WithResponseInto(&response))
+chatCompletion, err := client.Chat.Completions.New(
+	context.TODO(),
+	githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParams{
+		Model: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsModelUnion](shared.UnionString("openai/gpt-5-nano")),
+		Messages: githubcomdedaluslabsdedalussdkgo.F([]githubcomdedaluslabsdedalussdkgo.ChatCompletionNewParamsMessageUnion{githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParam{
+			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamRoleSystem),
+			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionSystemMessageParamContentUnion](shared.UnionString("You are Stephen Dedalus. Respond in morose Joycean malaise.")),
+		}, githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParam{
+			Role:    githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamRoleUser),
+			Content: githubcomdedaluslabsdedalussdkgo.F[githubcomdedaluslabsdedalussdkgo.ChatCompletionUserMessageParamContentUnion](shared.UnionString("Hello, how are you today?")),
+		}}),
+	},
+	option.WithResponseInto(&response),
+)
 if err != nil {
 	// handle error
 }
-fmt.Printf("%+v\n", response)
+fmt.Printf("%+v\n", chatCompletion)
 
 fmt.Printf("Status Code: %d\n", response.StatusCode)
 fmt.Printf("Headers: %+#v\n", response.Header)
@@ -424,7 +355,7 @@ To make requests to undocumented endpoints, you can use `client.Get`, `client.Po
 var (
     // params can be an io.Reader, a []byte, an encoding/json serializable object,
     // or a "…Params" struct defined in this library.
-    params map[string]any
+    params map[string]interface{}
 
     // result can be an []byte, *http.Response, a encoding/json deserializable object,
     // or a model defined in this library.
@@ -443,10 +374,10 @@ or the `option.WithJSONSet()` methods.
 
 ```go
 params := FooNewParams{
-    ID:   "id_xxxx",
-    Data: FooNewParamsData{
-        FirstName: githubcomdedaluslabsdedalussdkgo.String("John"),
-    },
+    ID:   githubcomdedaluslabsdedalussdkgo.F("id_xxxx"),
+    Data: githubcomdedaluslabsdedalussdkgo.F(FooNewParamsData{
+        FirstName: githubcomdedaluslabsdedalussdkgo.F("John"),
+    }),
 }
 client.Foo.New(context.Background(), params, option.WithJSONSet("data.last_name", "Doe"))
 ```
