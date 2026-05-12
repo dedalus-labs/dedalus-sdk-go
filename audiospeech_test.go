@@ -27,13 +27,13 @@ func TestAudioSpeechNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	resp, err := client.Audio.Speech.New(context.TODO(), githubcomdedaluslabsdedalussdkgo.AudioSpeechNewParams{
-		Input:          "Hello, how are you today?",
-		Model:          "openai/tts-1",
-		Voice:          githubcomdedaluslabsdedalussdkgo.AudioSpeechNewParamsVoiceAlloy,
-		Instructions:   githubcomdedaluslabsdedalussdkgo.String("instructions"),
-		ResponseFormat: githubcomdedaluslabsdedalussdkgo.AudioSpeechNewParamsResponseFormatMP3,
-		Speed:          githubcomdedaluslabsdedalussdkgo.Float(1),
-		StreamFormat:   githubcomdedaluslabsdedalussdkgo.AudioSpeechNewParamsStreamFormatSse,
+		Input:          githubcomdedaluslabsdedalussdkgo.F("Hello, how are you today?"),
+		Model:          githubcomdedaluslabsdedalussdkgo.F("openai/tts-1"),
+		Voice:          githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.AudioSpeechNewParamsVoiceAlloy),
+		Instructions:   githubcomdedaluslabsdedalussdkgo.F("instructions"),
+		ResponseFormat: githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.AudioSpeechNewParamsResponseFormatMP3),
+		Speed:          githubcomdedaluslabsdedalussdkgo.F(1.000000),
+		StreamFormat:   githubcomdedaluslabsdedalussdkgo.F(githubcomdedaluslabsdedalussdkgo.AudioSpeechNewParamsStreamFormatSse),
 	})
 	if err != nil {
 		var apierr *githubcomdedaluslabsdedalussdkgo.Error

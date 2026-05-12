@@ -1,5 +1,81 @@
 # Changelog
 
+## 0.1.0-alpha.4 (2026-05-12)
+
+Full Changelog: [v0.1.0-alpha.3...v0.1.0-alpha.4](https://github.com/dedalus-labs/dedalus-sdk-go/compare/v0.1.0-alpha.3...v0.1.0-alpha.4)
+
+### Features
+
+* **api:** config update for dedalus-ai/dev ([af41fea](https://github.com/dedalus-labs/dedalus-sdk-go/commit/af41fea3fa08b1c8c0595ae7346c0c525be5ae24))
+* **api:** config update for dedalus-ai/dev ([d240153](https://github.com/dedalus-labs/dedalus-sdk-go/commit/d240153d2233d17c0cd9a1407e4a15b8e2816528))
+* **api:** improve types ([981e302](https://github.com/dedalus-labs/dedalus-sdk-go/commit/981e302628d2adcf5448289b7834746f142c1b26))
+* **api:** mcp server params ([3417509](https://github.com/dedalus-labs/dedalus-sdk-go/commit/34175093b827bf28d333fccc6b46d233a5a375d0))
+* **api:** messages param nullable ([4408331](https://github.com/dedalus-labs/dedalus-sdk-go/commit/4408331c403387ad0b0e944dcc4141e1d5c3eafa))
+* **api:** response format ([87661ed](https://github.com/dedalus-labs/dedalus-sdk-go/commit/87661ede914cd98aeeacb141a533292623beedc6))
+* **api:** schema compiler landed ([77a9162](https://github.com/dedalus-labs/dedalus-sdk-go/commit/77a9162eacfa2f4aedfd3cc9a144c0a85fcac482))
+* **api:** standardize name casing with stainless initialism ([4291ed2](https://github.com/dedalus-labs/dedalus-sdk-go/commit/4291ed2e093ed660295f87992eec81bf5479012f))
+* **go:** add default http client with timeout ([e2cb60c](https://github.com/dedalus-labs/dedalus-sdk-go/commit/e2cb60ce4ce4f1e19694ef34536c30cca24606ee))
+* **internal:** support comma format in multipart form encoding ([f1ccbcd](https://github.com/dedalus-labs/dedalus-sdk-go/commit/f1ccbcde0941d1cec5fed35e0e27619ed340cfdd))
+* support setting headers via env ([ecea45b](https://github.com/dedalus-labs/dedalus-sdk-go/commit/ecea45ba2a1e81331c6e73aeccdbe2041acc7e07))
+
+
+### Bug Fixes
+
+* allow canceling a request while it is waiting to retry ([9d96a90](https://github.com/dedalus-labs/dedalus-sdk-go/commit/9d96a9072c0de669a58f12c85f0dae8e581e95f3))
+* **api:** add thought signature ([3320501](https://github.com/dedalus-labs/dedalus-sdk-go/commit/3320501ff18f520c131398a789e424f6540d185e))
+* **api:** mcp credential types ([294857c](https://github.com/dedalus-labs/dedalus-sdk-go/commit/294857cdd8ece556942094e93f4971a52b914fa9))
+* **client:** retain streaming when user sets request body ([9fe7725](https://github.com/dedalus-labs/dedalus-sdk-go/commit/9fe7725c06cc9181fc749076134694993f7aeced))
+* **docs:** add missing pointer prefix to api.md return types ([d3a6e17](https://github.com/dedalus-labs/dedalus-sdk-go/commit/d3a6e17b120b70fdca7f674a065453e76d574f54))
+* **docs:** fix mcp installation instructions for remote servers ([cd0a3a5](https://github.com/dedalus-labs/dedalus-sdk-go/commit/cd0a3a5db088358b32f9b5952500d3eb1bb34514))
+* fix request delays for retrying to be more respectful of high requested delays ([17472d0](https://github.com/dedalus-labs/dedalus-sdk-go/commit/17472d0a1e3fdf62740355e778ca979772964d51))
+* **go:** avoid panic when http.DefaultTransport is wrapped ([c6fc07a](https://github.com/dedalus-labs/dedalus-sdk-go/commit/c6fc07a3cd4b1f72f606d9e46f8cb1b4b70e6604))
+* **mcp:** correct code tool API endpoint ([10eac06](https://github.com/dedalus-labs/dedalus-sdk-go/commit/10eac06866c6bc23286992a33ed20cd0f5b27cb7))
+* prevent duplicate ? in query params ([9ef429e](https://github.com/dedalus-labs/dedalus-sdk-go/commit/9ef429e1371ccb690032a1dc12aca53137babdb3))
+* rename param to avoid collision ([9dfa024](https://github.com/dedalus-labs/dedalus-sdk-go/commit/9dfa024195bd09e018fc929d28872d3605f9a0a3))
+* skip usage tests that don't work with Prism ([2aab71d](https://github.com/dedalus-labs/dedalus-sdk-go/commit/2aab71d2cc3ed8e7f67bbe9d3400295b0e44514d))
+
+
+### Chores
+
+* **api:** migrate pkg manager to uv ([a3152f2](https://github.com/dedalus-labs/dedalus-sdk-go/commit/a3152f2f36b47e8ddf3a219e67a8516fe34ee384))
+* **api:** point local dev to 4010 port for prism ([7139c3e](https://github.com/dedalus-labs/dedalus-sdk-go/commit/7139c3e82d68d21ad6bd5ddfcf764caa939b87cf))
+* **auth:** add minor auth params ([bd1f962](https://github.com/dedalus-labs/dedalus-sdk-go/commit/bd1f96277a36b71c496d3722a708fc0fa02f1e8d))
+* avoid embedding reflect.Type for dead code elimination ([8561656](https://github.com/dedalus-labs/dedalus-sdk-go/commit/8561656704c4e0bece17675d34b3fed80aec9230))
+* bump gjson version ([aef2b2d](https://github.com/dedalus-labs/dedalus-sdk-go/commit/aef2b2de5b5d9c540c15313b88dc98a6118a2ed0))
+* **ci:** add build step ([4c25346](https://github.com/dedalus-labs/dedalus-sdk-go/commit/4c253460d5ad3e608024f32496d60789bb283dfc))
+* **ci:** skip lint on metadata-only changes ([c22fe80](https://github.com/dedalus-labs/dedalus-sdk-go/commit/c22fe803367f473db3f8e67c5d4551bd76d1b7dc))
+* **ci:** skip uploading artifacts on stainless-internal branches ([24f8258](https://github.com/dedalus-labs/dedalus-sdk-go/commit/24f8258859718371b6c99c48adc9e8c6519cb3cd))
+* **ci:** support opting out of skipping builds on metadata-only commits ([77ef114](https://github.com/dedalus-labs/dedalus-sdk-go/commit/77ef1147bcd0289bb854721a73d2c3b41e6c45f3))
+* **client:** improve example values ([431784a](https://github.com/dedalus-labs/dedalus-sdk-go/commit/431784af35384749c7857c9678321021122407d1))
+* elide duplicate aliases ([45e32df](https://github.com/dedalus-labs/dedalus-sdk-go/commit/45e32df175a4c4c25cc6a443bc7ca7de1946a99f))
+* **internal:** codegen related update ([41e4a20](https://github.com/dedalus-labs/dedalus-sdk-go/commit/41e4a20d82b9da73bf9a1c447dde3f61101aa60e))
+* **internal:** codegen related update ([99a5aae](https://github.com/dedalus-labs/dedalus-sdk-go/commit/99a5aae0ad7f6fd85d5f865094570038ca9eb9dd))
+* **internal:** minor cleanup ([3fad5ac](https://github.com/dedalus-labs/dedalus-sdk-go/commit/3fad5acd924fb0c00ee487cdfd078c7ba59cf8cf))
+* **internal:** more robust bootstrap script ([f567cf6](https://github.com/dedalus-labs/dedalus-sdk-go/commit/f567cf68d1a931e034750c93a08a6c0984d99086))
+* **internal:** move custom custom `json` tags to `api` ([4f81889](https://github.com/dedalus-labs/dedalus-sdk-go/commit/4f81889dbaa0a0ba48cf3b3f01fa05521c2d6f8a))
+* **internal:** remove mock server code ([364d35a](https://github.com/dedalus-labs/dedalus-sdk-go/commit/364d35a9ca8a3762b129916aefe37de3bf7fbcb9))
+* **internal:** tweak CI branches ([ac6b9ae](https://github.com/dedalus-labs/dedalus-sdk-go/commit/ac6b9ae0618564b8ae6f346f14596ab22cd686e4))
+* **internal:** update `actions/checkout` version ([2910bc9](https://github.com/dedalus-labs/dedalus-sdk-go/commit/2910bc950bce9074b63b503ac6f46f81a5e99656))
+* **internal:** update gitignore ([d9a70dc](https://github.com/dedalus-labs/dedalus-sdk-go/commit/d9a70dcfc066bc3a95846c1676b9bdc1828b2a95))
+* **internal:** use different example values for some enums ([52e10c5](https://github.com/dedalus-labs/dedalus-sdk-go/commit/52e10c556e087564958562f209e6e9c2493a1ef8))
+* **internal:** use explicit returns ([ed87ac4](https://github.com/dedalus-labs/dedalus-sdk-go/commit/ed87ac43f3479ca9b62bab4554572eb52b613e4f))
+* **internal:** use explicit returns in more places ([f43448e](https://github.com/dedalus-labs/dedalus-sdk-go/commit/f43448e89ddc8b18e131ac05988be80d335c7591))
+* redact api-key headers in debug logs ([49c93e3](https://github.com/dedalus-labs/dedalus-sdk-go/commit/49c93e33310a416704f7be4babb19f4c09fad739))
+* remove unnecessary error check for url parsing ([aa2a7bb](https://github.com/dedalus-labs/dedalus-sdk-go/commit/aa2a7bbb0d053c50a6c3bc22929187d0f28ce6bb))
+* update mock server docs ([ca456c4](https://github.com/dedalus-labs/dedalus-sdk-go/commit/ca456c4ad68cff2da1c60bfe2c59b8a9f2ce465b))
+* update placeholder string ([654af9e](https://github.com/dedalus-labs/dedalus-sdk-go/commit/654af9e9a5504fbc939f9255113ab42242b038e0))
+
+
+### Documentation
+
+* prominently feature MCP server setup in root SDK readmes ([44a047b](https://github.com/dedalus-labs/dedalus-sdk-go/commit/44a047ba8c96bf7dcb3064ef186e2cbaeb529478))
+
+
+### Refactors
+
+* **api:** types for mcp server serialization ([bee352c](https://github.com/dedalus-labs/dedalus-sdk-go/commit/bee352ca340111af38b261b930631c7e24c7e0c1))
+* **api:** update auth types ([816dff3](https://github.com/dedalus-labs/dedalus-sdk-go/commit/816dff340e9b0fb0481f85da4d26e1ebd439490b))
+
 ## 0.1.0-alpha.3 (2025-11-08)
 
 Full Changelog: [v0.1.0-alpha.2...v0.1.0-alpha.3](https://github.com/dedalus-labs/dedalus-sdk-go/compare/v0.1.0-alpha.2...v0.1.0-alpha.3)

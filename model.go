@@ -13,7 +13,6 @@ import (
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/apijson"
 	"github.com/dedalus-labs/dedalus-sdk-go/internal/requestconfig"
 	"github.com/dedalus-labs/dedalus-sdk-go/option"
-	"github.com/dedalus-labs/dedalus-sdk-go/packages/respjson"
 )
 
 // ModelService contains methods and other services that help with interacting with
@@ -29,8 +28,8 @@ type ModelService struct {
 // NewModelService generates a new service that applies the given options to each
 // request. These options are applied after the parent client's options (if there
 // is one), and before any request-specific options.
-func NewModelService(opts ...option.RequestOption) (r ModelService) {
-	r = ModelService{}
+func NewModelService(opts ...option.RequestOption) (r *ModelService) {
+	r = &ModelService{}
 	r.Options = opts
 	return
 }
@@ -73,11 +72,11 @@ func (r *ModelService) Get(ctx context.Context, modelID string, opts ...option.R
 	opts = slices.Concat(r.Options, opts)
 	if modelID == "" {
 		err = errors.New("missing required model_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("v1/models/%s", modelID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // List available models.
@@ -91,30 +90,33 @@ func (r *ModelService) List(ctx context.Context, opts ...option.RequestOption) (
 	opts = slices.Concat(r.Options, opts)
 	path := "v1/models"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Response for /v1/models endpoint.
 type ListModelsResponse struct {
 	// List of available models
-	Data []Model `json:"data,required"`
+	Data []Model `json:"data" api:"required"`
 	// Response object type
-	//
-	// Any of "list".
 	Object ListModelsResponseObject `json:"object"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Data        respjson.Field
-		Object      respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
+	JSON   listModelsResponseJSON   `json:"-"`
 }
 
-// Returns the unmodified JSON received from the API
-func (r ListModelsResponse) RawJSON() string { return r.JSON.raw }
-func (r *ListModelsResponse) UnmarshalJSON(data []byte) error {
+// listModelsResponseJSON contains the JSON metadata for the struct
+// [ListModelsResponse]
+type listModelsResponseJSON struct {
+	Data        apijson.Field
+	Object      apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *ListModelsResponse) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r listModelsResponseJSON) RawJSON() string {
+	return r.raw
 }
 
 // Response object type
@@ -124,55 +126,64 @@ const (
 	ListModelsResponseObjectList ListModelsResponseObject = "list"
 )
 
+func (r ListModelsResponseObject) IsKnown() bool {
+	switch r {
+	case ListModelsResponseObjectList:
+		return true
+	}
+	return false
+}
+
 // Unified model metadata across all providers.
 //
 // Combines provider-specific schemas into a single, consistent format. Fields that
 // aren't available from a provider are set to None.
 type Model struct {
 	// Unique model identifier with provider prefix (e.g., 'openai/gpt-4')
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// When the model was released (RFC 3339)
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// Provider that hosts this model
-	//
-	// Any of "openai", "anthropic", "google", "xai", "mistral", "groq", "fireworks",
-	// "deepseek".
-	Provider ModelProvider `json:"provider,required"`
+	Provider ModelProvider `json:"provider" api:"required"`
 	// Normalized model capabilities across all providers.
-	Capabilities ModelCapabilities `json:"capabilities,nullable"`
+	Capabilities ModelCapabilities `json:"capabilities" api:"nullable"`
 	// Provider-declared default parameters for model generation.
-	Defaults ModelDefaults `json:"defaults,nullable"`
+	Defaults ModelDefaults `json:"defaults" api:"nullable"`
 	// Model description
-	Description string `json:"description,nullable"`
+	Description string `json:"description" api:"nullable"`
 	// Human-readable model name
-	DisplayName string `json:"display_name,nullable"`
+	DisplayName string `json:"display_name" api:"nullable"`
 	// Provider-specific generation method names (None = not declared)
-	ProviderDeclaredGenerationMethods []string `json:"provider_declared_generation_methods,nullable"`
+	ProviderDeclaredGenerationMethods []string `json:"provider_declared_generation_methods" api:"nullable"`
 	// Raw provider-specific metadata
-	ProviderInfo map[string]any `json:"provider_info,nullable"`
+	ProviderInfo map[string]interface{} `json:"provider_info" api:"nullable"`
 	// Model version identifier
-	Version string `json:"version,nullable"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		ID                                respjson.Field
-		CreatedAt                         respjson.Field
-		Provider                          respjson.Field
-		Capabilities                      respjson.Field
-		Defaults                          respjson.Field
-		Description                       respjson.Field
-		DisplayName                       respjson.Field
-		ProviderDeclaredGenerationMethods respjson.Field
-		ProviderInfo                      respjson.Field
-		Version                           respjson.Field
-		ExtraFields                       map[string]respjson.Field
-		raw                               string
-	} `json:"-"`
+	Version string    `json:"version" api:"nullable"`
+	JSON    modelJSON `json:"-"`
 }
 
-// Returns the unmodified JSON received from the API
-func (r Model) RawJSON() string { return r.JSON.raw }
-func (r *Model) UnmarshalJSON(data []byte) error {
+// modelJSON contains the JSON metadata for the struct [Model]
+type modelJSON struct {
+	ID                                apijson.Field
+	CreatedAt                         apijson.Field
+	Provider                          apijson.Field
+	Capabilities                      apijson.Field
+	Defaults                          apijson.Field
+	Description                       apijson.Field
+	DisplayName                       apijson.Field
+	ProviderDeclaredGenerationMethods apijson.Field
+	ProviderInfo                      apijson.Field
+	Version                           apijson.Field
+	raw                               string
+	ExtraFields                       map[string]apijson.Field
+}
+
+func (r *Model) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r modelJSON) RawJSON() string {
+	return r.raw
 }
 
 // Provider that hosts this model
@@ -189,74 +200,91 @@ const (
 	ModelProviderDeepseek  ModelProvider = "deepseek"
 )
 
+func (r ModelProvider) IsKnown() bool {
+	switch r {
+	case ModelProviderOpenAI, ModelProviderAnthropic, ModelProviderGoogle, ModelProviderXai, ModelProviderMistral, ModelProviderGroq, ModelProviderFireworks, ModelProviderDeepseek:
+		return true
+	}
+	return false
+}
+
 // Normalized model capabilities across all providers.
 type ModelCapabilities struct {
 	// Supports audio processing
-	Audio bool `json:"audio,nullable"`
+	Audio bool `json:"audio" api:"nullable"`
 	// Supports image generation
-	ImageGeneration bool `json:"image_generation,nullable"`
+	ImageGeneration bool `json:"image_generation" api:"nullable"`
 	// Maximum input tokens
-	InputTokenLimit int64 `json:"input_token_limit,nullable"`
+	InputTokenLimit int64 `json:"input_token_limit" api:"nullable"`
 	// Maximum output tokens
-	OutputTokenLimit int64 `json:"output_token_limit,nullable"`
+	OutputTokenLimit int64 `json:"output_token_limit" api:"nullable"`
 	// Supports streaming responses
-	Streaming bool `json:"streaming,nullable"`
+	Streaming bool `json:"streaming" api:"nullable"`
 	// Supports structured JSON output
-	StructuredOutput bool `json:"structured_output,nullable"`
+	StructuredOutput bool `json:"structured_output" api:"nullable"`
 	// Supports text generation
-	Text bool `json:"text,nullable"`
+	Text bool `json:"text" api:"nullable"`
 	// Supports extended thinking/reasoning
-	Thinking bool `json:"thinking,nullable"`
+	Thinking bool `json:"thinking" api:"nullable"`
 	// Supports function/tool calling
-	Tools bool `json:"tools,nullable"`
+	Tools bool `json:"tools" api:"nullable"`
 	// Supports image understanding
-	Vision bool `json:"vision,nullable"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Audio            respjson.Field
-		ImageGeneration  respjson.Field
-		InputTokenLimit  respjson.Field
-		OutputTokenLimit respjson.Field
-		Streaming        respjson.Field
-		StructuredOutput respjson.Field
-		Text             respjson.Field
-		Thinking         respjson.Field
-		Tools            respjson.Field
-		Vision           respjson.Field
-		ExtraFields      map[string]respjson.Field
-		raw              string
-	} `json:"-"`
+	Vision bool                  `json:"vision" api:"nullable"`
+	JSON   modelCapabilitiesJSON `json:"-"`
 }
 
-// Returns the unmodified JSON received from the API
-func (r ModelCapabilities) RawJSON() string { return r.JSON.raw }
-func (r *ModelCapabilities) UnmarshalJSON(data []byte) error {
+// modelCapabilitiesJSON contains the JSON metadata for the struct
+// [ModelCapabilities]
+type modelCapabilitiesJSON struct {
+	Audio            apijson.Field
+	ImageGeneration  apijson.Field
+	InputTokenLimit  apijson.Field
+	OutputTokenLimit apijson.Field
+	Streaming        apijson.Field
+	StructuredOutput apijson.Field
+	Text             apijson.Field
+	Thinking         apijson.Field
+	Tools            apijson.Field
+	Vision           apijson.Field
+	raw              string
+	ExtraFields      map[string]apijson.Field
+}
+
+func (r *ModelCapabilities) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r modelCapabilitiesJSON) RawJSON() string {
+	return r.raw
 }
 
 // Provider-declared default parameters for model generation.
 type ModelDefaults struct {
 	// Default maximum output tokens
-	MaxOutputTokens int64 `json:"max_output_tokens,nullable"`
+	MaxOutputTokens int64 `json:"max_output_tokens" api:"nullable"`
 	// Default temperature setting
-	Temperature float64 `json:"temperature,nullable"`
+	Temperature float64 `json:"temperature" api:"nullable"`
 	// Default top_k setting
-	TopK int64 `json:"top_k,nullable"`
+	TopK int64 `json:"top_k" api:"nullable"`
 	// Default top_p setting
-	TopP float64 `json:"top_p,nullable"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		MaxOutputTokens respjson.Field
-		Temperature     respjson.Field
-		TopK            respjson.Field
-		TopP            respjson.Field
-		ExtraFields     map[string]respjson.Field
-		raw             string
-	} `json:"-"`
+	TopP float64           `json:"top_p" api:"nullable"`
+	JSON modelDefaultsJSON `json:"-"`
 }
 
-// Returns the unmodified JSON received from the API
-func (r ModelDefaults) RawJSON() string { return r.JSON.raw }
-func (r *ModelDefaults) UnmarshalJSON(data []byte) error {
+// modelDefaultsJSON contains the JSON metadata for the struct [ModelDefaults]
+type modelDefaultsJSON struct {
+	MaxOutputTokens apijson.Field
+	Temperature     apijson.Field
+	TopK            apijson.Field
+	TopP            apijson.Field
+	raw             string
+	ExtraFields     map[string]apijson.Field
+}
+
+func (r *ModelDefaults) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r modelDefaultsJSON) RawJSON() string {
+	return r.raw
 }
